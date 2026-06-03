@@ -714,43 +714,46 @@ class _TripsOverviewScreenState extends State<TripsOverviewScreen> {
                   const SizedBox(height: 24),
 
                   // Two Half-Width bottom action cards
-                  Row(
-                    children: [
-                      Expanded(
-                        child: GestureDetector(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    const ActiveDisruptionsScreen(),
-                              ),
-                            );
-                          },
-                          child: _buildQuickActionButton(
-                            icon: Icons.remove_red_eye_outlined,
-                            label: 'View\nDisruptions',
+                  IntrinsicHeight(
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Expanded(
+                          child: GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      const ActiveDisruptionsScreen(),
+                                ),
+                              );
+                            },
+                            child: _buildQuickActionButton(
+                              icon: Icons.remove_red_eye_outlined,
+                              label: 'View\nDisruptions',
+                            ),
                           ),
                         ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: GestureDetector(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const BorderReadyScreen(),
-                              ),
-                            );
-                          },
-                          child: _buildQuickActionButton(
-                            icon: Icons.verified_user_outlined,
-                            label: 'BorderReady™',
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const BorderReadyScreen(),
+                                ),
+                              );
+                            },
+                            child: _buildQuickActionButton(
+                              icon: Icons.verified_user_outlined,
+                              label: 'BorderReady™',
+                            ),
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ],
               ),
@@ -1041,6 +1044,7 @@ class _TripsOverviewScreenState extends State<TripsOverviewScreen> {
         ),
       ),
       child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(
             icon,

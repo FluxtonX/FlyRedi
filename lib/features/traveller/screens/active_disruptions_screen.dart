@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:sky_rightz_360/core/constants/app_colors.dart';
 import '../widgets/traveller_bottom_nav.dart';
 import 'flight_details_screen.dart';
+import 'ai_assistant_screen.dart';
 
 class ActiveDisruptionsScreen extends StatelessWidget {
   const ActiveDisruptionsScreen({super.key});
@@ -371,30 +372,40 @@ class ActiveDisruptionsScreen extends StatelessWidget {
                       ),
                       const SizedBox(width: 12),
                       Expanded(
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(vertical: 12),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.04),
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(
-                              color: Colors.white.withOpacity(0.08),
-                            ),
-                          ),
-                          alignment: Alignment.center,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(Icons.auto_awesome, color: Colors.white.withOpacity(0.8), size: 14),
-                              const SizedBox(width: 6),
-                              const Text(
-                                'Get AI Guidance',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.bold,
-                                ),
+                        child: GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const AiAssistantScreen(),
                               ),
-                            ],
+                            );
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.04),
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: Colors.white.withOpacity(0.08),
+                              ),
+                            ),
+                            alignment: Alignment.center,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.auto_awesome, color: Colors.white.withOpacity(0.8), size: 14),
+                                const SizedBox(width: 6),
+                                const Text(
+                                  'Get AI Guidance',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ),
