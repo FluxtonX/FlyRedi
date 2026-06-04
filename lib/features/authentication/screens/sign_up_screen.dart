@@ -14,7 +14,7 @@ class SignUpScreen extends StatelessWidget {
           children: [
             const SizedBox(height: 40),
             Image.asset(
-              'assets/images/Log.png',
+              'assets/images/flyredilogo.png',
               height: 100,
             ),
             const SizedBox(height: 24),

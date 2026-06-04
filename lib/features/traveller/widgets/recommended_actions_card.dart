@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../screens/flight_details_screen.dart';
 import '../screens/resolve_dashboard_screen.dart';
 import '../screens/ai_assistant_screen.dart';
 import 'demo_state.dart';
@@ -253,37 +252,6 @@ class RecommendedActionsCard extends StatelessWidget {
                   ),
                 ),
               ],
-            ),
-          ),
-          const SizedBox(height: 24),
-          GestureDetector(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const FlightDetailsScreen()),
-              );
-            },
-            child: Container(
-              padding: const EdgeInsets.symmetric(vertical: 18),
-              decoration: BoxDecoration(
-                color: const Color(0xFFFFC229),
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: const Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.arrow_forward, color: Colors.black, size: 20),
-                  SizedBox(width: 12),
-                  Text(
-                    'Start Claim Process',
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ],
-              ),
             ),
           ),
           const SizedBox(height: 16),

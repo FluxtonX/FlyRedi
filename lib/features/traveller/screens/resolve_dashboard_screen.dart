@@ -147,7 +147,7 @@ class _ResolveDashboardScreenState extends State<ResolveDashboardScreen> {
               ),
             ),
           ),
-          bottomNavigationBar: const TravellerBottomNav(activeIndex: 3),
+          bottomNavigationBar: const TravellerBottomNav(activeIndex: 2),
         );
       },
     );

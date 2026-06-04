@@ -4,6 +4,7 @@ import '../screens/expenses_screen.dart';
 import '../screens/trips_overview_screen.dart';
 import '../screens/profile_screen.dart';
 import '../screens/ai_assistant_screen.dart';
+import '../screens/resolve_dashboard_screen.dart';
 
 class TravellerBottomNav extends StatelessWidget {
   final int activeIndex;
@@ -70,19 +71,19 @@ class TravellerBottomNav extends StatelessWidget {
                 isActive: activeIndex == 1,
               ),
             ),
-            // Claims Tab
+            // Resolution Tab
             GestureDetector(
               onTap: () {
                 if (activeIndex != 2) {
                   Navigator.pushReplacement(
                     context,
-                    _createInstantRoute(const ExpensesScreen()),
+                    _createInstantRoute(const ResolveDashboardScreen()),
                   );
                 }
               },
               child: _buildNavItem(
                 icon: Icons.description_outlined,
-                label: 'Claims',
+                label: 'Resolution',
                 isActive: activeIndex == 2,
               ),
             ),

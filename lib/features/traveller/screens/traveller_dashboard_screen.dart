@@ -6,7 +6,6 @@ import '../widgets/add_flight_card.dart';
 import '../widgets/sentinel_monitoring_section.dart';
 import '../widgets/border_ready_section.dart';
 import '../widgets/recommended_actions_card.dart';
-import '../widgets/dashboard_notifications_section.dart';
 import '../widgets/active_issues_section.dart';
 import '../widgets/traveller_bottom_nav.dart';
 
@@ -61,8 +60,7 @@ class TravellerDashboardScreen extends StatelessWidget {
                   const SizedBox(height: 32),
                   const RecommendedActionsCard(),
                   const SizedBox(height: 32),
-                  const DashboardNotificationsSection(),
-                  const SizedBox(height: 32),
+
                   const ActiveIssuesSection(),
                   const SizedBox(height: 24),
                 ],

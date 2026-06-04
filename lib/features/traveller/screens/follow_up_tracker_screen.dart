@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:sky_rightz_360/core/constants/app_colors.dart';
 import '../widgets/traveller_bottom_nav.dart';
+import '../screens/flight_details_screen.dart';
 
 class FollowUpTrackerScreen extends StatelessWidget {
   const FollowUpTrackerScreen({super.key});
@@ -411,6 +412,45 @@ class FollowUpTrackerScreen extends StatelessWidget {
 
                   const SizedBox(height: 32),
 
+                  // Start Claim Process Button
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const FlightDetailsScreen()),
+                      );
+                    },
+                    child: Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(vertical: 18),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFFFC229), // Solid yellow
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: const Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.arrow_forward,
+                            color: Colors.black,
+                            size: 18,
+                          ),
+                          SizedBox(width: 8),
+                          Text(
+                            'Start Claim Process',
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 15,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 16),
+
                   // Back to Home Button
                   GestureDetector(
                     onTap: () {
@@ -420,7 +460,7 @@ class FollowUpTrackerScreen extends StatelessWidget {
                       width: double.infinity,
                       padding: const EdgeInsets.symmetric(vertical: 18),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFFFC229), // Yellow
+                        color: const Color(0xFFFFC229), // Solid yellow
                         borderRadius: BorderRadius.circular(16),
                       ),
                       child: const Row(
@@ -436,7 +476,7 @@ class FollowUpTrackerScreen extends StatelessWidget {
                             'Back to Home',
                             style: TextStyle(
                               color: Colors.black,
-                              fontSize: 14,
+                              fontSize: 15,
                               fontWeight: FontWeight.bold,
                             ),
                           ),

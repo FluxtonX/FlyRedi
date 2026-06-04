@@ -136,40 +136,6 @@ class DashboardNotificationsSection extends StatelessWidget {
                     'Departure delayed from 14:00 to 18:00. Monitor for updates.',
                 rightsDescription: 'Refreshments + ₦30,000 compensation',
               ),
-              const SizedBox(height: 16),
-
-              // BA 075 - Medium - Baggage Delayed
-              const NotificationCard(
-                mainIcon: Icons.info_outline,
-                mainIconColor: Color(0xFF3B82F6),
-                flightCode: 'BA 075',
-                severityText: 'MEDIUM',
-                severityColor: Color(0xFF3B82F6),
-                timeAgo: '1 day ago',
-                airline: 'British Airways',
-                issueIcon: Icons.luggage,
-                issueTitle: 'Baggage Delayed',
-                issueDescription:
-                    'Checked baggage not loaded on your connecting flight.',
-                rightsDescription: 'Emergency supplies reimbursement',
-              ),
-              const SizedBox(height: 16),
-
-              // EK 783 - Low - Gate Change
-              const NotificationCard(
-                mainIcon: Icons.check_circle_outline,
-                mainIconColor: Color(0xFF9CA3AF),
-                flightCode: 'EK 783',
-                severityText: 'LOW',
-                severityColor: Color(0xFF9CA3AF),
-                timeAgo: '3 hours ago',
-                airline: 'Emirates',
-                issueIcon: Icons.meeting_room,
-                issueTitle: 'Gate Change',
-                issueDescription:
-                    'Boarding gate changed from D12 to D18.',
-                rightsDescription: 'Informational only',
-              ),
             ],
           ],
         );
