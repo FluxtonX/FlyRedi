@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../screens/traveller_dashboard_screen.dart';
-import '../screens/expenses_screen.dart';
 import '../screens/trips_overview_screen.dart';
 import '../screens/profile_screen.dart';
 import '../screens/ai_assistant_screen.dart';

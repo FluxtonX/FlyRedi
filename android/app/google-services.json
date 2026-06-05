@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "444137301484",
+    "project_id": "skyright-e686f",
+    "storage_bucket": "skyright-e686f.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:444137301484:android:548abd0bed2bee89e20cc9",
+        "android_client_info": {
+          "package_name": "com.example.sky_rightz_360"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCv03Vs_OPQTInyTh0tS-B1SteKMFFv3Mc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

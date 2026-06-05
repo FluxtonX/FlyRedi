@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../screens/resolution_workflow_screen.dart';
 import '../screens/resolve_dashboard_screen.dart';
 
 class NotificationCard extends StatelessWidget {

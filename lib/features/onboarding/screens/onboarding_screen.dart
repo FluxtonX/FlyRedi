@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../widgets/onboarding_page.dart';
 import '../../traveller/screens/traveller_dashboard_screen.dart';
+import '../repositories/onboarding_repository.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
@@ -11,8 +13,10 @@ class OnboardingScreen extends StatefulWidget {
 
 class _OnboardingScreenState extends State<OnboardingScreen> {
   final PageController _pageController = PageController();
+  final OnboardingRepository _onboardingRepository = OnboardingRepository();
 
   int currentIndex = 0;
+  bool _isCompleting = false;
 
   final List<Map<String, dynamic>> onboardingData = [
     {
@@ -52,6 +56,35 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     },
   ];
 
+  Future<void> _finishOnboarding() async {
+    setState(() {
+      _isCompleting = true;
+    });
+
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      await _onboardingRepository.completeOnboarding(
+        role: 'User',
+        notificationsEnabled: true,
+        displayName: user?.displayName ?? user?.email?.split('@').first,
+      );
+    } catch (e) {
+      debugPrint('Failed to complete onboarding: $e');
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isCompleting = false;
+        });
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const TravellerDashboardScreen(),
+          ),
+        );
+      }
+    }
+  }
+
   void nextPage() {
     if (currentIndex < onboardingData.length - 1) {
       _pageController.nextPage(
@@ -59,12 +92,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         curve: Curves.easeIn,
       );
     } else {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => const TravellerDashboardScreen(),
-        ),
-      );
+      _finishOnboarding();
     }
   }
 
@@ -77,28 +105,55 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: PageView.builder(
-        controller: _pageController,
-        onPageChanged: (index) {
-          setState(() {
-            currentIndex = index;
-          });
-        },
-        itemCount: onboardingData.length,
-        itemBuilder: (context, index) {
-          final item = onboardingData[index];
+      body: Stack(
+        children: [
+          PageView.builder(
+            controller: _pageController,
+            onPageChanged: (index) {
+              setState(() {
+                currentIndex = index;
+              });
+            },
+            itemCount: onboardingData.length,
+            itemBuilder: (context, index) {
+              final item = onboardingData[index];
 
-          return OnboardingPage(
-            icon: item['icon'],
-            title: item['title'],
-            description: item['description'],
-            currentIndex: currentIndex,
-            totalPages: onboardingData.length,
-            isLastPage: currentIndex == onboardingData.length - 1,
-            onNext: nextPage,
-            onSkip: skipToLastPage,
-          );
-        },
+              return OnboardingPage(
+                icon: item['icon'],
+                title: item['title'],
+                description: item['description'],
+                currentIndex: currentIndex,
+                totalPages: onboardingData.length,
+                isLastPage: currentIndex == onboardingData.length - 1,
+                onNext: nextPage,
+                onSkip: skipToLastPage,
+              );
+            },
+          ),
+          if (_isCompleting)
+            Container(
+              color: Colors.black.withOpacity(0.5),
+              child: const Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    CircularProgressIndicator(
+                      valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFFFC229)),
+                    ),
+                    SizedBox(height: 16),
+                    Text(
+                      'Saving your preferences...',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+        ],
       ),
     );
   }

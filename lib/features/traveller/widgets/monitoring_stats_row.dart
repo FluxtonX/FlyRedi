@@ -1,45 +1,48 @@
 import 'package:flutter/material.dart';
-import 'demo_state.dart';
 
 class MonitoringStatsRow extends StatelessWidget {
-  const MonitoringStatsRow({super.key});
+  final int alertsCount;
+  final int casesCount;
+  final String totalSavings;
+
+  const MonitoringStatsRow({
+    super.key,
+    required this.alertsCount,
+    required this.casesCount,
+    required this.totalSavings,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder<bool>(
-      valueListenable: DemoState.isEmptyState,
-      builder: (context, isEmpty, child) {
-        return IntrinsicHeight(
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Expanded(
-                child: _buildStatCard(
-                  isEmpty ? '--' : '2',
-                  'Active\nAlerts',
-                  const Color(0xFFFFC229),
-                ),
-              ),
-              const SizedBox(width: 18),
-              Expanded(
-                child: _buildStatCard(
-                  isEmpty ? '--' : '68%',
-                  'Delay Risk',
-                  Colors.white,
-                ),
-              ),
-              const SizedBox(width: 18),
-              Expanded(
-                child: _buildStatCard(
-                  isEmpty ? '--' : '2',
-                  'Monitored',
-                  const Color(0xFF2DD4BF),
-                ),
-              ),
-            ],
+    return IntrinsicHeight(
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Expanded(
+            child: _buildStatCard(
+              alertsCount.toString(),
+              'Active\nAlerts',
+              const Color(0xFFFFC229),
+            ),
           ),
-        );
-      },
+          const SizedBox(width: 18),
+          Expanded(
+            child: _buildStatCard(
+              casesCount.toString(),
+              'Active\nClaims',
+              Colors.white,
+            ),
+          ),
+          const SizedBox(width: 18),
+          Expanded(
+            child: _buildStatCard(
+              totalSavings,
+              'Total\nSavings',
+              const Color(0xFF2DD4BF),
+            ),
+          ),
+        ],
+      ),
     );
   }
 

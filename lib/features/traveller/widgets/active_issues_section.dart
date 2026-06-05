@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../screens/expenses_screen.dart';
 import '../screens/expense_tracker_screen.dart';
-import '../screens/resolution_workflow_screen.dart';
 import '../screens/resolve_dashboard_screen.dart';
 import '../screens/trips_overview_screen.dart';
 import 'demo_state.dart';
