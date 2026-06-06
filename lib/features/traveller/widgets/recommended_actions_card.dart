@@ -1,19 +1,20 @@
 import 'package:flutter/material.dart';
 import '../screens/resolve_dashboard_screen.dart';
 import '../screens/ai_assistant_screen.dart';
-import 'demo_state.dart';
 
 class RecommendedActionsCard extends StatelessWidget {
-  const RecommendedActionsCard({super.key});
+  final bool isEmpty;
+
+  const RecommendedActionsCard({
+    super.key,
+    this.isEmpty = true,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder<bool>(
-      valueListenable: DemoState.isEmptyState,
-      builder: (context, isEmpty, child) {
-        if (isEmpty) return const SizedBox.shrink();
+    if (isEmpty) return const SizedBox.shrink();
 
-        return Column(
+    return Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             _buildHeader(),
@@ -21,8 +22,6 @@ class RecommendedActionsCard extends StatelessWidget {
             _buildMainCard(context),
           ],
         );
-      },
-    );
   }
 
   Widget _buildHeader() {

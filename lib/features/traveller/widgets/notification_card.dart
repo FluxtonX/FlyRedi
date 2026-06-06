@@ -13,6 +13,7 @@ class NotificationCard extends StatelessWidget {
   final String issueTitle;
   final String issueDescription;
   final String rightsDescription;
+  final VoidCallback? onMarkRead;
 
   const NotificationCard({
     super.key,
@@ -27,6 +28,7 @@ class NotificationCard extends StatelessWidget {
     required this.issueTitle,
     required this.issueDescription,
     required this.rightsDescription,
+    this.onMarkRead,
   });
 
   @override
@@ -201,7 +203,8 @@ class NotificationCard extends StatelessWidget {
                   onTap: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => const ResolveDashboardScreen()),
+                      MaterialPageRoute(
+                          builder: (context) => const ResolveDashboardScreen()),
                     );
                   },
                   child: Container(
@@ -225,22 +228,25 @@ class NotificationCard extends StatelessWidget {
               const SizedBox(width: 12),
               Expanded(
                 flex: 1,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF1E293B),
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(
-                      color: Colors.white.withOpacity(0.1),
+                child: GestureDetector(
+                  onTap: onMarkRead,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF1E293B),
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(
+                        color: Colors.white.withOpacity(0.1),
+                      ),
                     ),
-                  ),
-                  alignment: Alignment.center,
-                  child: const Text(
-                    'Details',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 15,
-                      fontWeight: FontWeight.w600,
+                    alignment: Alignment.center,
+                    child: Text(
+                      onMarkRead != null ? 'Mark Read' : 'Read',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
                 ),

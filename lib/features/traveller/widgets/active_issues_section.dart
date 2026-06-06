@@ -3,17 +3,18 @@ import '../screens/expenses_screen.dart';
 import '../screens/expense_tracker_screen.dart';
 import '../screens/resolve_dashboard_screen.dart';
 import '../screens/trips_overview_screen.dart';
-import 'demo_state.dart';
 
 class ActiveIssuesSection extends StatelessWidget {
-  const ActiveIssuesSection({super.key});
+  final bool isEmpty;
+
+  const ActiveIssuesSection({
+    super.key,
+    this.isEmpty = true,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder<bool>(
-      valueListenable: DemoState.isEmptyState,
-      builder: (context, isEmpty, child) {
-        return Column(
+    return Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             _buildTotalExpensesHeader(context),
@@ -56,8 +57,6 @@ class ActiveIssuesSection extends StatelessWidget {
             _buildActiveClaimsCard(context, isEmpty),
           ],
         );
-      },
-    );
   }
 
   Widget _buildTotalExpensesHeader(BuildContext context) {

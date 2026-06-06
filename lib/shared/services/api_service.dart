@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class ApiService {
@@ -25,4 +26,47 @@ class ApiService {
 
     return response;
   }
+
+  static Future<dynamic> post(String endpoint,
+      {Map<String, dynamic>? body}) async {
+    final response = await http.post(
+      Uri.parse('$baseUrl$endpoint'),
+      headers: await getHeaders(),
+      body: body != null ? jsonEncode(body) : null,
+    );
+
+    return response;
+  }
+
+  static Future<dynamic> patch(String endpoint,
+      {Map<String, dynamic>? body}) async {
+    final response = await http.patch(
+      Uri.parse('$baseUrl$endpoint'),
+      headers: await getHeaders(),
+      body: body != null ? jsonEncode(body) : null,
+    );
+
+    return response;
+  }
+
+  static Future<dynamic> put(String endpoint,
+      {Map<String, dynamic>? body}) async {
+    final response = await http.put(
+      Uri.parse('$baseUrl$endpoint'),
+      headers: await getHeaders(),
+      body: body != null ? jsonEncode(body) : null,
+    );
+
+    return response;
+  }
+
+  static Future<dynamic> delete(String endpoint) async {
+    final response = await http.delete(
+      Uri.parse('$baseUrl$endpoint'),
+      headers: await getHeaders(),
+    );
+
+    return response;
+  }
 }
+

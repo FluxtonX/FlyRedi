@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:sky_rightz_360/core/constants/app_colors.dart';
-import 'package:sky_rightz_360/features/traveller/widgets/demo_state.dart';
 import '../widgets/traveller_bottom_nav.dart';
 import 'add_expense_screen.dart';
 
@@ -9,11 +8,9 @@ class ExpenseTrackerScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder<bool>(
-      valueListenable: DemoState.isEmptyState,
-      builder: (context, isEmpty, child) {
-        return Scaffold(
-          backgroundColor: AppColors.background,
+    bool isEmpty = true;
+    return Scaffold(
+      backgroundColor: AppColors.background,
           appBar: AppBar(
             backgroundColor: Colors.transparent,
             elevation: 0,
@@ -189,10 +186,7 @@ class ExpenseTrackerScreen extends StatelessWidget {
               ],
             ),
           ),
-          bottomNavigationBar: const TravellerBottomNav(activeIndex: 0),
         );
-      },
-    );
   }
 
   Widget _buildExpenseItem({

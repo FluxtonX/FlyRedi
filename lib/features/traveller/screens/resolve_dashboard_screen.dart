@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:sky_rightz_360/core/constants/app_colors.dart';
-import 'package:sky_rightz_360/features/traveller/widgets/demo_state.dart';
 import '../widgets/traveller_bottom_nav.dart';
 import '../widgets/resolve_header_gradient.dart';
 import '../widgets/case_card.dart';
@@ -15,11 +14,9 @@ class ResolveDashboardScreen extends StatefulWidget {
 class _ResolveDashboardScreenState extends State<ResolveDashboardScreen> {
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder<bool>(
-      valueListenable: DemoState.isEmptyState,
-      builder: (context, isEmpty, child) {
-        return Scaffold(
-          backgroundColor: AppColors.background,
+    bool isEmpty = true;
+    return Scaffold(
+      backgroundColor: AppColors.background,
           body: SafeArea(
             bottom: false,
             child: SingleChildScrollView(
@@ -149,7 +146,5 @@ class _ResolveDashboardScreenState extends State<ResolveDashboardScreen> {
           ),
           bottomNavigationBar: const TravellerBottomNav(activeIndex: 2),
         );
-      },
-    );
   }
 }

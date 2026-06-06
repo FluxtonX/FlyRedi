@@ -21,7 +21,7 @@ class SentinelMonitoringSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        const SentinelHeader(),
+        SentinelHeader(isEmpty: alertsCount == 0 && casesCount == 0),
         const SizedBox(height: 24),
         if (hasAlerts) ...[
           const FlightMonitorCard(),

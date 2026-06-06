@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
 import '../screens/border_ready_screen.dart';
-import 'demo_state.dart';
 
 class BorderReadySection extends StatelessWidget {
-  const BorderReadySection({super.key});
+  final bool isEmpty;
+
+  const BorderReadySection({
+    super.key,
+    this.isEmpty = true,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder<bool>(
-      valueListenable: DemoState.isEmptyState,
-      builder: (context, isEmpty, child) {
-        return Column(
+    return Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             _buildHeader(),
@@ -28,8 +29,6 @@ class BorderReadySection extends StatelessWidget {
             ),
           ],
         );
-      },
-    );
   }
 
   Widget _buildHeader() {

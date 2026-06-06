@@ -10,10 +10,13 @@ import '../widgets/active_issues_section.dart';
 import '../widgets/traveller_bottom_nav.dart';
 import '../widgets/dashboard_modules_grid.dart';
 import '../widgets/dashboard_activity_list.dart';
+import '../widgets/dashboard_notifications_section.dart';
 import '../repositories/dashboard_repository.dart';
+import '../repositories/alert_repository.dart';
 import '../models/dashboard_summary.dart';
 import '../models/dashboard_activity.dart';
 import '../models/dashboard_module.dart';
+import '../models/alert_model.dart';
 
 class TravellerDashboardScreen extends StatefulWidget {
   const TravellerDashboardScreen({super.key});
@@ -25,12 +28,14 @@ class TravellerDashboardScreen extends StatefulWidget {
 
 class _TravellerDashboardScreenState extends State<TravellerDashboardScreen> {
   final DashboardRepository _repository = DashboardRepository();
+  final AlertRepository _alertRepository = AlertRepository();
   bool _isLoading = true;
   String? _errorMessage;
 
   DashboardSummary? _summary;
   List<DashboardActivity> _activities = [];
   List<DashboardModule> _modules = [];
+  List<AlertModel> _alerts = [];
 
   @override
   void initState() {
@@ -50,6 +55,7 @@ class _TravellerDashboardScreenState extends State<TravellerDashboardScreen> {
         _repository.getSummary(),
         _repository.getActivities(),
         _repository.getModules(),
+        _alertRepository.fetchAlerts(limit: 5),
       ]);
 
       if (mounted) {
@@ -57,6 +63,7 @@ class _TravellerDashboardScreenState extends State<TravellerDashboardScreen> {
           _summary = results[0] as DashboardSummary;
           _activities = results[1] as List<DashboardActivity>;
           _modules = results[2] as List<DashboardModule>;
+          _alerts = (results[3] as AlertListResponse).alerts;
           _isLoading = false;
         });
       }
@@ -184,7 +191,7 @@ class _TravellerDashboardScreenState extends State<TravellerDashboardScreen> {
             totalSavings: summary.totalSavings,
           ),
           const SizedBox(height: 32),
-          const BorderReadySection(),
+          BorderReadySection(isEmpty: _activities.isEmpty),
           const SizedBox(height: 32),
           if (_modules.isNotEmpty) ...[
             DashboardModulesGrid(modules: _modules),
@@ -194,9 +201,11 @@ class _TravellerDashboardScreenState extends State<TravellerDashboardScreen> {
             DashboardActivityList(activities: _activities),
             const SizedBox(height: 32),
           ],
-          const RecommendedActionsCard(),
+          RecommendedActionsCard(isEmpty: summary.alertsCount == 0 && summary.casesCount == 0),
           const SizedBox(height: 32),
-          const ActiveIssuesSection(),
+          ActiveIssuesSection(isEmpty: summary.alertsCount == 0 && summary.casesCount == 0),
+          const SizedBox(height: 32),
+          DashboardNotificationsSection(alerts: _alerts),
           const SizedBox(height: 24),
         ],
       ),

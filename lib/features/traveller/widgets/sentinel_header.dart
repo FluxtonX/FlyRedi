@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
-import 'demo_state.dart';
 
 class SentinelHeader extends StatelessWidget {
-  const SentinelHeader({super.key});
+  final bool isEmpty;
+
+  const SentinelHeader({
+    super.key,
+    required this.isEmpty,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder<bool>(
-      valueListenable: DemoState.isEmptyState,
-      builder: (context, isEmpty, child) {
         return Row(
           children: [
             Container(
@@ -71,7 +72,5 @@ class SentinelHeader extends StatelessWidget {
             ),
           ],
         );
-      },
-    );
   }
 }
