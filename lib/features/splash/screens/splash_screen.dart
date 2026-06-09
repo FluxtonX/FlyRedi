@@ -4,7 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import '../../authentication/screens/sign_in_screen.dart';
 import '../../onboarding/screens/onboarding_screen.dart';
 import '../../onboarding/repositories/onboarding_repository.dart';
-import '../../traveller/screens/traveller_dashboard_screen.dart';
+import '../../traveller/screens/traveller_tabs_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -46,7 +46,7 @@ class _SplashScreenState extends State<SplashScreen> {
         context,
         MaterialPageRoute(
           builder: (context) => isCompleted
-              ? const TravellerDashboardScreen()
+              ? const TravellerTabsScreen()
               : const OnboardingScreen(),
         ),
       );

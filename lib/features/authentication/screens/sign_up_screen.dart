@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:http/http.dart' as http;
 import '../../../core/widgets/custom_button.dart';
 import '../widgets/auth_textfield.dart';
 import 'sign_in_screen.dart';
@@ -113,10 +112,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
       await userCredential.user?.updateDisplayName(nameController.text.trim());
 
       // Sync new user to backend (creates Firestore profile)
-      final syncResponse = await http.post(
-        Uri.parse('${ApiService.baseUrl}/api/auth/sync'),
-        headers: await ApiService.getHeaders(),
-      );
+      final syncResponse = await ApiService.post('/api/auth/sync');
 
       if (!mounted) return;
 

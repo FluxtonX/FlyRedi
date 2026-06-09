@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../widgets/onboarding_page.dart';
-import '../../traveller/screens/traveller_dashboard_screen.dart';
+import '../widgets/plan_selection_page.dart';
+import '../../traveller/screens/traveller_tabs_screen.dart';
 import '../repositories/onboarding_repository.dart';
 
 class OnboardingScreen extends StatefulWidget {
@@ -17,6 +18,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   int currentIndex = 0;
   bool _isCompleting = false;
+  int get _planPageIndex => onboardingData.length;
+  int get _totalPages => onboardingData.length + 1;
 
   final List<Map<String, dynamic>> onboardingData = [
     {
@@ -78,7 +81,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (context) => const TravellerDashboardScreen(),
+            builder: (context) => const TravellerTabsScreen(),
           ),
         );
       }
@@ -86,7 +89,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   }
 
   void nextPage() {
-    if (currentIndex < onboardingData.length - 1) {
+    if (currentIndex < _planPageIndex) {
       _pageController.nextPage(
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeIn,
@@ -98,7 +101,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   void skipToLastPage() {
     _pageController.jumpToPage(
-      onboardingData.length - 1,
+      _planPageIndex,
     );
   }
 
@@ -114,8 +117,21 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 currentIndex = index;
               });
             },
-            itemCount: onboardingData.length,
+            itemCount: _totalPages,
             itemBuilder: (context, index) {
+              if (index == _planPageIndex) {
+                return PlanSelectionPage(
+                  onBack: () {
+                    _pageController.previousPage(
+                      duration: const Duration(milliseconds: 300),
+                      curve: Curves.easeIn,
+                    );
+                  },
+                  onContinueFree: _finishOnboarding,
+                  onUpgradeToPro: _finishOnboarding,
+                );
+              }
+
               final item = onboardingData[index];
 
               return OnboardingPage(
@@ -123,8 +139,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 title: item['title'],
                 description: item['description'],
                 currentIndex: currentIndex,
-                totalPages: onboardingData.length,
-                isLastPage: currentIndex == onboardingData.length - 1,
+                totalPages: _totalPages,
+                isLastPage: false,
                 onNext: nextPage,
                 onSkip: skipToLastPage,
               );

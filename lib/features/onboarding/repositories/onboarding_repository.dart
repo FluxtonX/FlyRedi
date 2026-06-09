@@ -5,7 +5,8 @@ import '../../../shared/services/api_service.dart';
 class OnboardingRepository {
   Future<bool> getOnboardingStatus() async {
     try {
-      final http.Response response = await ApiService.get('/api/auth/onboarding');
+      final http.Response response =
+          await ApiService.get('/api/auth/onboarding');
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         return data['onboardingCompleted'] == true;
@@ -27,15 +28,13 @@ class OnboardingRepository {
       if (displayName != null) 'displayName': displayName,
     };
 
-    final headers = await ApiService.getHeaders();
-    final response = await http.patch(
-      Uri.parse('${ApiService.baseUrl}/api/auth/onboarding'),
-      headers: headers,
-      body: jsonEncode(body),
-    );
+    final http.Response response =
+        await ApiService.patch('/api/auth/onboarding', body: body);
 
     if (response.statusCode != 200) {
-      throw Exception('Failed to complete onboarding: ${response.statusCode} - ${response.body}');
+      throw Exception(
+        'Failed to complete onboarding: ${response.statusCode} - ${response.body}',
+      );
     }
   }
 }

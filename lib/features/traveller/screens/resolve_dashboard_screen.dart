@@ -5,7 +5,12 @@ import '../widgets/resolve_header_gradient.dart';
 import '../widgets/case_card.dart';
 
 class ResolveDashboardScreen extends StatefulWidget {
-  const ResolveDashboardScreen({super.key});
+  final bool showBottomNav;
+
+  const ResolveDashboardScreen({
+    super.key,
+    this.showBottomNav = true,
+  });
 
   @override
   State<ResolveDashboardScreen> createState() => _ResolveDashboardScreenState();
@@ -144,7 +149,8 @@ class _ResolveDashboardScreenState extends State<ResolveDashboardScreen> {
               ),
             ),
           ),
-          bottomNavigationBar: const TravellerBottomNav(activeIndex: 2),
+          bottomNavigationBar:
+              widget.showBottomNav ? const TravellerBottomNav(activeIndex: 2) : null,
         );
   }
 }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:sky_rightz_360/core/constants/app_colors.dart';
 import '../models/trip_model.dart';
 import '../repositories/trip_repository.dart';
+import '../widgets/skeleton_box.dart';
 import '../widgets/traveller_bottom_nav.dart';
 import 'active_disruptions_screen.dart';
 import 'upcoming_trips_screen.dart';
@@ -10,7 +11,12 @@ import 'border_ready_screen.dart';
 import 'flight_detail_screen.dart';
 
 class TripsOverviewScreen extends StatefulWidget {
-  const TripsOverviewScreen({super.key});
+  final bool showBottomNav;
+
+  const TripsOverviewScreen({
+    super.key,
+    this.showBottomNav = true,
+  });
 
   @override
   State<TripsOverviewScreen> createState() => _TripsOverviewScreenState();
@@ -20,6 +26,7 @@ class _TripsOverviewScreenState extends State<TripsOverviewScreen> {
   final TripRepository _repository = TripRepository();
   List<TripModel> _trips = [];
   bool _isLoading = true;
+  bool _hasLoadedTrips = false;
   String? _errorMessage;
 
   @override
@@ -29,18 +36,35 @@ class _TripsOverviewScreenState extends State<TripsOverviewScreen> {
   }
 
   Future<void> _loadTrips() async {
+    if (!mounted) return;
     setState(() {
-      _isLoading = true;
+      _isLoading = !_hasLoadedTrips;
       _errorMessage = null;
     });
 
     try {
       final trips = await _repository.fetchUserTrips();
+      if (!mounted) return;
       setState(() {
         _trips = trips;
         _isLoading = false;
+        _hasLoadedTrips = true;
       });
     } catch (e) {
+      if (!mounted) return;
+      if (_hasLoadedTrips) {
+        setState(() {
+          _errorMessage = null;
+          _isLoading = false;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Could not refresh trips.'),
+            backgroundColor: Color(0xFFE11D48),
+          ),
+        );
+        return;
+      }
       setState(() {
         _errorMessage = e.toString();
         _isLoading = false;
@@ -125,12 +149,11 @@ class _TripsOverviewScreenState extends State<TripsOverviewScreen> {
   @override
   Widget build(BuildContext context) {
     if (_isLoading) {
-      return const Scaffold(
+      return Scaffold(
         backgroundColor: AppColors.background,
-        body: Center(
-          child: CircularProgressIndicator(color: Color(0xFFFFC229)),
-        ),
-        bottomNavigationBar: TravellerBottomNav(activeIndex: 1),
+        body: _buildTripsSkeleton(),
+        bottomNavigationBar:
+            widget.showBottomNav ? const TravellerBottomNav(activeIndex: 1) : null,
       );
     }
 
@@ -156,7 +179,8 @@ class _TripsOverviewScreenState extends State<TripsOverviewScreen> {
             ],
           ),
         ),
-        bottomNavigationBar: const TravellerBottomNav(activeIndex: 1),
+        bottomNavigationBar:
+            widget.showBottomNav ? const TravellerBottomNav(activeIndex: 1) : null,
       );
     }
 
@@ -478,7 +502,48 @@ class _TripsOverviewScreenState extends State<TripsOverviewScreen> {
           ),
         ),
       ),
-      bottomNavigationBar: const TravellerBottomNav(activeIndex: 1),
+      bottomNavigationBar:
+          widget.showBottomNav ? const TravellerBottomNav(activeIndex: 1) : null,
+    );
+  }
+
+  Widget _buildTripsSkeleton() {
+    return SafeArea(
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: const [
+                SkeletonBox(width: 130, height: 50, radius: 14),
+                SkeletonBox(width: 42, height: 42, radius: 14),
+              ],
+            ),
+            const SizedBox(height: 24),
+            Row(
+              children: const [
+                Expanded(child: SkeletonBox(height: 96, radius: 18)),
+                SizedBox(width: 12),
+                Expanded(child: SkeletonBox(height: 96, radius: 18)),
+                SizedBox(width: 12),
+                Expanded(child: SkeletonBox(height: 96, radius: 18)),
+              ],
+            ),
+            const SizedBox(height: 28),
+            const SkeletonBox(width: 180, height: 24, radius: 12),
+            const SizedBox(height: 14),
+            const SkeletonBox(height: 132, radius: 20),
+            const SizedBox(height: 28),
+            const SkeletonBox(width: 160, height: 24, radius: 12),
+            const SizedBox(height: 14),
+            const SkeletonBox(height: 112, radius: 18),
+            const SizedBox(height: 12),
+            const SkeletonBox(height: 112, radius: 18),
+          ],
+        ),
+      ),
     );
   }
 

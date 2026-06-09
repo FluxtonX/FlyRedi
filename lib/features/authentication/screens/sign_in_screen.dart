@@ -1,13 +1,12 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:http/http.dart' as http;
 import 'reset_password_screen.dart';
 import '../../../core/widgets/custom_button.dart';
 import '../widgets/auth_textfield.dart';
 import 'sign_up_screen.dart';
 import '../../onboarding/screens/onboarding_screen.dart';
-import '../../traveller/screens/traveller_dashboard_screen.dart';
+import '../../traveller/screens/traveller_tabs_screen.dart';
 import '../../../shared/services/api_service.dart';
 
 class SignInScreen extends StatefulWidget {
@@ -100,10 +99,7 @@ class _SignInScreenState extends State<SignInScreen> {
       );
 
       // Sync user with backend and get profile
-      final syncResponse = await http.post(
-        Uri.parse('${ApiService.baseUrl}/api/auth/sync'),
-        headers: await ApiService.getHeaders(),
-      );
+      final syncResponse = await ApiService.post('/api/auth/sync');
 
       if (!mounted) return;
 
@@ -120,7 +116,7 @@ class _SignInScreenState extends State<SignInScreen> {
         context,
         MaterialPageRoute(
           builder: (context) => onboardingCompleted
-              ? const TravellerDashboardScreen()
+              ? const TravellerTabsScreen()
               : const OnboardingScreen(),
         ),
       );

@@ -4,10 +4,12 @@ import '../screens/ai_assistant_screen.dart';
 
 class RecommendedActionsCard extends StatelessWidget {
   final bool isEmpty;
+  final VoidCallback? onUpgrade;
 
   const RecommendedActionsCard({
     super.key,
     this.isEmpty = true,
+    this.onUpgrade,
   });
 
   @override
@@ -227,12 +229,7 @@ class RecommendedActionsCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 16),
                 GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => const ResolveDashboardScreen()),
-                    );
-                  },
+                  onTap: onUpgrade,
                   child: Container(
                     padding: const EdgeInsets.symmetric(vertical: 14),
                     decoration: BoxDecoration(
@@ -240,13 +237,20 @@ class RecommendedActionsCard extends StatelessWidget {
                       borderRadius: BorderRadius.circular(20),
                     ),
                     alignment: Alignment.center,
-                    child: const Text(
-                      'Resolve Now',
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                      ),
+                    child: const Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.arrow_forward, color: Colors.black, size: 18),
+                        SizedBox(width: 10),
+                        Text(
+                          'Upgrade for More Claims',
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),

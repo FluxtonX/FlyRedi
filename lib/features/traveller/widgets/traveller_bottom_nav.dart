@@ -1,16 +1,14 @@
 import 'package:flutter/material.dart';
-import '../screens/traveller_dashboard_screen.dart';
-import '../screens/trips_overview_screen.dart';
-import '../screens/profile_screen.dart';
-import '../screens/ai_assistant_screen.dart';
-import '../screens/resolve_dashboard_screen.dart';
+import '../screens/traveller_tabs_screen.dart';
 
 class TravellerBottomNav extends StatelessWidget {
   final int activeIndex;
+  final ValueChanged<int>? onTabSelected;
 
   const TravellerBottomNav({
     super.key,
     this.activeIndex = 0,
+    this.onTabSelected,
   });
 
   Route _createInstantRoute(Widget screen) {
@@ -18,6 +16,21 @@ class TravellerBottomNav extends StatelessWidget {
       pageBuilder: (context, animation, secondaryAnimation) => screen,
       transitionDuration: Duration.zero,
       reverseTransitionDuration: Duration.zero,
+    );
+  }
+
+  void _selectTab(BuildContext context, int index) {
+    if (activeIndex == index) return;
+
+    if (onTabSelected != null) {
+      onTabSelected!(index);
+      return;
+    }
+
+    Navigator.pushAndRemoveUntil(
+      context,
+      _createInstantRoute(TravellerTabsScreen(initialIndex: index)),
+      (route) => false,
     );
   }
 
@@ -38,16 +51,7 @@ class TravellerBottomNav extends StatelessWidget {
           children: [
             // Home Tab
             GestureDetector(
-              onTap: () {
-                if (activeIndex != 0) {
-                  // Push dashboard screen replacement to keep stack clean and transition instantly
-                  Navigator.pushAndRemoveUntil(
-                    context,
-                    _createInstantRoute(const TravellerDashboardScreen()),
-                    (route) => false,
-                  );
-                }
-              },
+              onTap: () => _selectTab(context, 0),
               child: _buildNavItem(
                 icon: Icons.home_outlined,
                 label: 'Home',
@@ -56,14 +60,7 @@ class TravellerBottomNav extends StatelessWidget {
             ),
             // Trips Tab
             GestureDetector(
-              onTap: () {
-                if (activeIndex != 1) {
-                  Navigator.pushReplacement(
-                    context,
-                    _createInstantRoute(const TripsOverviewScreen()),
-                  );
-                }
-              },
+              onTap: () => _selectTab(context, 1),
               child: _buildNavItem(
                 icon: Icons.flight_outlined,
                 label: 'Trips',
@@ -72,14 +69,7 @@ class TravellerBottomNav extends StatelessWidget {
             ),
             // Resolution Tab
             GestureDetector(
-              onTap: () {
-                if (activeIndex != 2) {
-                  Navigator.pushReplacement(
-                    context,
-                    _createInstantRoute(const ResolveDashboardScreen()),
-                  );
-                }
-              },
+              onTap: () => _selectTab(context, 2),
               child: _buildNavItem(
                 icon: Icons.description_outlined,
                 label: 'Resolution',
@@ -88,14 +78,7 @@ class TravellerBottomNav extends StatelessWidget {
             ),
             // Assistant Tab
             GestureDetector(
-              onTap: () {
-                if (activeIndex != 3) {
-                  Navigator.pushReplacement(
-                    context,
-                    _createInstantRoute(const AiAssistantScreen()),
-                  );
-                }
-              },
+              onTap: () => _selectTab(context, 3),
               child: _buildNavItem(
                 icon: Icons.auto_awesome_outlined,
                 label: 'Assistant',
@@ -104,14 +87,7 @@ class TravellerBottomNav extends StatelessWidget {
             ),
             // Profile Tab
             GestureDetector(
-              onTap: () {
-                if (activeIndex != 4) {
-                  Navigator.pushReplacement(
-                    context,
-                    _createInstantRoute(const ProfileScreen()),
-                  );
-                }
-              },
+              onTap: () => _selectTab(context, 4),
               child: _buildNavItem(
                 icon: Icons.person_outline,
                 label: 'Profile',

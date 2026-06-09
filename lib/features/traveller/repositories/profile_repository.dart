@@ -18,25 +18,24 @@ class ProfileRepository {
     String? displayName,
     String? phoneNumber,
   }) async {
-    final headers = await ApiService.getHeaders();
     final body = <String, dynamic>{};
     if (displayName != null) body['displayName'] = displayName;
     if (phoneNumber != null) body['phoneNumber'] = phoneNumber;
 
-    final response = await http.put(
-      Uri.parse('${ApiService.baseUrl}/api/auth/profile'),
-      headers: headers,
-      body: jsonEncode(body),
-    );
+    final http.Response response =
+        await ApiService.put('/api/auth/profile', body: body);
     if (response.statusCode == 200) {
       return UserProfile.fromJson(jsonDecode(response.body));
     }
-    throw Exception('Failed to update profile: ${response.statusCode} - ${response.body}');
+    throw Exception(
+      'Failed to update profile: ${response.statusCode} - ${response.body}',
+    );
   }
 
   // GET /api/auth/profile/stats
   Future<ProfileStats> getStats() async {
-    final http.Response response = await ApiService.get('/api/auth/profile/stats');
+    final http.Response response =
+        await ApiService.get('/api/auth/profile/stats');
     if (response.statusCode == 200) {
       return ProfileStats.fromJson(jsonDecode(response.body));
     }
@@ -45,11 +44,9 @@ class ProfileRepository {
 
   // PATCH /api/auth/profile/notifications
   Future<void> updateNotifications({required bool enabled}) async {
-    final headers = await ApiService.getHeaders();
-    final response = await http.patch(
-      Uri.parse('${ApiService.baseUrl}/api/auth/profile/notifications'),
-      headers: headers,
-      body: jsonEncode({'notificationsEnabled': enabled}),
+    final http.Response response = await ApiService.patch(
+      '/api/auth/profile/notifications',
+      body: {'notificationsEnabled': enabled},
     );
     if (response.statusCode != 200) {
       throw Exception('Failed to update notifications: ${response.statusCode}');
@@ -58,11 +55,9 @@ class ProfileRepository {
 
   // PATCH /api/auth/profile/settings
   Future<void> updateSettings(Map<String, dynamic> settings) async {
-    final headers = await ApiService.getHeaders();
-    final response = await http.patch(
-      Uri.parse('${ApiService.baseUrl}/api/auth/profile/settings'),
-      headers: headers,
-      body: jsonEncode({'settings': settings}),
+    final http.Response response = await ApiService.patch(
+      '/api/auth/profile/settings',
+      body: {'settings': settings},
     );
     if (response.statusCode != 200) {
       throw Exception('Failed to update settings: ${response.statusCode}');
@@ -71,11 +66,7 @@ class ProfileRepository {
 
   // DELETE /api/auth/account
   Future<void> deleteAccount() async {
-    final headers = await ApiService.getHeaders();
-    final response = await http.delete(
-      Uri.parse('${ApiService.baseUrl}/api/auth/account'),
-      headers: headers,
-    );
+    final http.Response response = await ApiService.delete('/api/auth/account');
     if (response.statusCode != 200) {
       throw Exception('Failed to delete account: ${response.statusCode}');
     }

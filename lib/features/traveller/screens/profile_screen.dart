@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:sky_rightz_360/core/constants/app_colors.dart';
+import '../widgets/skeleton_box.dart';
 import '../widgets/traveller_bottom_nav.dart';
 import '../models/user_profile.dart';
 import '../repositories/profile_repository.dart';
@@ -11,7 +12,12 @@ import 'border_ready_screen.dart';
 import 'flight_detail_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
-  const ProfileScreen({super.key});
+  final bool showBottomNav;
+
+  const ProfileScreen({
+    super.key,
+    this.showBottomNav = true,
+  });
 
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
@@ -21,6 +27,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   final ProfileRepository _repository = ProfileRepository();
 
   bool _isLoading = true;
+  bool _hasLoadedProfile = false;
   String? _errorMessage;
 
   UserProfile? _profile;
@@ -37,7 +44,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Future<void> _loadProfileData() async {
     if (!mounted) return;
     setState(() {
-      _isLoading = true;
+      _isLoading = !_hasLoadedProfile;
       _errorMessage = null;
     });
     try {
@@ -50,10 +57,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
           _profile = results[0] as UserProfile;
           _stats = results[1] as ProfileStats;
           _isLoading = false;
+          _hasLoadedProfile = true;
         });
       }
     } catch (e) {
       if (mounted) {
+        if (_hasLoadedProfile) {
+          setState(() {
+            _errorMessage = null;
+            _isLoading = false;
+          });
+          _showSnackBar('Could not refresh profile.', isError: true);
+          return;
+        }
         setState(() {
           _errorMessage = e.toString().replaceAll('Exception: ', '');
           _isLoading = false;
@@ -360,26 +376,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ],
       ),
       body: _buildBody(),
-      bottomNavigationBar: const TravellerBottomNav(activeIndex: 4),
+      bottomNavigationBar:
+          widget.showBottomNav ? const TravellerBottomNav(activeIndex: 4) : null,
     );
   }
 
   Widget _buildBody() {
     if (_isLoading) {
-      return const Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            CircularProgressIndicator(
-              valueColor:
-                  AlwaysStoppedAnimation<Color>(Color(0xFFFFC229)),
-            ),
-            SizedBox(height: 16),
-            Text('Loading profile...',
-                style: TextStyle(color: Colors.white70, fontSize: 16)),
-          ],
-        ),
-      );
+      return _buildProfileSkeleton();
     }
 
     if (_errorMessage != null) {
@@ -724,6 +728,71 @@ class _ProfileScreenState extends State<ProfileScreen> {
             const SizedBox(height: 16),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildProfileSkeleton() {
+    return SingleChildScrollView(
+      physics: const AlwaysScrollableScrollPhysics(),
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Container(
+            padding: const EdgeInsets.symmetric(vertical: 28, horizontal: 16),
+            decoration: BoxDecoration(
+              color: const Color(0xFF0C162A),
+              borderRadius: BorderRadius.circular(24),
+              border: Border.all(color: Colors.white.withOpacity(0.06)),
+            ),
+            child: Column(
+              children: const [
+                SkeletonBox(width: 80, height: 80, radius: 40),
+                SizedBox(height: 16),
+                SkeletonBox(width: 160, height: 22, radius: 12),
+                SizedBox(height: 8),
+                SkeletonBox(width: 210, height: 16, radius: 10),
+                SizedBox(height: 16),
+                SkeletonBox(width: 100, height: 30, radius: 20),
+              ],
+            ),
+          ),
+          const SizedBox(height: 20),
+          Row(
+            children: const [
+              Expanded(child: SkeletonBox(height: 100, radius: 20)),
+              SizedBox(width: 10),
+              Expanded(child: SkeletonBox(height: 100, radius: 20)),
+              SizedBox(width: 10),
+              Expanded(child: SkeletonBox(height: 100, radius: 20)),
+            ],
+          ),
+          const SizedBox(height: 28),
+          const SkeletonBox(width: 120, height: 18, radius: 10),
+          const SizedBox(height: 14),
+          Row(
+            children: const [
+              Expanded(child: SkeletonBox(height: 104, radius: 18)),
+              SizedBox(width: 12),
+              Expanded(child: SkeletonBox(height: 104, radius: 18)),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: const [
+              Expanded(child: SkeletonBox(height: 104, radius: 18)),
+              SizedBox(width: 12),
+              Expanded(child: SkeletonBox(height: 104, radius: 18)),
+            ],
+          ),
+          const SizedBox(height: 28),
+          const SkeletonBox(width: 110, height: 18, radius: 10),
+          const SizedBox(height: 14),
+          const SkeletonBox(height: 62, radius: 16),
+          const SizedBox(height: 14),
+          const SkeletonBox(height: 62, radius: 16),
+        ],
       ),
     );
   }

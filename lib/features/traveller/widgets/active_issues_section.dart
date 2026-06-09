@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../screens/expenses_screen.dart';
 import '../screens/expense_tracker_screen.dart';
+import '../screens/pro_benefits_screen.dart';
 import '../screens/resolve_dashboard_screen.dart';
 import '../screens/trips_overview_screen.dart';
 
@@ -55,6 +56,8 @@ class ActiveIssuesSection extends StatelessWidget {
             _buildActiveClaimsHeader(context),
             const SizedBox(height: 20),
             _buildActiveClaimsCard(context, isEmpty),
+            const SizedBox(height: 24),
+            _buildUpgradeCard(context),
           ],
         );
   }
@@ -299,7 +302,7 @@ class ActiveIssuesSection extends StatelessWidget {
             );
           },
           child: const Text(
-            'View all',
+            '1/1 used',
             style: TextStyle(
               color: Color(0xFFFFC229),
               fontSize: 15,
@@ -386,6 +389,91 @@ class ActiveIssuesSection extends StatelessWidget {
                   ),
                 ],
               ),
+      ),
+    );
+  }
+
+  Widget _buildUpgradeCard(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const ProBenefitsScreen()),
+        );
+      },
+      child: Container(
+        padding: const EdgeInsets.all(22),
+        decoration: BoxDecoration(
+          color: const Color(0xFF101B30),
+          borderRadius: BorderRadius.circular(22),
+          border: Border.all(color: const Color(0xFFFFC229)),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const Row(
+              children: [
+                Icon(
+                  Icons.workspace_premium_outlined,
+                  color: Color(0xFFFFC229),
+                  size: 30,
+                ),
+                SizedBox(width: 14),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Upgrade to Pro',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      SizedBox(height: 5),
+                      Text(
+                        'Unlimited everything for \$9/month',
+                        style: TextStyle(
+                          color: Colors.white54,
+                          fontSize: 13,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 18),
+            Container(
+              height: 56,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: const Color(0xFFFFC943),
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: const Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.workspace_premium_outlined,
+                    color: Colors.black,
+                    size: 18,
+                  ),
+                  SizedBox(width: 10),
+                  Text(
+                    'See All Pro Benefits',
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

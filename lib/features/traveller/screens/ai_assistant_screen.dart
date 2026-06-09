@@ -4,7 +4,12 @@ import '../widgets/traveller_bottom_nav.dart';
 import 'resolve_dashboard_screen.dart';
 
 class AiAssistantScreen extends StatefulWidget {
-  const AiAssistantScreen({super.key});
+  final bool showBottomNav;
+
+  const AiAssistantScreen({
+    super.key,
+    this.showBottomNav = true,
+  });
 
   @override
   State<AiAssistantScreen> createState() => _AiAssistantScreenState();
@@ -385,7 +390,8 @@ class _AiAssistantScreenState extends State<AiAssistantScreen> {
           ),
         ],
       ),
-      bottomNavigationBar: const TravellerBottomNav(activeIndex: 3),
+      bottomNavigationBar:
+          widget.showBottomNav ? const TravellerBottomNav(activeIndex: 3) : null,
     );
   }
 

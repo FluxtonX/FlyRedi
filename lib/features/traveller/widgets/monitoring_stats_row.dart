@@ -28,17 +28,17 @@ class MonitoringStatsRow extends StatelessWidget {
           const SizedBox(width: 18),
           Expanded(
             child: _buildStatCard(
-              casesCount.toString(),
-              'Active\nClaims',
-              Colors.white,
+              totalSavings,
+              'Total\nSavings',
+              const Color(0xFF2DD4BF),
             ),
           ),
           const SizedBox(width: 18),
           Expanded(
             child: _buildStatCard(
-              totalSavings,
-              'Total\nSavings',
-              const Color(0xFF2DD4BF),
+              casesCount.toString(),
+              'Active\nClaims',
+              Colors.white,
             ),
           ),
         ],
