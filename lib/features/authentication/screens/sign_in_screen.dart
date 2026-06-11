@@ -188,7 +188,7 @@ class _SignInScreenState extends State<SignInScreen> {
                 ),
                 const SizedBox(height: 10),
                 const Text(
-                  'Sign in to your SkyRightz360 account',
+                  'Sign in to your FlyRedi account',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: Colors.white70,

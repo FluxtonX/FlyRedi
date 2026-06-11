@@ -5,11 +5,13 @@ import '../constants/app_colors.dart';
 class CustomButton extends StatelessWidget {
   final String title;
   final VoidCallback onTap;
+  final bool isLoading;
 
   const CustomButton({
     super.key,
     required this.title,
     required this.onTap,
+    this.isLoading = false,
   });
 
   @override
@@ -26,13 +28,22 @@ class CustomButton extends StatelessWidget {
             borderRadius: BorderRadius.circular(14),
           ),
         ),
-        child: Text(
-          title,
-          style: const TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
+        child: isLoading
+            ? const SizedBox(
+                width: 22,
+                height: 22,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2.4,
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.black),
+                ),
+              )
+            : Text(
+                title,
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
       ),
     );
   }

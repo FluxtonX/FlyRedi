@@ -1,5 +1,6 @@
-import 'dart:async';
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import '../../../shared/services/api_service.dart';
 import '../widgets/traveller_bottom_nav.dart';
 import 'resolve_dashboard_screen.dart';
 
@@ -66,14 +67,53 @@ class _AiAssistantScreenState extends State<AiAssistantScreen> {
     });
   }
 
-  void _handleSubmitted(String text) {
-    if (text.trim().isEmpty) return;
+  List<Map<String, String>> _buildChatHistory() {
+    return _messages
+        .skip(1)
+        .where((message) => message.text.trim().isNotEmpty)
+        .map((message) => {
+              'role': message.isUser ? 'user' : 'assistant',
+              'text': message.text,
+            })
+        .toList();
+  }
+
+  Future<String> _sendAssistantMessage(
+    String text,
+    List<Map<String, String>> history,
+  ) async {
+    final response = await ApiService.post(
+      '/api/assistant/chat',
+      body: {
+        'message': text,
+        'history': history,
+      },
+    );
+
+    final decoded = jsonDecode(response.body);
+
+    if (response.statusCode >= 200 && response.statusCode < 300) {
+      final reply = decoded is Map<String, dynamic> ? decoded['reply'] : null;
+      if (reply is String && reply.trim().isNotEmpty) {
+        return reply.trim();
+      }
+      throw Exception('Assistant returned an empty reply.');
+    }
+
+    final message = decoded is Map<String, dynamic> ? decoded['message'] : null;
+    throw Exception(message is String ? message : 'Assistant request failed.');
+  }
+
+  Future<void> _handleSubmitted(String text) async {
+    final cleanText = text.trim();
+    if (cleanText.isEmpty || _isTyping) return;
+    final history = _buildChatHistory();
     _textController.clear();
 
     setState(() {
       _messages.add(
         ChatMessage(
-          text: text,
+          text: cleanText,
           isUser: true,
           timestamp: DateTime.now(),
         ),
@@ -83,36 +123,9 @@ class _AiAssistantScreenState extends State<AiAssistantScreen> {
     });
     _scrollToBottom();
 
-    // Simulated response logic
-    Timer(const Duration(milliseconds: 1500), () {
-      String response = "I have received your request. Let me check flight guidelines and regulatory databases to give you the most accurate assistance.";
-      
-      final cleanText = text.toLowerCase();
-      if (cleanText.contains('compensation') || cleanText.contains('what compensation')) {
-        response = 'Under air passenger rights regulations (such as EU261 or NCAA), you can get compensation for flight disruptions depending on the length of delay, flight distance, or cancellation notice:\n\n'
-            '• **Delays over 3 hours:** up to **\$600 (€600)** depending on distance.\n'
-            '• **Cancellations:** up to **\$600** if notified less than 14 days before departure.\n'
-            '• **Overbooking / Denied Boarding:** Immediate compensation up to **\$600**.\n\n'
-            'Let me know your flight number to check your specific eligibility!';
-      } else if (cleanText.contains('delayed') || cleanText.contains('flight is delayed')) {
-        response = 'If your flight is delayed, please follow these key steps:\n\n'
-            '1. **Keep your boarding pass** and any travel documents.\n'
-            '2. **Ask the airline** for the official reason for the delay.\n'
-            '3. **Request food & drink vouchers** if the delay is over 2 hours.\n'
-            '4. **Keep all receipts** if you incur out-of-pocket expenses (meals, hotels, transport).\n'
-            '5. **Check your claim eligibility** using our automated assistant workflow!';
-      } else if (cleanText.contains('cancellation') || cleanText.contains('claim for cancellation')) {
-        response = 'Yes! You can claim compensation for cancelled flights if:\n\n'
-            '• The airline notified you of the cancellation **less than 14 days** before the scheduled departure date.\n'
-            '• The cancellation was **within the airline\'s control** (not due to extraordinary circumstances like extreme weather or air traffic control strikes).\n\n'
-            'Additionally, the airline must offer you a choice between a full refund or an alternative flight to your destination.';
-      } else if (cleanText.contains('how long') || cleanText.contains('processing take')) {
-        response = 'Claim processing times vary by airline and case complexity:\n\n'
-            '• **Straightforward claims:** Usually take **3 to 8 weeks**.\n'
-            '• **Complex cases** (requiring regulatory intervention or legal steps): Can take **3 to 6 months**.\n\n'
-            'We track and follow up on your claim in real-time. You can view your active claims anytime under the \'Claims\' tab!';
-      }
-
+    try {
+      final response = await _sendAssistantMessage(cleanText, history);
+      if (!mounted) return;
       setState(() {
         _isTyping = false;
         _messages.add(
@@ -124,7 +137,20 @@ class _AiAssistantScreenState extends State<AiAssistantScreen> {
         );
       });
       _scrollToBottom();
-    });
+    } catch (error) {
+      if (!mounted) return;
+      setState(() {
+        _isTyping = false;
+        _messages.add(
+          ChatMessage(
+            text: 'Sorry, I could not reach the AI assistant right now. Please check your connection and try again.',
+            isUser: false,
+            timestamp: DateTime.now(),
+          ),
+        );
+      });
+      _scrollToBottom();
+    }
   }
 
   void _resetChat() {
@@ -364,7 +390,7 @@ class _AiAssistantScreenState extends State<AiAssistantScreen> {
                           contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 14),
                           border: InputBorder.none,
                         ),
-                        onSubmitted: _handleSubmitted,
+                        onSubmitted: (value) => _handleSubmitted(value),
                       ),
                     ),
                   ),

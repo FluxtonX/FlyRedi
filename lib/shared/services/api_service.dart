@@ -1,9 +1,13 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:convert';
+
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 
 class ApiService {
-  static const String baseUrl = 'http://10.0.2.2:3000';
+  static const String baseUrl = kReleaseMode
+      ? 'https://skyright-backend.onrender.com'
+      : 'http://10.0.2.2:3000';
 
   static Future<String> getToken() async {
     final user = FirebaseAuth.instance.currentUser;

@@ -18,6 +18,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final nameController = TextEditingController();
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
+  final nameFocusNode = FocusNode();
+  final emailFocusNode = FocusNode();
+  final passwordFocusNode = FocusNode();
 
   bool isLoading = false;
 
@@ -34,7 +37,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
     final name = nameController.text.trim();
     final email = emailController.text.trim();
-    final password = passwordController.text.trim();
+    final password = passwordController.text;
 
     if (name.isEmpty) {
       nameErr = 'Full name is required.';
@@ -50,8 +53,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
     if (password.isEmpty) {
       passErr = 'Password is required.';
-    } else if (password.length < 6) {
-      passErr = 'Password must be at least 6 characters.';
+    } else if (password.length < 8) {
+      passErr = 'Password must be at least 8 characters.';
+    } else if (!RegExp(r'^(?=.*[A-Za-z])(?=.*\d).+$').hasMatch(password)) {
+      passErr = 'Password must include letters and numbers.';
     }
 
     setState(() {
@@ -97,6 +102,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
   // ─── Sign Up Logic ─────────────────────────────────────────────────────────
 
   Future<void> signUpUser() async {
+    if (isLoading) return;
+
+    FocusScope.of(context).unfocus();
     if (!_validateInputs()) return;
 
     setState(() => isLoading = true);
@@ -105,7 +113,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
       final userCredential =
           await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: emailController.text.trim(),
-        password: passwordController.text.trim(),
+        password: passwordController.text,
       );
 
       // Set displayName immediately after sign-up
@@ -155,7 +163,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
       case 'invalid-email':
         return 'The email address is badly formatted.';
       case 'weak-password':
-        return 'Password is too weak. Use at least 6 characters.';
+        return 'Password is too weak. Use at least 8 characters with letters and numbers.';
       case 'network-request-failed':
         return 'No internet connection. Please check your network.';
       default:
@@ -165,6 +173,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   @override
   void dispose() {
+    nameFocusNode.dispose();
+    emailFocusNode.dispose();
+    passwordFocusNode.dispose();
     nameController.dispose();
     emailController.dispose();
     passwordController.dispose();
@@ -179,8 +190,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
       backgroundColor: const Color(0xFF071B3A),
       body: SafeArea(
         child: SingleChildScrollView(
+          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24),
+            padding: EdgeInsets.fromLTRB(
+              24,
+              0,
+              24,
+              MediaQuery.viewInsetsOf(context).bottom + 24,
+            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
@@ -203,7 +220,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 ),
                 const SizedBox(height: 8),
                 const Text(
-                  'Get started with SkyRightz360',
+                  'Get started with FlyRedi',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: Colors.white70,
@@ -215,8 +232,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 // Full Name field
                 AuthTextField(
                   controller: nameController,
+                  focusNode: nameFocusNode,
                   label: 'Full Name',
                   hint: 'Enter your full name',
+                  keyboardType: TextInputType.name,
+                  textInputAction: TextInputAction.next,
+                  autofillHints: const [AutofillHints.name],
+                  textCapitalization: TextCapitalization.words,
+                  onSubmitted: (_) => emailFocusNode.requestFocus(),
                 ),
                 if (_nameError != null) ...[
                   const SizedBox(height: 6),
@@ -227,8 +250,15 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 // Email field
                 AuthTextField(
                   controller: emailController,
+                  focusNode: emailFocusNode,
                   label: 'Email',
                   hint: 'Enter your email',
+                  keyboardType: TextInputType.emailAddress,
+                  textInputAction: TextInputAction.next,
+                  autofillHints: const [AutofillHints.email],
+                  autocorrect: false,
+                  enableSuggestions: false,
+                  onSubmitted: (_) => passwordFocusNode.requestFocus(),
                 ),
                 if (_emailError != null) ...[
                   const SizedBox(height: 6),
@@ -239,9 +269,18 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 // Password field
                 AuthTextField(
                   controller: passwordController,
+                  focusNode: passwordFocusNode,
                   label: 'Password',
-                  hint: 'Create your password (min. 6 characters)',
+                  hint: 'Create your password (min. 8 characters)',
                   obscureText: true,
+                  keyboardType: TextInputType.visiblePassword,
+                  textInputAction: TextInputAction.done,
+                  autofillHints: const [AutofillHints.newPassword],
+                  autocorrect: false,
+                  enableSuggestions: false,
+                  onSubmitted: (_) {
+                    if (!isLoading) signUpUser();
+                  },
                 ),
                 if (_passwordError != null) ...[
                   const SizedBox(height: 6),
@@ -251,8 +290,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
                 // Create Account button
                 CustomButton(
-                  title: isLoading ? 'Creating Account...' : 'Create Account',
+                  title: 'Create Account',
                   onTap: isLoading ? () {} : signUpUser,
+                  isLoading: isLoading,
                 ),
                 const SizedBox(height: 24),
 
@@ -297,14 +337,20 @@ class _SignUpScreenState extends State<SignUpScreen> {
       padding: const EdgeInsets.only(left: 4),
       child: Row(
         children: [
-          const Icon(Icons.info_outline_rounded, size: 14, color: Color(0xFFE11D48)),
+          const Icon(
+            Icons.info_outline_rounded,
+            size: 14,
+            color: Color(0xFFE11D48),
+          ),
           const SizedBox(width: 6),
-          Text(
-            message,
-            style: const TextStyle(
-              color: Color(0xFFE11D48),
-              fontSize: 12,
-              fontWeight: FontWeight.w500,
+          Expanded(
+            child: Text(
+              message,
+              style: const TextStyle(
+                color: Color(0xFFE11D48),
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+              ),
             ),
           ),
         ],
