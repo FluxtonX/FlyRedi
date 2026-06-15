@@ -10,6 +10,8 @@ import 'trips_overview_screen.dart';
 import 'resolve_dashboard_screen.dart';
 import 'border_ready_screen.dart';
 import 'flight_detail_screen.dart';
+import 'privacy_security_screen.dart';
+import 'help_support_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   final bool showBottomNav;
@@ -707,11 +709,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
             _buildSettingsItem(
               icon: Icons.lock_outline,
               title: 'Privacy & Security',
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const PrivacySecurityScreen(),
+                ),
+              ),
             ),
             const SizedBox(height: 10),
             _buildSettingsItem(
               icon: Icons.help_outline,
               title: 'Help & Support',
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const HelpSupportScreen(),
+                ),
+              ),
             ),
 
             const SizedBox(height: 24),

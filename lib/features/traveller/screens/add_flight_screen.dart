@@ -38,6 +38,10 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
     super.dispose();
   }
 
+  String _normalizeFlightNumber(String value) {
+    return value.trim().toUpperCase().replaceAll(RegExp(r'\s+'), '');
+  }
+
   void _simulateUpload() {
     setState(() {
       _isUploading = true;
@@ -373,41 +377,6 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
                   );
                   return;
                 }
-                if (_isManualMode && _originController.text.trim().isEmpty) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: const Text(
-                        'Please enter an Origin.',
-                        style: TextStyle(
-                            color: Colors.white, fontWeight: FontWeight.bold),
-                      ),
-                      backgroundColor: const Color(0xFFEF4444),
-                      behavior: SnackBarBehavior.floating,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                  );
-                  return;
-                }
-                if (_isManualMode &&
-                    _destinationController.text.trim().isEmpty) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: const Text(
-                        'Please enter a Destination.',
-                        style: TextStyle(
-                            color: Colors.white, fontWeight: FontWeight.bold),
-                      ),
-                      backgroundColor: const Color(0xFFEF4444),
-                      behavior: SnackBarBehavior.floating,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                  );
-                  return;
-                }
                 if (_isManualMode && _dateController.text.trim().isEmpty) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
@@ -463,7 +432,8 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
                   }
 
                   final trip = await _tripRepository.createTrip(
-                    flightNumber: _flightNumberController.text.trim(),
+                    flightNumber:
+                        _normalizeFlightNumber(_flightNumberController.text),
                     origin: _originController.text.trim(),
                     destination: _destinationController.text.trim(),
                     departureDate: _dateController.text.trim(),
@@ -584,7 +554,7 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
 
         // Origin
         const Text(
-          'Origin',
+          'Origin (Optional)',
           style: TextStyle(
             color: Colors.white70,
             fontSize: 13,
@@ -614,7 +584,7 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
 
         // Destination
         const Text(
-          'Destination',
+          'Destination (Optional)',
           style: TextStyle(
             color: Colors.white70,
             fontSize: 13,
@@ -725,7 +695,7 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
               const SizedBox(width: 10),
               Expanded(
                 child: Text(
-                  'Tip: Adding your booking reference allows us to monitor your specific seat assignments and automatically check-in when available.',
+                  'Tip: Flight number and date let us find route details automatically. Add origin and destination if the provider cannot resolve the flight.',
                   style: TextStyle(
                     color: Colors.white.withOpacity(0.4),
                     fontSize: 11,

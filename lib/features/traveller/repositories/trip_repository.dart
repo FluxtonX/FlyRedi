@@ -37,8 +37,10 @@ class TripRepository {
       '/api/trips',
       body: {
         'tripName': flightNumber,
+        'flightNumber': flightNumber,
         'origin': origin,
         'destination': destination,
+        'departureDate': departureDate,
         'bookingReference': bookingReference,
         'totalDuration': departureDate,
         'stops': stops,
