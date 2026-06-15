@@ -52,6 +52,7 @@ class _TravellerDashboardScreenState extends State<TravellerDashboardScreen> {
   List<AlertModel> _alerts = [];
   List<TripModel> _trips = [];
   UserProfile? _profile;
+  ProfileStats? _stats;
 
   @override
   void initState() {
@@ -85,6 +86,7 @@ class _TravellerDashboardScreenState extends State<TravellerDashboardScreen> {
         _alertRepository.fetchAlerts(limit: 5),
         _tripRepository.fetchUserTrips(),
         _profileRepository.getProfile(),
+        _profileRepository.getStats(),
       ]);
 
       if (mounted) {
@@ -94,6 +96,7 @@ class _TravellerDashboardScreenState extends State<TravellerDashboardScreen> {
           _alerts = (results[2] as AlertListResponse).alerts;
           _trips = results[3] as List<TripModel>;
           _profile = results[4] as UserProfile;
+          _stats = results[5] as ProfileStats;
           _isLoading = false;
           _hasLoadedData = true;
         });
@@ -217,6 +220,14 @@ class _TravellerDashboardScreenState extends State<TravellerDashboardScreen> {
     }
 
     final summary = _summary!;
+    final stats = _stats;
+    final usedFlights = stats?.flightsMonitored ?? _trips.length;
+    final maxFlights = stats?.flightsMonitoredMax ?? freeFlightLimit;
+    final usedClaims = stats?.claimsFiled ?? summary.casesCount;
+    final maxClaims = stats?.claimsFiledMax ?? 1;
+    final usedAiQuestions = stats?.aiAssistantQuestions ?? 0;
+    final maxAiQuestions = stats?.aiAssistantQuestionsMax ?? 5;
+    final planLabel = _planLabel(_profile?.plan);
 
     return SingleChildScrollView(
       physics: const AlwaysScrollableScrollPhysics(),
@@ -226,12 +237,17 @@ class _TravellerDashboardScreenState extends State<TravellerDashboardScreen> {
         children: [
           DashboardHeader(
             displayName: displayName,
+            planLabel: planLabel,
             notificationCount: summary.alertsCount,
           ),
           const SizedBox(height: 18),
           MonthlyUsageCard(
-            usedFlights: _trips.length,
-            maxFlights: freeFlightLimit,
+            usedFlights: usedFlights,
+            maxFlights: maxFlights,
+            usedClaims: usedClaims,
+            maxClaims: maxClaims,
+            usedAiQuestions: usedAiQuestions,
+            maxAiQuestions: maxAiQuestions,
             onViewDetails: () {
               Navigator.push(
                 context,
@@ -278,6 +294,11 @@ class _TravellerDashboardScreenState extends State<TravellerDashboardScreen> {
     );
   }
 
+  String _planLabel(String? plan) {
+    if (plan == null || plan.trim().isEmpty) return 'Free Plan';
+    return plan.endsWith('Plan') || plan.endsWith('Pass') ? plan : '$plan Plan';
+  }
+
   Widget _buildDashboardSkeleton(String displayName) {
     return SingleChildScrollView(
       physics: const AlwaysScrollableScrollPhysics(),
@@ -285,7 +306,11 @@ class _TravellerDashboardScreenState extends State<TravellerDashboardScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          DashboardHeader(displayName: displayName, notificationCount: 0),
+          DashboardHeader(
+            displayName: displayName,
+            planLabel: 'Free Plan',
+            notificationCount: 0,
+          ),
           const SizedBox(height: 18),
           const SkeletonBox(height: 128, radius: 22),
           const SizedBox(height: 18),

@@ -1,10 +1,9 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import '../../authentication/screens/sign_in_screen.dart';
+import 'package:get/get.dart';
 import '../../onboarding/screens/onboarding_screen.dart';
 import '../../onboarding/repositories/onboarding_repository.dart';
-import '../../traveller/screens/traveller_tabs_screen.dart';
+import '../../auth/presentation/controllers/auth_controller.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -15,6 +14,7 @@ class SplashScreen extends StatefulWidget {
 
 class _SplashScreenState extends State<SplashScreen> {
   final OnboardingRepository _onboardingRepository = OnboardingRepository();
+  final AuthController _authController = Get.find<AuthController>();
 
   @override
   void initState() {
@@ -32,32 +32,16 @@ class _SplashScreenState extends State<SplashScreen> {
     if (!mounted) return;
 
     if (!hasSeenOnboarding) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => const OnboardingScreen(),
-        ),
-      );
+      Get.off(() => const OnboardingScreen());
       return;
     }
 
-    final user = FirebaseAuth.instance.currentUser;
-    if (user == null) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => const SignInScreen(),
-        ),
-      );
+    if (!_authController.isAuthenticated) {
+      Get.offAllNamed('/login');
       return;
     }
 
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(
-        builder: (context) => const TravellerTabsScreen(),
-      ),
-    );
+    Get.offAllNamed('/home');
   }
 
   @override

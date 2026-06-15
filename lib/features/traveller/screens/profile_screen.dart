@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:get/get.dart';
 import 'package:sky_rightz_360/core/constants/app_colors.dart';
 import '../widgets/skeleton_box.dart';
 import '../widgets/traveller_bottom_nav.dart';
-import '../models/user_profile.dart';
+import '../../auth/data/models/user_profile.dart';
+import '../../auth/presentation/controllers/auth_controller.dart';
 import '../repositories/profile_repository.dart';
-import '../../authentication/screens/sign_in_screen.dart';
 import 'trips_overview_screen.dart';
 import 'resolve_dashboard_screen.dart';
 import 'border_ready_screen.dart';
@@ -25,12 +25,13 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   final ProfileRepository _repository = ProfileRepository();
+  final AuthController _authController = Get.find<AuthController>();
 
   bool _isLoading = true;
   bool _hasLoadedProfile = false;
   String? _errorMessage;
 
-  UserProfile? _profile;
+  UserProfile? get _profile => _authController.userProfile.value;
   ProfileStats? _stats;
 
   @override
@@ -49,12 +50,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
     });
     try {
       final results = await Future.wait([
-        _repository.getProfile(),
+        _authController.refreshProfile(),
         _repository.getStats(),
       ]);
       if (mounted) {
         setState(() {
-          _profile = results[0] as UserProfile;
           _stats = results[1] as ProfileStats;
           _isLoading = false;
           _hasLoadedProfile = true;
@@ -174,9 +174,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               displayName: nameCtrl.text.trim(),
                               phoneNumber: phoneCtrl.text.trim(),
                             );
-                            if (mounted) {
-                              setState(() => _profile = updated);
-                            }
+                            await _authController.updateProfileState(updated);
                             if (ctx.mounted) Navigator.pop(ctx);
                             _showSnackBar('Profile updated successfully!');
                           } catch (_) {
@@ -233,17 +231,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  // ─── Notification Toggle ──────────────────────────────────────────────────
-
   Future<void> _toggleNotifications(bool value) async {
-    final prev = _profile!.notificationsEnabled;
-    setState(() => _profile = _profile!.copyWith(notificationsEnabled: value));
+    final currentProfile = _profile;
+    if (currentProfile == null) return;
+
+    final prev = currentProfile.notificationsEnabled;
+    await _authController.updateProfileState(currentProfile.copyWith(notificationsEnabled: value));
     try {
       await _repository.updateNotifications(enabled: value);
       _showSnackBar(
           value ? 'Notifications enabled.' : 'Notifications disabled.');
     } catch (_) {
-      if (mounted) setState(() => _profile = _profile!.copyWith(notificationsEnabled: prev));
+      await _authController.updateProfileState(currentProfile.copyWith(notificationsEnabled: prev));
       _showSnackBar('Failed to update notifications.', isError: true);
     }
   }
@@ -271,15 +270,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ElevatedButton(
             onPressed: () async {
               Navigator.pop(ctx);
-              await FirebaseAuth.instance.signOut();
-              if (mounted) {
-                Navigator.pushAndRemoveUntil(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => const SignInScreen()),
-                  (route) => false,
-                );
-              }
+              await _authController.logout();
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFFE11D48),
@@ -321,14 +312,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               Navigator.pop(ctx);
               try {
                 await _repository.deleteAccount();
-                if (mounted) {
-                  Navigator.pushAndRemoveUntil(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const SignInScreen()),
-                    (route) => false,
-                  );
-                }
+                await _authController.logout();
               } catch (_) {
                 _showSnackBar('Failed to delete account.', isError: true);
               }
@@ -366,12 +350,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
         ),
         actions: [
-          if (_profile != null)
-            IconButton(
-              onPressed: _showEditProfileSheet,
-              icon: const Icon(Icons.edit_outlined, color: Color(0xFFFFC229)),
-              tooltip: 'Edit profile',
-            ),
+          Obx(() => _profile != null
+              ? IconButton(
+                  onPressed: _showEditProfileSheet,
+                  icon: const Icon(Icons.edit_outlined, color: Color(0xFFFFC229)),
+                  tooltip: 'Edit profile',
+                )
+              : const SizedBox.shrink()),
           const SizedBox(width: 8),
         ],
       ),
@@ -586,6 +571,46 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                 ),
               ],
+            ),
+
+            const SizedBox(height: 28),
+
+            // ── Monthly Usage ─────────────────────────────────────────────
+            _sectionLabel('Monthly Usage'),
+            const SizedBox(height: 14),
+            _buildUsageRow(
+              icon: Icons.flight_takeoff,
+              label: 'Flights Monitored',
+              used: stats.flightsMonitored,
+              max: stats.flightsMonitoredMax,
+            ),
+            const SizedBox(height: 10),
+            _buildUsageRow(
+              icon: Icons.fact_check_outlined,
+              label: 'Claims Filed',
+              used: stats.claimsFiled,
+              max: stats.claimsFiledMax,
+            ),
+            const SizedBox(height: 10),
+            _buildUsageRow(
+              icon: Icons.auto_awesome,
+              label: 'AI Complaint Letters',
+              used: stats.aiComplaintLetters,
+              max: stats.aiComplaintLettersMax,
+            ),
+            const SizedBox(height: 10),
+            _buildUsageRow(
+              icon: Icons.chat_bubble_outline,
+              label: 'AI Assistant Questions',
+              used: stats.aiAssistantQuestions,
+              max: stats.aiAssistantQuestionsMax,
+            ),
+            const SizedBox(height: 10),
+            _buildUsageRow(
+              icon: Icons.upload_outlined,
+              label: 'Document Uploads',
+              used: stats.documentUploads,
+              max: stats.documentUploadsMax,
             ),
 
             const SizedBox(height: 28),
@@ -844,6 +869,87 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
+  Widget _buildUsageRow({
+    required IconData icon,
+    required String label,
+    required int used,
+    required int max,
+  }) {
+    final bool atLimit = max > 0 && used >= max;
+    final double progress = max > 0 ? (used / max).clamp(0.0, 1.0) : 0.0;
+    final Color valueColor =
+        atLimit ? const Color(0xFFFF4D5E) : const Color(0xFF23C78A);
+    final Color barColor =
+        atLimit ? const Color(0xFFFF4D5E) : const Color(0xFF23C78A);
+
+    return Container(
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: const Color(0xFF0C162A),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: Colors.white.withOpacity(0.05)),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: const Color(0xFF162035),
+              shape: BoxShape.circle,
+              border: Border.all(color: Colors.white.withOpacity(0.06)),
+            ),
+            child: Icon(icon, color: const Color(0xFFFFC229), size: 18),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        label,
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.7),
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                    Text(
+                      '$used/$max',
+                      style: TextStyle(
+                        color: valueColor,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                    if (atLimit) ...[
+                      const SizedBox(width: 6),
+                      const Icon(Icons.error_outline,
+                          color: Color(0xFFFF4D5E), size: 15),
+                    ],
+                  ],
+                ),
+                const SizedBox(height: 10),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(999),
+                  child: LinearProgressIndicator(
+                    value: progress,
+                    minHeight: 5,
+                    backgroundColor: const Color(0xFF2B3B5E),
+                    valueColor: AlwaysStoppedAnimation<Color>(barColor),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
   Widget _buildQuickAccessCard({
     required IconData icon,
     required String title,

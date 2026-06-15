@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import '../../../core/widgets/custom_button.dart';
+import 'package:get/get.dart';
+import '../controllers/auth_controller.dart';
 import '../widgets/auth_textfield.dart';
-import 'sign_in_screen.dart';
-import '../../traveller/screens/traveller_tabs_screen.dart';
-import '../../../shared/services/api_service.dart';
+import '../../../../core/widgets/custom_button.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
@@ -14,20 +12,19 @@ class SignUpScreen extends StatefulWidget {
 }
 
 class _SignUpScreenState extends State<SignUpScreen> {
-  final nameController = TextEditingController();
-  final emailController = TextEditingController();
-  final passwordController = TextEditingController();
-  final nameFocusNode = FocusNode();
-  final emailFocusNode = FocusNode();
-  final passwordFocusNode = FocusNode();
+  final AuthController _authController = Get.find<AuthController>();
 
-  bool isLoading = false;
+  final TextEditingController nameController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
 
-  String? _nameError;
-  String? _emailError;
-  String? _passwordError;
+  final FocusNode nameFocusNode = FocusNode();
+  final FocusNode emailFocusNode = FocusNode();
+  final FocusNode passwordFocusNode = FocusNode();
 
-  // ─── Validation ─────────────────────────────────────────────────────────────
+  final RxnString _nameError = RxnString();
+  final RxnString _emailError = RxnString();
+  final RxnString _passwordError = RxnString();
 
   bool _validateInputs() {
     String? nameErr;
@@ -58,105 +55,23 @@ class _SignUpScreenState extends State<SignUpScreen> {
       passErr = 'Password must include letters and numbers.';
     }
 
-    setState(() {
-      _nameError = nameErr;
-      _emailError = emailErr;
-      _passwordError = passErr;
-    });
+    _nameError.value = nameErr;
+    _emailError.value = emailErr;
+    _passwordError.value = passErr;
 
     return nameErr == null && emailErr == null && passErr == null;
   }
 
-  // ─── Snack Bar ────────────────────────────────────────────────────────────
-
-  void _showSnackBar(String message, {bool isError = true}) {
-    if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Row(
-          children: [
-            Icon(
-              isError ? Icons.error_outline_rounded : Icons.check_circle_outline_rounded,
-              color: Colors.white,
-              size: 20,
-            ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: Text(
-                message,
-                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w500),
-              ),
-            ),
-          ],
-        ),
-        backgroundColor: isError ? const Color(0xFFE11D48) : const Color(0xFF10B981),
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        duration: const Duration(seconds: 3),
-      ),
-    );
-  }
-
-  // ─── Sign Up Logic ─────────────────────────────────────────────────────────
-
-  Future<void> signUpUser() async {
-    if (isLoading) return;
-
+  Future<void> _handleRegister() async {
+    if (_authController.isLoading.value) return;
     FocusScope.of(context).unfocus();
     if (!_validateInputs()) return;
 
-    setState(() => isLoading = true);
-
-    try {
-      final userCredential =
-          await FirebaseAuth.instance.createUserWithEmailAndPassword(
-        email: emailController.text.trim(),
-        password: passwordController.text,
-      );
-
-      // Set displayName immediately after sign-up
-      await userCredential.user?.updateDisplayName(nameController.text.trim());
-
-      // Sync new user to backend (creates Firestore profile)
-      await ApiService.post('/api/auth/sync');
-
-      if (!mounted) return;
-
-      _showSnackBar('Account created successfully!', isError: false);
-
-      // Small delay so user sees the success toast before navigation
-      await Future.delayed(const Duration(milliseconds: 700));
-      if (!mounted) return;
-
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => const TravellerTabsScreen(),
-        ),
-      );
-    } on FirebaseAuthException catch (e) {
-      _showSnackBar(_mapFirebaseError(e.code));
-    } catch (_) {
-      _showSnackBar('Something went wrong. Please try again.');
-    } finally {
-      if (mounted) setState(() => isLoading = false);
-    }
-  }
-
-  String _mapFirebaseError(String code) {
-    switch (code) {
-      case 'email-already-in-use':
-        return 'An account already exists for this email.';
-      case 'invalid-email':
-        return 'The email address is badly formatted.';
-      case 'weak-password':
-        return 'Password is too weak. Use at least 8 characters with letters and numbers.';
-      case 'network-request-failed':
-        return 'No internet connection. Please check your network.';
-      default:
-        return 'Sign up failed. Please try again.';
-    }
+    await _authController.register(
+      nameController.text.trim(),
+      emailController.text.trim(),
+      passwordController.text,
+    );
   }
 
   @override
@@ -169,8 +84,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
     passwordController.dispose();
     super.dispose();
   }
-
-  // ─── Build ─────────────────────────────────────────────────────────────────
 
   @override
   Widget build(BuildContext context) {
@@ -229,10 +142,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   textCapitalization: TextCapitalization.words,
                   onSubmitted: (_) => emailFocusNode.requestFocus(),
                 ),
-                if (_nameError != null) ...[
-                  const SizedBox(height: 6),
-                  _buildFieldError(_nameError!),
-                ],
+                Obx(() => _nameError.value != null
+                    ? Column(
+                        children: [
+                          const SizedBox(height: 6),
+                          _buildFieldError(_nameError.value!),
+                        ],
+                      )
+                    : const SizedBox.shrink()),
                 const SizedBox(height: 18),
 
                 // Email field
@@ -248,10 +165,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   enableSuggestions: true,
                   onSubmitted: (_) => passwordFocusNode.requestFocus(),
                 ),
-                if (_emailError != null) ...[
-                  const SizedBox(height: 6),
-                  _buildFieldError(_emailError!),
-                ],
+                Obx(() => _emailError.value != null
+                    ? Column(
+                        children: [
+                          const SizedBox(height: 6),
+                          _buildFieldError(_emailError.value!),
+                        ],
+                      )
+                    : const SizedBox.shrink()),
                 const SizedBox(height: 18),
 
                 // Password field
@@ -266,9 +187,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   autofillHints: const [AutofillHints.newPassword],
                   autocorrect: false,
                   enableSuggestions: false,
-                  onSubmitted: (_) {
-                    if (!isLoading) signUpUser();
-                  },
+                  onSubmitted: (_) => _handleRegister(),
                 ),
                 const SizedBox(height: 6),
                 const Padding(
@@ -282,18 +201,22 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     ),
                   ),
                 ),
-                if (_passwordError != null) ...[
-                  const SizedBox(height: 6),
-                  _buildFieldError(_passwordError!),
-                ],
+                Obx(() => _passwordError.value != null
+                    ? Column(
+                        children: [
+                          const SizedBox(height: 6),
+                          _buildFieldError(_passwordError.value!),
+                        ],
+                      )
+                    : const SizedBox.shrink()),
                 const SizedBox(height: 28),
 
                 // Create Account button
-                CustomButton(
-                  title: 'Create Account',
-                  onTap: isLoading ? () {} : signUpUser,
-                  isLoading: isLoading,
-                ),
+                Obx(() => CustomButton(
+                      title: 'Create Account',
+                      onTap: _authController.isLoading.value ? () {} : _handleRegister,
+                      isLoading: _authController.isLoading.value,
+                    )),
                 const SizedBox(height: 24),
 
                 // Already have account
@@ -305,14 +228,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       style: TextStyle(color: Colors.white70),
                     ),
                     GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const SignInScreen(),
-                          ),
-                        );
-                      },
+                      onTap: () => Get.toNamed('/login'),
                       child: const Text(
                         'Sign In',
                         style: TextStyle(

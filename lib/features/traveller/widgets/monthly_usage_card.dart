@@ -5,6 +5,10 @@ class MonthlyUsageCard extends StatelessWidget {
   final VoidCallback onLimitTap;
   final int usedFlights;
   final int maxFlights;
+  final int usedClaims;
+  final int maxClaims;
+  final int usedAiQuestions;
+  final int maxAiQuestions;
 
   const MonthlyUsageCard({
     super.key,
@@ -12,6 +16,10 @@ class MonthlyUsageCard extends StatelessWidget {
     required this.onLimitTap,
     required this.usedFlights,
     required this.maxFlights,
+    required this.usedClaims,
+    required this.maxClaims,
+    required this.usedAiQuestions,
+    required this.maxAiQuestions,
   });
 
   @override
@@ -51,25 +59,33 @@ class MonthlyUsageCard extends StatelessWidget {
             label: 'Flights',
             value: '$usedFlights/$maxFlights',
             locked: usedFlights >= maxFlights,
+            progress: _progress(usedFlights, maxFlights),
             onTap: onLimitTap,
           ),
           const SizedBox(height: 10),
           _UsageMiniRow(
             label: 'Claims',
-            value: '1/1',
-            locked: true,
+            value: '$usedClaims/$maxClaims',
+            locked: usedClaims >= maxClaims,
+            progress: _progress(usedClaims, maxClaims),
             onTap: onLimitTap,
           ),
           const SizedBox(height: 10),
           _UsageMiniRow(
             label: 'AI Questions',
-            value: '5/5',
-            locked: true,
+            value: '$usedAiQuestions/$maxAiQuestions',
+            locked: usedAiQuestions >= maxAiQuestions,
+            progress: _progress(usedAiQuestions, maxAiQuestions),
             onTap: onLimitTap,
           ),
         ],
       ),
     );
+  }
+
+  double _progress(int used, int max) {
+    if (max <= 0) return 0;
+    return (used / max).clamp(0.0, 1.0).toDouble();
   }
 }
 
@@ -77,12 +93,14 @@ class _UsageMiniRow extends StatelessWidget {
   final String label;
   final String value;
   final bool locked;
+  final double progress;
   final VoidCallback onTap;
 
   const _UsageMiniRow({
     required this.label,
     required this.value,
     required this.locked,
+    required this.progress,
     required this.onTap,
   });
 
@@ -124,11 +142,12 @@ class _UsageMiniRow extends StatelessWidget {
           const SizedBox(height: 6),
           ClipRRect(
             borderRadius: BorderRadius.circular(999),
-            child: const LinearProgressIndicator(
-              value: 1,
+            child: LinearProgressIndicator(
+              value: progress,
               minHeight: 5,
-              backgroundColor: Color(0xFF38445A),
-              valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFFF4D5E)),
+              backgroundColor: const Color(0xFF38445A),
+              valueColor:
+                  const AlwaysStoppedAnimation<Color>(Color(0xFFFF4D5E)),
             ),
           ),
         ],

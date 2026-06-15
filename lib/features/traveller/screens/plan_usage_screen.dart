@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:sky_rightz_360/core/constants/app_colors.dart';
+import '../../auth/data/models/user_profile.dart';
+import '../../auth/presentation/controllers/auth_controller.dart';
 import '../models/trip_model.dart';
 import '../repositories/trip_repository.dart';
+import '../repositories/profile_repository.dart';
 import '../utils/add_flight_navigation.dart';
 import '../widgets/traveller_bottom_nav.dart';
 import '../widgets/upgrade_to_pro_dialog.dart';
@@ -16,7 +20,11 @@ class PlanUsageScreen extends StatefulWidget {
 
 class _PlanUsageScreenState extends State<PlanUsageScreen> {
   final TripRepository _tripRepository = TripRepository();
+  final ProfileRepository _profileRepository = ProfileRepository();
+  final AuthController _authController = Get.find<AuthController>();
+
   List<TripModel> _trips = [];
+  ProfileStats? _stats;
 
   int get _usedFlights => _trips.length;
   double get _flightProgress =>
@@ -26,7 +34,7 @@ class _PlanUsageScreenState extends State<PlanUsageScreen> {
   void initState() {
     super.initState();
     TripRepository.tripsVersion.addListener(_onTripsChanged);
-    _loadTrips();
+    _loadData();
   }
 
   @override
@@ -36,15 +44,19 @@ class _PlanUsageScreenState extends State<PlanUsageScreen> {
   }
 
   void _onTripsChanged() {
-    _loadTrips();
+    _loadData();
   }
 
-  Future<void> _loadTrips() async {
+  Future<void> _loadData() async {
     try {
-      final trips = await _tripRepository.fetchUserTrips();
+      final results = await Future.wait([
+        _tripRepository.fetchUserTrips(),
+        _profileRepository.getStats(),
+      ]);
       if (!mounted) return;
       setState(() {
-        _trips = trips;
+        _trips = results[0] as List<TripModel>;
+        _stats = results[1] as ProfileStats;
       });
     } catch (_) {}
   }
@@ -157,40 +169,50 @@ class _PlanUsageScreenState extends State<PlanUsageScreen> {
               _PlanUsageRow(
                 icon: Icons.flight_takeoff,
                 label: 'Flights Monitored',
-                value: '$_usedFlights/$freeFlightLimit',
-                progress: _flightProgress,
-                warning: _usedFlights >= freeFlightLimit,
+                value: '${_stats?.flightsMonitored ?? _usedFlights}/${_stats?.flightsMonitoredMax ?? freeFlightLimit}',
+                progress: _stats != null
+                    ? (_stats!.flightsMonitored / _stats!.flightsMonitoredMax).clamp(0.0, 1.0)
+                    : _flightProgress,
+                warning: (_stats?.flightsMonitored ?? _usedFlights) >= (_stats?.flightsMonitoredMax ?? freeFlightLimit),
                 onTap: () => showUpgradeToProDialog(context),
               ),
               _PlanUsageRow(
                 icon: Icons.fact_check_outlined,
                 label: 'Claims Filed',
-                value: '1/1',
-                progress: 1,
-                warning: true,
+                value: '${_stats?.claimsFiled ?? 0}/${_stats?.claimsFiledMax ?? 1}',
+                progress: _stats != null && _stats!.claimsFiledMax > 0
+                    ? (_stats!.claimsFiled / _stats!.claimsFiledMax).clamp(0.0, 1.0)
+                    : 0,
+                warning: (_stats?.claimsFiled ?? 0) >= (_stats?.claimsFiledMax ?? 1),
                 onTap: () => showUpgradeToProDialog(context),
               ),
               _PlanUsageRow(
                 icon: Icons.auto_awesome,
                 label: 'AI Complaint Letters',
-                value: '1/1',
-                progress: 1,
-                warning: true,
+                value: '${_stats?.aiComplaintLetters ?? 0}/${_stats?.aiComplaintLettersMax ?? 1}',
+                progress: _stats != null && _stats!.aiComplaintLettersMax > 0
+                    ? (_stats!.aiComplaintLetters / _stats!.aiComplaintLettersMax).clamp(0.0, 1.0)
+                    : 0,
+                warning: (_stats?.aiComplaintLetters ?? 0) >= (_stats?.aiComplaintLettersMax ?? 1),
                 onTap: () => showUpgradeToProDialog(context),
               ),
               _PlanUsageRow(
                 icon: Icons.chat_bubble_outline,
                 label: 'AI Assistant Questions',
-                value: '5/5',
-                progress: 1,
-                warning: true,
+                value: '${_stats?.aiAssistantQuestions ?? 0}/${_stats?.aiAssistantQuestionsMax ?? 5}',
+                progress: _stats != null && _stats!.aiAssistantQuestionsMax > 0
+                    ? (_stats!.aiAssistantQuestions / _stats!.aiAssistantQuestionsMax).clamp(0.0, 1.0)
+                    : 0,
+                warning: (_stats?.aiAssistantQuestions ?? 0) >= (_stats?.aiAssistantQuestionsMax ?? 5),
                 onTap: () => showUpgradeToProDialog(context),
               ),
               _PlanUsageRow(
                 icon: Icons.upload_outlined,
                 label: 'Document Uploads',
-                value: '3/5',
-                progress: 0.6,
+                value: '${_stats?.documentUploads ?? 0}/${_stats?.documentUploadsMax ?? 5}',
+                progress: _stats != null && _stats!.documentUploadsMax > 0
+                    ? (_stats!.documentUploads / _stats!.documentUploadsMax).clamp(0.0, 1.0)
+                    : 0,
                 warning: false,
                 onTap: () {},
               ),

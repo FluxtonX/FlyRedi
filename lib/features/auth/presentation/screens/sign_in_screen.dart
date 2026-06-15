@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'reset_password_screen.dart';
-import '../../../core/widgets/custom_button.dart';
+import 'package:get/get.dart';
+import '../controllers/auth_controller.dart';
 import '../widgets/auth_textfield.dart';
-import 'sign_up_screen.dart';
-import '../../traveller/screens/traveller_tabs_screen.dart';
-import '../../../shared/services/api_service.dart';
+import '../../../../core/widgets/custom_button.dart';
 
 class SignInScreen extends StatefulWidget {
   const SignInScreen({super.key});
@@ -15,15 +12,13 @@ class SignInScreen extends StatefulWidget {
 }
 
 class _SignInScreenState extends State<SignInScreen> {
+  final AuthController _authController = Get.find<AuthController>();
+
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
 
-  bool isLoading = false;
-
-  // ─── Validation ────────────────────────────────────────────────────────────
-
-  String? _emailError;
-  String? _passwordError;
+  final RxnString _emailError = RxnString();
+  final RxnString _passwordError = RxnString();
 
   bool _validateInputs() {
     String? emailErr;
@@ -44,96 +39,19 @@ class _SignInScreenState extends State<SignInScreen> {
       passErr = 'Password must be at least 6 characters.';
     }
 
-    setState(() {
-      _emailError = emailErr;
-      _passwordError = passErr;
-    });
+    _emailError.value = emailErr;
+    _passwordError.value = passErr;
 
     return emailErr == null && passErr == null;
   }
 
-  // ─── Show styled SnackBar ───────────────────────────────────────────────────
-
-  void _showSnackBar(String message, {bool isError = true}) {
-    if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Row(
-          children: [
-            Icon(
-              isError ? Icons.error_outline_rounded : Icons.check_circle_outline_rounded,
-              color: Colors.white,
-              size: 20,
-            ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: Text(
-                message,
-                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w500),
-              ),
-            ),
-          ],
-        ),
-        backgroundColor: isError ? const Color(0xFFE11D48) : const Color(0xFF10B981),
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        duration: const Duration(seconds: 3),
-      ),
-    );
-  }
-
-  // ─── Login Logic ────────────────────────────────────────────────────────────
-
-  Future<void> loginUser() async {
+  Future<void> _handleLogin() async {
     if (!_validateInputs()) return;
-
-    setState(() => isLoading = true);
-
-    try {
-      await FirebaseAuth.instance.signInWithEmailAndPassword(
-        email: emailController.text.trim(),
-        password: passwordController.text.trim(),
-      );
-
-      // Sync user with backend and get profile
-      await ApiService.post('/api/auth/sync');
-
-      if (!mounted) return;
-
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => const TravellerTabsScreen(),
-        ),
-      );
-    } on FirebaseAuthException catch (e) {
-      _showSnackBar(_mapFirebaseError(e.code));
-    } catch (_) {
-      _showSnackBar('Something went wrong. Please try again.');
-    } finally {
-      if (mounted) setState(() => isLoading = false);
-    }
-  }
-
-  // ─── Firebase error → readable message ─────────────────────────────────────
-
-  String _mapFirebaseError(String code) {
-    switch (code) {
-      case 'user-not-found':
-        return 'No account found for this email.';
-      case 'wrong-password':
-      case 'invalid-credential':
-        return 'Incorrect email or password. Please try again.';
-      case 'user-disabled':
-        return 'Your account has been disabled. Please contact support.';
-      case 'too-many-requests':
-        return 'Too many attempts. Try again later.';
-      case 'network-request-failed':
-        return 'No internet connection. Please check your network.';
-      default:
-        return 'Login failed. Please try again.';
-    }
+    FocusScope.of(context).unfocus();
+    await _authController.login(
+      emailController.text.trim(),
+      passwordController.text.trim(),
+    );
   }
 
   @override
@@ -142,8 +60,6 @@ class _SignInScreenState extends State<SignInScreen> {
     passwordController.dispose();
     super.dispose();
   }
-
-  // ─── Build ──────────────────────────────────────────────────────────────────
 
   @override
   Widget build(BuildContext context) {
@@ -195,10 +111,14 @@ class _SignInScreenState extends State<SignInScreen> {
                   autocorrect: false,
                   enableSuggestions: true,
                 ),
-                if (_emailError != null) ...[
-                  const SizedBox(height: 6),
-                  _buildFieldError(_emailError!),
-                ],
+                Obx(() => _emailError.value != null
+                    ? Column(
+                        children: [
+                          const SizedBox(height: 6),
+                          _buildFieldError(_emailError.value!),
+                        ],
+                      )
+                    : const SizedBox.shrink()),
                 const SizedBox(height: 20),
 
                 // Password field
@@ -212,25 +132,23 @@ class _SignInScreenState extends State<SignInScreen> {
                   autofillHints: const [AutofillHints.password],
                   autocorrect: false,
                   enableSuggestions: false,
+                  onSubmitted: (_) => _handleLogin(),
                 ),
-                if (_passwordError != null) ...[
-                  const SizedBox(height: 6),
-                  _buildFieldError(_passwordError!),
-                ],
+                Obx(() => _passwordError.value != null
+                    ? Column(
+                        children: [
+                          const SizedBox(height: 6),
+                          _buildFieldError(_passwordError.value!),
+                        ],
+                      )
+                    : const SizedBox.shrink()),
                 const SizedBox(height: 16),
 
                 // Forgot password
                 Align(
                   alignment: Alignment.centerRight,
                   child: GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const ResetPasswordScreen(),
-                        ),
-                      );
-                    },
+                    onTap: () => Get.toNamed('/forgot-password'),
                     child: const Text(
                       'Forgot Password?',
                       style: TextStyle(
@@ -244,10 +162,10 @@ class _SignInScreenState extends State<SignInScreen> {
                 const SizedBox(height: 30),
 
                 // Sign In button
-                CustomButton(
-                  title: isLoading ? 'Signing In...' : 'Sign In',
-                  onTap: isLoading ? () {} : loginUser,
-                ),
+                Obx(() => CustomButton(
+                      title: _authController.isLoading.value ? 'Signing In...' : 'Sign In',
+                      onTap: _authController.isLoading.value ? () {} : _handleLogin,
+                    )),
                 const SizedBox(height: 30),
 
                 // Sign Up link
@@ -259,14 +177,7 @@ class _SignInScreenState extends State<SignInScreen> {
                       style: TextStyle(color: Colors.white70),
                     ),
                     GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const SignUpScreen(),
-                          ),
-                        );
-                      },
+                      onTap: () => Get.toNamed('/register'),
                       child: const Text(
                         'Sign Up',
                         style: TextStyle(
@@ -293,12 +204,14 @@ class _SignInScreenState extends State<SignInScreen> {
         children: [
           const Icon(Icons.info_outline_rounded, size: 14, color: Color(0xFFE11D48)),
           const SizedBox(width: 6),
-          Text(
-            message,
-            style: const TextStyle(
-              color: Color(0xFFE11D48),
-              fontSize: 12,
-              fontWeight: FontWeight.w500,
+          Expanded(
+            child: Text(
+              message,
+              style: const TextStyle(
+                color: Color(0xFFE11D48),
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+              ),
             ),
           ),
         ],

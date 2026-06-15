@@ -3,11 +3,13 @@ import '../screens/notifications_screen.dart';
 
 class DashboardHeader extends StatelessWidget {
   final String displayName;
+  final String planLabel;
   final int notificationCount;
 
   const DashboardHeader({
     super.key,
     required this.displayName,
+    required this.planLabel,
     required this.notificationCount,
   });
 
@@ -32,9 +34,9 @@ class DashboardHeader extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 6),
-              const Text(
-                'Free Plan',
-                style: TextStyle(
+              Text(
+                planLabel,
+                style: const TextStyle(
                   color: Colors.white60,
                   fontSize: 13,
                 ),
