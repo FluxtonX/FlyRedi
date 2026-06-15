@@ -1,10 +1,177 @@
 import 'package:flutter/material.dart';
 import 'package:sky_rightz_360/core/constants/app_colors.dart';
+import '../models/trip_model.dart';
+import '../models/user_profile.dart';
+import '../repositories/profile_repository.dart';
+import '../repositories/trip_repository.dart';
+import '../utils/add_flight_navigation.dart';
 import '../widgets/traveller_bottom_nav.dart';
-import 'add_flight_screen.dart';
 
-class UpcomingTripsScreen extends StatelessWidget {
+class UpcomingTripsScreen extends StatefulWidget {
   const UpcomingTripsScreen({super.key});
+
+  @override
+  State<UpcomingTripsScreen> createState() => _UpcomingTripsScreenState();
+}
+
+class _UpcomingTripsScreenState extends State<UpcomingTripsScreen> {
+  final TripRepository _tripRepository = TripRepository();
+  final ProfileRepository _profileRepository = ProfileRepository();
+  List<TripModel> _trips = [];
+  UserProfile? _profile;
+  final Set<String> _deletingTripIds = {};
+  bool _isLoading = true;
+  String? _errorMessage;
+
+  @override
+  void initState() {
+    super.initState();
+    TripRepository.tripsVersion.addListener(_onTripsChanged);
+    _loadLimitData();
+  }
+
+  @override
+  void dispose() {
+    TripRepository.tripsVersion.removeListener(_onTripsChanged);
+    super.dispose();
+  }
+
+  void _onTripsChanged() {
+    _loadLimitData();
+  }
+
+  Future<void> _loadLimitData() async {
+    try {
+      final results = await Future.wait([
+        _tripRepository.fetchUserTrips(),
+        _profileRepository.getProfile(),
+      ]);
+      if (!mounted) return;
+      setState(() {
+        _trips = results[0] as List<TripModel>;
+        _profile = results[1] as UserProfile;
+        _isLoading = false;
+        _errorMessage = null;
+      });
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _isLoading = false;
+        _errorMessage = e.toString();
+      });
+    }
+  }
+
+  Future<void> _handleAddFlightTap() async {
+    await openAddFlightWithLimit(
+      context: context,
+      currentTrips: _trips.length,
+      hasUnlimitedFlights: _profile?.hasUnlimitedFlightMonitoring ?? false,
+      onReturn: () async {
+        if (!mounted) return;
+        await _loadLimitData();
+      },
+    );
+  }
+
+  Future<void> _confirmDeleteTrip(TripModel trip) async {
+    final shouldDelete = await showDialog<bool>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: const Color(0xFF0C162A),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(18),
+          ),
+          title: const Text(
+            'Delete this trip?',
+            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text(
+                'Cancel',
+                style: TextStyle(color: Colors.white70),
+              ),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: const Text(
+                'Delete',
+                style: TextStyle(
+                  color: Color(0xFFEF4444),
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (shouldDelete == true) {
+      await _deleteTrip(trip);
+    }
+  }
+
+  Future<void> _deleteTrip(TripModel trip) async {
+    if (_deletingTripIds.contains(trip.id)) return;
+
+    final originalTrips = List<TripModel>.from(_trips);
+    setState(() {
+      _deletingTripIds.add(trip.id);
+      _trips.removeWhere((item) => item.id == trip.id);
+    });
+
+    try {
+      await _tripRepository.deleteTrip(trip.id);
+      if (!mounted) return;
+      await _loadLimitData();
+      if (!mounted) return;
+      setState(() {
+        _deletingTripIds.remove(trip.id);
+      });
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _trips = originalTrips;
+        _deletingTripIds.remove(trip.id);
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Failed to delete trip: $e',
+            style: const TextStyle(color: Colors.white),
+          ),
+          backgroundColor: const Color(0xFFE11D48),
+        ),
+      );
+    }
+  }
+
+  bool _hasReadableTripValue(String value) {
+    final normalized = value.trim().toLowerCase();
+    return normalized.isNotEmpty && normalized != 'unknown' && normalized != '--';
+  }
+
+  String _tripFlightLabel(TripModel trip) {
+    if (_hasReadableTripValue(trip.flightNumber)) return trip.flightNumber;
+    if (_hasReadableTripValue(trip.tripName)) return trip.tripName;
+    return 'Trip added';
+  }
+
+  String _tripLocationLabel(String value, String fallback) {
+    return _hasReadableTripValue(value) ? value : fallback;
+  }
+
+  String _tripDateLabel(TripModel trip) {
+    if (_hasReadableTripValue(trip.departureDate)) return trip.departureDate;
+    if (_hasReadableTripValue(trip.totalDuration ?? '')) {
+      return trip.totalDuration!;
+    }
+    return 'Date not set';
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -29,81 +196,98 @@ class UpcomingTripsScreen extends StatelessWidget {
         actions: [
           IconButton(
             icon: const Icon(Icons.add, color: Colors.white),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const AddFlightScreen(),
-                ),
-              );
-            },
+            onPressed: _handleAddFlightTap,
           ),
           const SizedBox(width: 12),
         ],
       ),
-      body: SingleChildScrollView(
+      body: _buildBody(),
+      bottomNavigationBar: const TravellerBottomNav(activeIndex: 1),
+    );
+  }
+
+  Widget _buildBody() {
+    if (_isLoading) {
+      return const Center(
+        child: CircularProgressIndicator(
+          valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFFFC229)),
+        ),
+      );
+    }
+
+    if (_errorMessage != null) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Text(
+            'Failed to load trips:\n$_errorMessage',
+            textAlign: TextAlign.center,
+            style: const TextStyle(color: Colors.white),
+          ),
+        ),
+      );
+    }
+
+    return SingleChildScrollView(
         padding: const EdgeInsets.all(24),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // Flight 1
-            _buildUpcomingFlightCard(
-              airlineName: 'United Airlines',
-              flightCode: 'UA 2847',
-              status: 'Delayed',
-              statusColor: const Color(0xFFFFC229),
-              from: 'SFO',
-              fromTime: '10:45 AM',
-              fromCity: 'San Francisco',
-              to: 'JFK',
-              toTime: '7:15 PM',
-              toCity: 'New York',
-              terminal: 'Terminal 3',
-              gate: 'Gate B24',
-              date: 'May 15, 2026',
-            ),
+            if (_trips.isEmpty)
+              Container(
+                padding: const EdgeInsets.symmetric(vertical: 36),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF0C162A),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: Colors.white.withOpacity(0.04),
+                  ),
+                ),
+                alignment: Alignment.center,
+                child: Text(
+                  'No upcoming trip for now',
+                  style: TextStyle(
+                    color: Colors.white.withOpacity(0.4),
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              )
+            else
+              ..._trips.map((trip) {
+                final firstLeg =
+                    trip.timeline.isNotEmpty ? trip.timeline.first : null;
+                final flightLabel = _tripFlightLabel(trip);
+                final origin = _tripLocationLabel(trip.origin, 'Origin not set');
+                final destination =
+                    _tripLocationLabel(trip.destination, 'Destination not set');
+                final departureDate = _tripDateLabel(trip);
 
-            const SizedBox(height: 14),
-
-            // Flight 2
-            _buildUpcomingFlightCard(
-              airlineName: 'Delta',
-              flightCode: 'DL 1523',
-              status: 'On Time',
-              statusColor: const Color(0xFF10B981),
-              from: 'JFK',
-              fromTime: '2:30 PM',
-              fromCity: 'New York',
-              to: 'LAX',
-              toTime: '5:45 PM',
-              toCity: 'Los Angeles',
-              terminal: 'Terminal 2',
-              gate: 'Gate A12',
-              date: 'May 18, 2026',
-            ),
-
-            const SizedBox(height: 14),
-
-            // Flight 3
-            _buildUpcomingFlightCard(
-              airlineName: 'American Airlines',
-              flightCode: 'AA 456',
-              status: 'On Time',
-              statusColor: const Color(0xFF10B981),
-              from: 'LAX',
-              fromTime: '9:00 AM',
-              fromCity: 'Los Angeles',
-              to: 'ORD',
-              toTime: '3:15 PM',
-              toCity: 'Chicago',
-              terminal: 'Terminal 4',
-              gate: 'Gate K18',
-              date: 'May 22, 2026',
-            ),
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 14),
+                  child: _buildUpcomingFlightCard(
+                    airlineName: flightLabel,
+                    flightCode: flightLabel,
+                    status: trip.trackingEnabled ? 'Active' : trip.status,
+                    statusColor: trip.trackingEnabled
+                        ? const Color(0xFF10B981)
+                        : const Color(0xFFFFC229),
+                    from: origin,
+                    fromTime: firstLeg?.fromTime ?? 'Departure',
+                    fromCity: origin,
+                    to: destination,
+                    toTime: firstLeg?.toTime ?? 'Arrival',
+                    toCity: destination,
+                    terminal: 'Terminal not set',
+                    gate: 'Gate not set',
+                    date: departureDate,
+                    isDeleting: _deletingTripIds.contains(trip.id),
+                    onDelete: () => _confirmDeleteTrip(trip),
+                  ),
+                );
+              }).toList(),
           ],
         ),
-      ),
-      bottomNavigationBar: const TravellerBottomNav(activeIndex: 1),
     );
   }
 
@@ -121,6 +305,8 @@ class UpcomingTripsScreen extends StatelessWidget {
     required String terminal,
     required String gate,
     required String date,
+    required bool isDeleting,
+    required VoidCallback onDelete,
   }) {
     return Container(
       padding: const EdgeInsets.all(20),
@@ -157,20 +343,54 @@ class UpcomingTripsScreen extends StatelessWidget {
                   ),
                 ],
               ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                decoration: BoxDecoration(
-                  color: statusColor.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(6),
-                ),
-                child: Text(
-                  status,
-                  style: TextStyle(
-                    color: statusColor,
-                    fontSize: 10,
-                    fontWeight: FontWeight.bold,
+              Row(
+                children: [
+                  Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: statusColor.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: Text(
+                      status,
+                      style: TextStyle(
+                        color: statusColor,
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
-                ),
+                  const SizedBox(width: 8),
+                  GestureDetector(
+                    onTap: isDeleting ? null : onDelete,
+                    child: Container(
+                      width: 28,
+                      height: 28,
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFE11D48).withOpacity(0.12),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: isDeleting
+                          ? const SizedBox(
+                              width: 14,
+                              height: 14,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                  Color(0xFFE11D48),
+                                ),
+                              ),
+                            )
+                          : const Icon(
+                              Icons.delete_outline,
+                              color: Color(0xFFE11D48),
+                              size: 16,
+                            ),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),

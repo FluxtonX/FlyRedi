@@ -189,6 +189,11 @@ class _SignInScreenState extends State<SignInScreen> {
                   controller: emailController,
                   label: 'Email',
                   hint: 'Enter your email',
+                  keyboardType: TextInputType.emailAddress,
+                  textInputAction: TextInputAction.next,
+                  autofillHints: const [AutofillHints.email],
+                  autocorrect: false,
+                  enableSuggestions: true,
                 ),
                 if (_emailError != null) ...[
                   const SizedBox(height: 6),
@@ -202,6 +207,11 @@ class _SignInScreenState extends State<SignInScreen> {
                   label: 'Password',
                   hint: 'Enter your password',
                   obscureText: true,
+                  keyboardType: TextInputType.visiblePassword,
+                  textInputAction: TextInputAction.done,
+                  autofillHints: const [AutofillHints.password],
+                  autocorrect: false,
+                  enableSuggestions: false,
                 ),
                 if (_passwordError != null) ...[
                   const SizedBox(height: 6),

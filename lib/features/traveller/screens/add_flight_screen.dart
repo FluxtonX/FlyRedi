@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:sky_rightz_360/core/constants/app_colors.dart';
+import 'package:sky_rightz_360/features/traveller/repositories/trip_repository.dart';
+import '../models/user_profile.dart';
+import '../repositories/profile_repository.dart';
+import '../utils/add_flight_navigation.dart';
 import '../widgets/traveller_bottom_nav.dart';
+import '../widgets/upgrade_to_pro_dialog.dart';
 
 class AddFlightScreen extends StatefulWidget {
   const AddFlightScreen({super.key});
@@ -12,16 +17,22 @@ class AddFlightScreen extends StatefulWidget {
 class _AddFlightScreenState extends State<AddFlightScreen> {
   bool _isManualMode = true; // true: Manual Entry, false: Upload Booking
   final TextEditingController _flightNumberController = TextEditingController();
+  final TextEditingController _originController = TextEditingController();
+  final TextEditingController _destinationController = TextEditingController();
   final TextEditingController _dateController = TextEditingController();
   final TextEditingController _bookingRefController = TextEditingController();
-
+  final TripRepository _tripRepository = TripRepository();
+  final ProfileRepository _profileRepository = ProfileRepository();
   bool _isUploading = false;
+  bool _isSavingTrip = false;
   double _uploadProgress = 0.0;
   String? _uploadedFileName;
 
   @override
   void dispose() {
     _flightNumberController.dispose();
+    _originController.dispose();
+    _destinationController.dispose();
     _dateController.dispose();
     _bookingRefController.dispose();
     super.dispose();
@@ -54,11 +65,20 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
   }
 
   Future<void> _selectDate(BuildContext context) async {
+    final today = DateTime.now();
+    final firstDate = DateTime(today.year, today.month, today.day);
+    final lastDate = DateTime(today.year + 5, today.month, today.day);
+    final selectedDate = DateTime.tryParse(_dateController.text);
+    final initialDate =
+        selectedDate != null && !selectedDate.isBefore(firstDate)
+            ? selectedDate
+            : firstDate;
+
     final DateTime? picked = await showDatePicker(
       context: context,
-      initialDate: DateTime(2026, 5, 22),
-      firstDate: DateTime(2026, 1, 1),
-      lastDate: DateTime(2026, 12, 31),
+      initialDate: initialDate,
+      firstDate: firstDate,
+      lastDate: lastDate,
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
@@ -76,7 +96,8 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
     );
     if (picked != null) {
       setState(() {
-        _dateController.text = "${picked.year}-${picked.month.toString().padLeft(2, '0')}-${picked.day.toString().padLeft(2, '0')}";
+        _dateController.text =
+            "${picked.year}-${picked.month.toString().padLeft(2, '0')}-${picked.day.toString().padLeft(2, '0')}";
       });
     }
   }
@@ -195,10 +216,14 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
                       child: Container(
                         padding: const EdgeInsets.symmetric(vertical: 12),
                         decoration: BoxDecoration(
-                          color: _isManualMode ? const Color(0xFF08101E) : Colors.transparent,
+                          color: _isManualMode
+                              ? const Color(0xFF08101E)
+                              : Colors.transparent,
                           borderRadius: BorderRadius.circular(10),
                           border: Border.all(
-                            color: _isManualMode ? Colors.white.withOpacity(0.08) : Colors.transparent,
+                            color: _isManualMode
+                                ? Colors.white.withOpacity(0.08)
+                                : Colors.transparent,
                           ),
                         ),
                         child: Row(
@@ -206,14 +231,18 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
                           children: [
                             Icon(
                               Icons.flight_takeoff,
-                              color: _isManualMode ? const Color(0xFFFFC229) : Colors.white60,
+                              color: _isManualMode
+                                  ? const Color(0xFFFFC229)
+                                  : Colors.white60,
                               size: 16,
                             ),
                             const SizedBox(width: 8),
                             Text(
                               'Manual Entry',
                               style: TextStyle(
-                                color: _isManualMode ? Colors.white : Colors.white60,
+                                color: _isManualMode
+                                    ? Colors.white
+                                    : Colors.white60,
                                 fontSize: 13,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -233,10 +262,14 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
                       child: Container(
                         padding: const EdgeInsets.symmetric(vertical: 12),
                         decoration: BoxDecoration(
-                          color: !_isManualMode ? const Color(0xFF08101E) : Colors.transparent,
+                          color: !_isManualMode
+                              ? const Color(0xFF08101E)
+                              : Colors.transparent,
                           borderRadius: BorderRadius.circular(10),
                           border: Border.all(
-                            color: !_isManualMode ? Colors.white.withOpacity(0.08) : Colors.transparent,
+                            color: !_isManualMode
+                                ? Colors.white.withOpacity(0.08)
+                                : Colors.transparent,
                           ),
                         ),
                         child: Row(
@@ -244,14 +277,18 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
                           children: [
                             Icon(
                               Icons.upload_file_outlined,
-                              color: !_isManualMode ? const Color(0xFFFFC229) : Colors.white60,
+                              color: !_isManualMode
+                                  ? const Color(0xFFFFC229)
+                                  : Colors.white60,
                               size: 16,
                             ),
                             const SizedBox(width: 8),
                             Text(
                               'Upload Booking',
                               style: TextStyle(
-                                color: !_isManualMode ? Colors.white : Colors.white60,
+                                color: !_isManualMode
+                                    ? Colors.white
+                                    : Colors.white60,
                                 fontSize: 13,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -315,13 +352,69 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
 
             // Start Monitoring Button
             GestureDetector(
-              onTap: () {
-                if (_isManualMode && _flightNumberController.text.isEmpty) {
+              onTap: _isSavingTrip
+                  ? null
+                  : () async {
+                if (_isManualMode &&
+                    _flightNumberController.text.trim().isEmpty) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: const Text(
                         'Please enter a valid Flight Number.',
-                        style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                            color: Colors.white, fontWeight: FontWeight.bold),
+                      ),
+                      backgroundColor: const Color(0xFFEF4444),
+                      behavior: SnackBarBehavior.floating,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                  );
+                  return;
+                }
+                if (_isManualMode && _originController.text.trim().isEmpty) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: const Text(
+                        'Please enter an Origin.',
+                        style: TextStyle(
+                            color: Colors.white, fontWeight: FontWeight.bold),
+                      ),
+                      backgroundColor: const Color(0xFFEF4444),
+                      behavior: SnackBarBehavior.floating,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                  );
+                  return;
+                }
+                if (_isManualMode &&
+                    _destinationController.text.trim().isEmpty) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: const Text(
+                        'Please enter a Destination.',
+                        style: TextStyle(
+                            color: Colors.white, fontWeight: FontWeight.bold),
+                      ),
+                      backgroundColor: const Color(0xFFEF4444),
+                      behavior: SnackBarBehavior.floating,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                  );
+                  return;
+                }
+                if (_isManualMode && _dateController.text.trim().isEmpty) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: const Text(
+                        'Please select a Departure Date.',
+                        style: TextStyle(
+                            color: Colors.white, fontWeight: FontWeight.bold),
                       ),
                       backgroundColor: const Color(0xFFEF4444),
                       behavior: SnackBarBehavior.floating,
@@ -337,7 +430,8 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
                     SnackBar(
                       content: const Text(
                         'Please upload your booking confirmation first.',
-                        style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                            color: Colors.white, fontWeight: FontWeight.bold),
                       ),
                       backgroundColor: const Color(0xFFEF4444),
                       behavior: SnackBarBehavior.floating,
@@ -349,7 +443,64 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
                   return;
                 }
 
-                _showSuccessDialog();
+                setState(() {
+                  _isSavingTrip = true;
+                });
+
+                try {
+                  final results = await Future.wait([
+                    _tripRepository.fetchUserTrips(),
+                    _profileRepository.getProfile(),
+                  ]);
+                  final trips = results[0] as List;
+                  final profile = results[1] as UserProfile;
+
+                  if (!profile.hasUnlimitedFlightMonitoring &&
+                      trips.length >= freeFlightLimit) {
+                    if (!mounted) return;
+                    showUpgradeToProDialog(context);
+                    return;
+                  }
+
+                  final trip = await _tripRepository.createTrip(
+                    flightNumber: _flightNumberController.text.trim(),
+                    origin: _originController.text.trim(),
+                    destination: _destinationController.text.trim(),
+                    departureDate: _dateController.text.trim(),
+                    bookingReference:
+                        _bookingRefController.text.trim().isEmpty
+                            ? null
+                            : _bookingRefController.text.trim(),
+                    stops: 0,
+                    timeline: const [],
+                  );
+                  await _tripRepository.enableTripLiveTracking(trip.id, true);
+
+                  if (!mounted) return;
+                  _showSuccessDialog();
+                } catch (e) {
+                  if (!mounted) return;
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        'Failed to save trip: $e',
+                        style: const TextStyle(
+                            color: Colors.white, fontWeight: FontWeight.bold),
+                      ),
+                      backgroundColor: const Color(0xFFEF4444),
+                      behavior: SnackBarBehavior.floating,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                  );
+                } finally {
+                  if (mounted) {
+                    setState(() {
+                      _isSavingTrip = false;
+                    });
+                  }
+                }
               },
               child: Container(
                 width: double.infinity,
@@ -358,21 +509,37 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
                   color: const Color(0xFFFFC229), // Yellow
                   borderRadius: BorderRadius.circular(16),
                 ),
-                child: const Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.shield_outlined, color: Colors.black, size: 18),
-                    SizedBox(width: 8),
-                    Text(
-                      'Start Monitoring',
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
+                child: _isSavingTrip
+                    ? const Center(
+                        child: SizedBox(
+                          height: 18,
+                          width: 18,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            valueColor:
+                                AlwaysStoppedAnimation<Color>(Colors.black),
+                          ),
+                        ),
+                    )
+                    : const Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.shield_outlined,
+                            color: Colors.black,
+                            size: 18,
+                          ),
+                          SizedBox(width: 8),
+                          Text(
+                            'Start Monitoring',
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
                       ),
-                    ),
-                  ],
-                ),
               ),
             ),
           ],
@@ -408,7 +575,68 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
               borderRadius: BorderRadius.circular(14),
               borderSide: BorderSide.none,
             ),
-            contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+            contentPadding:
+                const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+          ),
+        ),
+
+        const SizedBox(height: 20),
+
+        // Origin
+        const Text(
+          'Origin',
+          style: TextStyle(
+            color: Colors.white70,
+            fontSize: 13,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+        const SizedBox(height: 8),
+        TextField(
+          controller: _originController,
+          textCapitalization: TextCapitalization.characters,
+          style: const TextStyle(color: Colors.white, fontSize: 14),
+          decoration: InputDecoration(
+            hintText: 'e.g., SFO',
+            hintStyle: const TextStyle(color: Colors.white30, fontSize: 14),
+            fillColor: const Color(0xFF0C162A),
+            filled: true,
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(14),
+              borderSide: BorderSide.none,
+            ),
+            contentPadding:
+                const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+          ),
+        ),
+
+        const SizedBox(height: 20),
+
+        // Destination
+        const Text(
+          'Destination',
+          style: TextStyle(
+            color: Colors.white70,
+            fontSize: 13,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+        const SizedBox(height: 8),
+        TextField(
+          controller: _destinationController,
+          textCapitalization: TextCapitalization.characters,
+          style: const TextStyle(color: Colors.white, fontSize: 14),
+          decoration: InputDecoration(
+            hintText: 'e.g., JFK',
+            hintStyle: const TextStyle(color: Colors.white30, fontSize: 14),
+            fillColor: const Color(0xFF0C162A),
+            filled: true,
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(14),
+              borderSide: BorderSide.none,
+            ),
+            contentPadding:
+                const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
           ),
         ),
 
@@ -424,25 +652,24 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
           ),
         ),
         const SizedBox(height: 8),
-        GestureDetector(
+        TextField(
+          controller: _dateController,
+          readOnly: true,
           onTap: () => _selectDate(context),
-          child: AbsIgnorePointer(
-            child: TextField(
-              controller: _dateController,
-              style: const TextStyle(color: Colors.white, fontSize: 14),
-              decoration: InputDecoration(
-                hintText: 'Select Date',
-                hintStyle: const TextStyle(color: Colors.white30, fontSize: 14),
-                fillColor: const Color(0xFF0C162A),
-                filled: true,
-                suffixIcon: const Icon(Icons.calendar_today_outlined, color: Colors.white30, size: 18),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(14),
-                  borderSide: BorderSide.none,
-                ),
-                contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
-              ),
+          style: const TextStyle(color: Colors.white, fontSize: 14),
+          decoration: InputDecoration(
+            hintText: 'Select Date',
+            hintStyle: const TextStyle(color: Colors.white30, fontSize: 14),
+            fillColor: const Color(0xFF0C162A),
+            filled: true,
+            suffixIcon: const Icon(Icons.calendar_today_outlined,
+                color: Colors.white30, size: 18),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(14),
+              borderSide: BorderSide.none,
             ),
+            contentPadding:
+                const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
           ),
         ),
 
@@ -470,7 +697,8 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
               borderRadius: BorderRadius.circular(14),
               borderSide: BorderSide.none,
             ),
-            contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+            contentPadding:
+                const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
           ),
         ),
 
@@ -521,7 +749,9 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
           color: const Color(0xFF0C162A),
           borderRadius: BorderRadius.circular(24),
           border: Border.all(
-            color: _uploadedFileName != null ? const Color(0xFF10B981) : Colors.white.withOpacity(0.08),
+            color: _uploadedFileName != null
+                ? const Color(0xFF10B981)
+                : Colors.white.withOpacity(0.08),
             style: BorderStyle.solid,
           ),
         ),
@@ -538,7 +768,7 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
               ),
               const SizedBox(height: 16),
               Text(
-                'Uploading... ${( _uploadProgress * 100 ).toInt()}%',
+                'Uploading... ${(_uploadProgress * 100).toInt()}%',
                 style: const TextStyle(
                   color: Colors.white70,
                   fontSize: 14,
@@ -717,19 +947,6 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
           ),
         );
       },
-    );
-  }
-}
-
-class AbsIgnorePointer extends StatelessWidget {
-  final Widget child;
-  const AbsIgnorePointer({super.key, required this.child});
-
-  @override
-  Widget build(BuildContext context) {
-    return IgnorePointer(
-      ignoring: true,
-      child: child,
     );
   }
 }

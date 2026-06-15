@@ -18,7 +18,12 @@ import '../repositories/alert_repository.dart';
 import '../models/dashboard_summary.dart';
 import '../models/dashboard_activity.dart';
 import '../models/alert_model.dart';
+import '../models/user_profile.dart';
+import '../utils/add_flight_navigation.dart';
 import 'plan_usage_screen.dart';
+import '../repositories/trip_repository.dart';
+import '../models/trip_model.dart';
+import '../repositories/profile_repository.dart';
 
 class TravellerDashboardScreen extends StatefulWidget {
   final bool showBottomNav;
@@ -36,6 +41,8 @@ class TravellerDashboardScreen extends StatefulWidget {
 class _TravellerDashboardScreenState extends State<TravellerDashboardScreen> {
   final DashboardRepository _repository = DashboardRepository();
   final AlertRepository _alertRepository = AlertRepository();
+  final TripRepository _tripRepository = TripRepository();
+  final ProfileRepository _profileRepository = ProfileRepository();
   bool _isLoading = true;
   bool _hasLoadedData = false;
   String? _errorMessage;
@@ -43,15 +50,29 @@ class _TravellerDashboardScreenState extends State<TravellerDashboardScreen> {
   DashboardSummary? _summary;
   List<DashboardActivity> _activities = [];
   List<AlertModel> _alerts = [];
+  List<TripModel> _trips = [];
+  UserProfile? _profile;
 
   @override
   void initState() {
     super.initState();
+    TripRepository.tripsVersion.addListener(_onTripsChanged);
+    _loadDashboardData();
+  }
+
+  @override
+  void dispose() {
+    TripRepository.tripsVersion.removeListener(_onTripsChanged);
+    super.dispose();
+  }
+
+  void _onTripsChanged() {
     _loadDashboardData();
   }
 
   Future<void> _loadDashboardData() async {
     if (!mounted) return;
+
     setState(() {
       _isLoading = !_hasLoadedData;
       _errorMessage = null;
@@ -62,6 +83,8 @@ class _TravellerDashboardScreenState extends State<TravellerDashboardScreen> {
         _repository.getSummary(),
         _repository.getActivities(),
         _alertRepository.fetchAlerts(limit: 5),
+        _tripRepository.fetchUserTrips(),
+        _profileRepository.getProfile(),
       ]);
 
       if (mounted) {
@@ -69,6 +92,8 @@ class _TravellerDashboardScreenState extends State<TravellerDashboardScreen> {
           _summary = results[0] as DashboardSummary;
           _activities = results[1] as List<DashboardActivity>;
           _alerts = (results[2] as AlertListResponse).alerts;
+          _trips = results[3] as List<TripModel>;
+          _profile = results[4] as UserProfile;
           _isLoading = false;
           _hasLoadedData = true;
         });
@@ -80,6 +105,7 @@ class _TravellerDashboardScreenState extends State<TravellerDashboardScreen> {
             _errorMessage = null;
             _isLoading = false;
           });
+
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text('Could not refresh dashboard data.'),
@@ -88,12 +114,25 @@ class _TravellerDashboardScreenState extends State<TravellerDashboardScreen> {
           );
           return;
         }
+
         setState(() {
           _errorMessage = e.toString().replaceAll('Exception: ', '');
           _isLoading = false;
         });
       }
     }
+  }
+
+  Future<void> _handleAddFlightTap() async {
+    await openAddFlightWithLimit(
+      context: context,
+      currentTrips: _trips.length,
+      hasUnlimitedFlights: _profile?.hasUnlimitedFlightMonitoring ?? false,
+      onReturn: () async {
+        if (!mounted) return;
+        await _loadDashboardData();
+      },
+    );
   }
 
   @override
@@ -112,8 +151,9 @@ class _TravellerDashboardScreenState extends State<TravellerDashboardScreen> {
           child: _buildBody(displayName),
         ),
       ),
-      bottomNavigationBar:
-          widget.showBottomNav ? const TravellerBottomNav(activeIndex: 0) : null,
+      bottomNavigationBar: widget.showBottomNav
+          ? const TravellerBottomNav(activeIndex: 0)
+          : null,
     );
   }
 
@@ -190,6 +230,8 @@ class _TravellerDashboardScreenState extends State<TravellerDashboardScreen> {
           ),
           const SizedBox(height: 18),
           MonthlyUsageCard(
+            usedFlights: _trips.length,
+            maxFlights: freeFlightLimit,
             onViewDetails: () {
               Navigator.push(
                 context,
@@ -202,7 +244,9 @@ class _TravellerDashboardScreenState extends State<TravellerDashboardScreen> {
           ),
           const SizedBox(height: 18),
           AddFlightCard(
-            onTap: () => showUpgradeToProDialog(context),
+            usedFlights: _trips.length,
+            maxFlights: freeFlightLimit,
+            onTap: _handleAddFlightTap,
           ),
           const SizedBox(height: 24),
           SentinelMonitoringSection(

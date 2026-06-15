@@ -1,18 +1,21 @@
 import 'package:flutter/material.dart';
-import '../screens/add_flight_screen.dart';
 
 class AddFlightCard extends StatelessWidget {
-  final VoidCallback? onTap;
+  final VoidCallback onTap;
+  final int usedFlights;
+  final int maxFlights;
 
   const AddFlightCard({
     super.key,
-    this.onTap,
+    required this.onTap,
+    required this.usedFlights,
+    required this.maxFlights,
   });
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: onTap ?? () => _openAddFlight(context),
+      onTap: onTap,
       child: Container(
         padding: const EdgeInsets.all(18),
         decoration: BoxDecoration(
@@ -38,11 +41,11 @@ class AddFlightCard extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 16),
-            const Expanded(
+            Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
+                  const Text(
                     'Add Flight to Monitor',
                     style: TextStyle(
                       color: Colors.white,
@@ -50,10 +53,10 @@ class AddFlightCard extends StatelessWidget {
                       fontWeight: FontWeight.w700,
                     ),
                   ),
-                  SizedBox(height: 5),
+                  const SizedBox(height: 5),
                   Text(
-                    '2/2 used this month',
-                    style: TextStyle(
+                    '$usedFlights/$maxFlights used this month',
+                    style: const TextStyle(
                       color: Colors.white54,
                       fontSize: 12,
                     ),
@@ -69,13 +72,6 @@ class AddFlightCard extends StatelessWidget {
           ],
         ),
       ),
-    );
-  }
-
-  void _openAddFlight(BuildContext context) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const AddFlightScreen()),
     );
   }
 }

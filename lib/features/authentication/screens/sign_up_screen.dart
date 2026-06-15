@@ -245,7 +245,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   textInputAction: TextInputAction.next,
                   autofillHints: const [AutofillHints.email],
                   autocorrect: false,
-                  enableSuggestions: false,
+                  enableSuggestions: true,
                   onSubmitted: (_) => passwordFocusNode.requestFocus(),
                 ),
                 if (_emailError != null) ...[
@@ -269,6 +269,18 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   onSubmitted: (_) {
                     if (!isLoading) signUpUser();
                   },
+                ),
+                const SizedBox(height: 6),
+                const Padding(
+                  padding: EdgeInsets.only(left: 4),
+                  child: Text(
+                    'Use at least 8 characters with letters and numbers.',
+                    style: TextStyle(
+                      color: Colors.white54,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
                 ),
                 if (_passwordError != null) ...[
                   const SizedBox(height: 6),

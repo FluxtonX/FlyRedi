@@ -3,11 +3,15 @@ import 'package:flutter/material.dart';
 class MonthlyUsageCard extends StatelessWidget {
   final VoidCallback onViewDetails;
   final VoidCallback onLimitTap;
+  final int usedFlights;
+  final int maxFlights;
 
   const MonthlyUsageCard({
     super.key,
     required this.onViewDetails,
     required this.onLimitTap,
+    required this.usedFlights,
+    required this.maxFlights,
   });
 
   @override
@@ -45,8 +49,8 @@ class MonthlyUsageCard extends StatelessWidget {
           const SizedBox(height: 14),
           _UsageMiniRow(
             label: 'Flights',
-            value: '2/2',
-            locked: true,
+            value: '$usedFlights/$maxFlights',
+            locked: usedFlights >= maxFlights,
             onTap: onLimitTap,
           ),
           const SizedBox(height: 10),

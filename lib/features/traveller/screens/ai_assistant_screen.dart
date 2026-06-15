@@ -186,12 +186,7 @@ class _AiAssistantScreenState extends State<AiAssistantScreen> {
           padding: const EdgeInsets.only(top: 40, bottom: 12),
           child: Row(
             children: [
-              const SizedBox(width: 8),
-              IconButton(
-                icon: const Icon(Icons.arrow_back, color: Colors.white70),
-                onPressed: () => Navigator.pop(context),
-              ),
-              const SizedBox(width: 4),
+              const SizedBox(width: 20),
               // Circular icon container with golden sparkle icon
               Container(
                 padding: const EdgeInsets.all(12),

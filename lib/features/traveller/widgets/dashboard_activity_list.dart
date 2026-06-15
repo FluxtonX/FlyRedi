@@ -82,6 +82,25 @@ class DashboardActivityList extends StatelessWidget {
     }
   }
 
+  bool _hasReadableText(String value) {
+    final normalized = value.trim().toLowerCase();
+    return normalized.isNotEmpty &&
+        normalized != 'unknown' &&
+        normalized != '--' &&
+        normalized != 'unknown → unknown' &&
+        normalized != 'unknown - unknown';
+  }
+
+  String _activityTitle(DashboardActivity activity) {
+    if (_hasReadableText(activity.title)) return activity.title;
+    return activity.type == 'trip' ? 'Trip added' : 'Activity';
+  }
+
+  String _activitySubtitle(DashboardActivity activity) {
+    if (_hasReadableText(activity.subtitle)) return activity.subtitle;
+    return activity.type == 'trip' ? 'Trip saved' : '';
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -167,6 +186,7 @@ class DashboardActivityList extends StatelessWidget {
                 final activity = activities[index];
                 final icon = _getIcon(activity.type);
                 final color = _getColor(activity.type);
+                final subtitle = _activitySubtitle(activity);
 
                 return ListTile(
                   onTap: () => _onTapActivity(context, activity),
@@ -183,20 +203,22 @@ class DashboardActivityList extends StatelessWidget {
                     ),
                   ),
                   title: Text(
-                    activity.title,
+                    _activityTitle(activity),
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
-                  subtitle: Text(
-                    activity.subtitle,
-                    style: const TextStyle(
-                      color: Colors.white54,
-                      fontSize: 14,
+                  subtitle: subtitle.isEmpty
+                      ? null
+                      : Text(
+                          subtitle,
+                          style: const TextStyle(
+                            color: Colors.white54,
+                            fontSize: 14,
+                          ),
                     ),
-                  ),
                   trailing: Text(
                     _formatTime(activity.createdAt),
                     style: const TextStyle(

@@ -1,11 +1,53 @@
 import 'package:flutter/material.dart';
 import 'package:sky_rightz_360/core/constants/app_colors.dart';
+import '../models/trip_model.dart';
+import '../repositories/trip_repository.dart';
+import '../utils/add_flight_navigation.dart';
 import '../widgets/traveller_bottom_nav.dart';
 import '../widgets/upgrade_to_pro_dialog.dart';
 import 'pro_benefits_screen.dart';
 
-class PlanUsageScreen extends StatelessWidget {
+class PlanUsageScreen extends StatefulWidget {
   const PlanUsageScreen({super.key});
+
+  @override
+  State<PlanUsageScreen> createState() => _PlanUsageScreenState();
+}
+
+class _PlanUsageScreenState extends State<PlanUsageScreen> {
+  final TripRepository _tripRepository = TripRepository();
+  List<TripModel> _trips = [];
+
+  int get _usedFlights => _trips.length;
+  double get _flightProgress =>
+      (_usedFlights / freeFlightLimit).clamp(0.0, 1.0).toDouble();
+
+  @override
+  void initState() {
+    super.initState();
+    TripRepository.tripsVersion.addListener(_onTripsChanged);
+    _loadTrips();
+  }
+
+  @override
+  void dispose() {
+    TripRepository.tripsVersion.removeListener(_onTripsChanged);
+    super.dispose();
+  }
+
+  void _onTripsChanged() {
+    _loadTrips();
+  }
+
+  Future<void> _loadTrips() async {
+    try {
+      final trips = await _tripRepository.fetchUserTrips();
+      if (!mounted) return;
+      setState(() {
+        _trips = trips;
+      });
+    } catch (_) {}
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -115,9 +157,9 @@ class PlanUsageScreen extends StatelessWidget {
               _PlanUsageRow(
                 icon: Icons.flight_takeoff,
                 label: 'Flights Monitored',
-                value: '2/2',
-                progress: 1,
-                warning: true,
+                value: '$_usedFlights/$freeFlightLimit',
+                progress: _flightProgress,
+                warning: _usedFlights >= freeFlightLimit,
                 onTap: () => showUpgradeToProDialog(context),
               ),
               _PlanUsageRow(

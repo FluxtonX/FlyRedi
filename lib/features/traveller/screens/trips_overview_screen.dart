@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:sky_rightz_360/core/constants/app_colors.dart';
 import '../models/trip_model.dart';
+import '../models/user_profile.dart';
+import '../repositories/profile_repository.dart';
 import '../repositories/trip_repository.dart';
 import '../widgets/skeleton_box.dart';
 import '../widgets/traveller_bottom_nav.dart';
+import '../utils/add_flight_navigation.dart';
 import 'active_disruptions_screen.dart';
 import 'upcoming_trips_screen.dart';
-import 'add_flight_screen.dart';
 import 'border_ready_screen.dart';
 import 'flight_detail_screen.dart';
 
@@ -24,7 +26,10 @@ class TripsOverviewScreen extends StatefulWidget {
 
 class _TripsOverviewScreenState extends State<TripsOverviewScreen> {
   final TripRepository _repository = TripRepository();
+  final ProfileRepository _profileRepository = ProfileRepository();
   List<TripModel> _trips = [];
+  UserProfile? _profile;
+  final Set<String> _deletingTripIds = {};
   bool _isLoading = true;
   bool _hasLoadedTrips = false;
   String? _errorMessage;
@@ -32,6 +37,17 @@ class _TripsOverviewScreenState extends State<TripsOverviewScreen> {
   @override
   void initState() {
     super.initState();
+    TripRepository.tripsVersion.addListener(_onTripsChanged);
+    _loadTrips();
+  }
+
+  @override
+  void dispose() {
+    TripRepository.tripsVersion.removeListener(_onTripsChanged);
+    super.dispose();
+  }
+
+  void _onTripsChanged() {
     _loadTrips();
   }
 
@@ -43,10 +59,14 @@ class _TripsOverviewScreenState extends State<TripsOverviewScreen> {
     });
 
     try {
-      final trips = await _repository.fetchUserTrips();
+      final results = await Future.wait([
+        _repository.fetchUserTrips(),
+        _profileRepository.getProfile(),
+      ]);
       if (!mounted) return;
       setState(() {
-        _trips = trips;
+        _trips = results[0] as List<TripModel>;
+        _profile = results[1] as UserProfile;
         _isLoading = false;
         _hasLoadedTrips = true;
       });
@@ -72,6 +92,18 @@ class _TripsOverviewScreenState extends State<TripsOverviewScreen> {
     }
   }
 
+  Future<void> _handleAddFlightTap() async {
+    await openAddFlightWithLimit(
+      context: context,
+      currentTrips: _trips.length,
+      hasUnlimitedFlights: _profile?.hasUnlimitedFlightMonitoring ?? false,
+      onReturn: () async {
+        if (!mounted) return;
+        await _loadTrips();
+      },
+    );
+  }
+
   Future<void> _toggleTracking(TripModel trip) async {
     bool newStatus = !trip.trackingEnabled;
     // Optimistic UI update
@@ -82,8 +114,11 @@ class _TripsOverviewScreenState extends State<TripsOverviewScreen> {
           id: trip.id,
           userId: trip.userId,
           tripName: trip.tripName,
+          flightNumber: trip.flightNumber,
           origin: trip.origin,
           destination: trip.destination,
+          departureDate: trip.departureDate,
+          bookingReference: trip.bookingReference,
           totalDuration: trip.totalDuration,
           stops: trip.stops,
           timeline: trip.timeline,
@@ -144,6 +179,112 @@ class _TripsOverviewScreenState extends State<TripsOverviewScreen> {
         ),
       );
     }
+  }
+
+  Future<void> _confirmDeleteTrip(TripModel trip) async {
+    final shouldDelete = await showDialog<bool>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: const Color(0xFF0C162A),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(18),
+          ),
+          title: const Text(
+            'Delete this trip?',
+            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text(
+                'Cancel',
+                style: TextStyle(color: Colors.white70),
+              ),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: const Text(
+                'Delete',
+                style: TextStyle(
+                  color: Color(0xFFEF4444),
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (shouldDelete == true) {
+      await _deleteTrip(trip);
+    }
+  }
+
+  Future<void> _deleteTrip(TripModel trip) async {
+    if (_deletingTripIds.contains(trip.id)) return;
+
+    final originalTrips = List<TripModel>.from(_trips);
+    setState(() {
+      _deletingTripIds.add(trip.id);
+      _trips.removeWhere((item) => item.id == trip.id);
+    });
+
+    try {
+      await _repository.deleteTrip(trip.id);
+      if (!mounted) return;
+      await _loadTrips();
+      if (!mounted) return;
+      setState(() {
+        _deletingTripIds.remove(trip.id);
+      });
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _trips = originalTrips;
+        _deletingTripIds.remove(trip.id);
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Failed to delete trip: $e',
+            style: const TextStyle(color: Colors.white),
+          ),
+          backgroundColor: const Color(0xFFE11D48),
+        ),
+      );
+    }
+  }
+
+  bool _hasReadableTripValue(String value) {
+    final normalized = value.trim().toLowerCase();
+    return normalized.isNotEmpty && normalized != 'unknown' && normalized != '--';
+  }
+
+  String _tripFlightLabel(TripModel trip) {
+    if (_hasReadableTripValue(trip.flightNumber)) return trip.flightNumber;
+    if (_hasReadableTripValue(trip.tripName)) return trip.tripName;
+    return 'Trip added';
+  }
+
+  String _tripLocationLabel(String value, String fallback) {
+    return _hasReadableTripValue(value) ? value : fallback;
+  }
+
+  String _tripRouteLabel(TripModel trip) {
+    final origin = _tripLocationLabel(trip.origin, 'Origin not set');
+    final destination =
+        _tripLocationLabel(trip.destination, 'Destination not set');
+    return '$origin → $destination';
+  }
+
+  String _tripDateLabel(TripModel trip) {
+    if (_hasReadableTripValue(trip.departureDate)) return trip.departureDate;
+    if (_hasReadableTripValue(trip.totalDuration ?? '')) {
+      return trip.totalDuration!;
+    }
+    return 'Date not set';
   }
 
   @override
@@ -230,14 +371,7 @@ class _TripsOverviewScreenState extends State<TripsOverviewScreen> {
                   ),
                   IconButton(
                     icon: const Icon(Icons.add, color: Colors.white),
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const AddFlightScreen(),
-                        ),
-                      );
-                    },
+                    onPressed: _handleAddFlightTap,
                   ),
                 ],
               ),
@@ -364,21 +498,29 @@ class _TripsOverviewScreenState extends State<TripsOverviewScreen> {
                 ...monitoredTrips.map((trip) {
                   final firstLeg =
                       trip.timeline.isNotEmpty ? trip.timeline.first : null;
+                  final origin =
+                      _tripLocationLabel(trip.origin, 'Origin not set');
+                  final destination = _tripLocationLabel(
+                    trip.destination,
+                    'Destination not set',
+                  );
                   return Padding(
                     padding: const EdgeInsets.only(bottom: 12.0),
                     child: _buildProtectedFlightCard(
-                      airlineCode:
-                          firstLeg?.airlineCode ?? trip.tripName.toUpperCase(),
-                      risk: '${(firstLeg?.riskLevel ?? 'LOW').toUpperCase()} RISK',
+                      airlineCode: _tripFlightLabel(trip),
+                      risk:
+                          '${(firstLeg?.riskLevel ?? 'LOW').toUpperCase()} RISK',
                       riskColor: _getRiskColor(firstLeg?.riskLevel),
-                      from: firstLeg?.from ?? trip.origin,
-                      fromTime: firstLeg?.fromTime ?? '--',
-                      to: firstLeg?.to ?? trip.destination,
-                      toTime: firstLeg?.toTime ?? '--',
-                      statusText: trip.status.toUpperCase(),
+                      from: origin,
+                      fromTime: firstLeg?.fromTime ?? 'Departure',
+                      to: destination,
+                      toTime: firstLeg?.toTime ?? 'Arrival',
+                      statusText: trip.trackingEnabled
+                          ? 'ACTIVE'
+                          : trip.status.toUpperCase(),
                       delayProb: firstLeg?.delayProb ?? '0%',
                       activeAlerts: firstLeg?.activeAlerts ?? 0,
-                      date: firstLeg?.date ?? '--',
+                      date: _tripDateLabel(trip),
                     ),
                   );
                 }).toList(),
@@ -556,6 +698,8 @@ class _TripsOverviewScreenState extends State<TripsOverviewScreen> {
   }
 
   Widget _buildUpcomingCard(TripModel trip, TripTimelineItem? firstLeg) {
+    final isDeleting = _deletingTripIds.contains(trip.id);
+
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
@@ -575,7 +719,7 @@ class _TripsOverviewScreenState extends State<TripsOverviewScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    firstLeg?.airlineCode ?? trip.tripName.toUpperCase(),
+                    _tripFlightLabel(trip),
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 14,
@@ -584,7 +728,7 @@ class _TripsOverviewScreenState extends State<TripsOverviewScreen> {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    '${trip.origin} → ${trip.destination}',
+                    _tripRouteLabel(trip),
                     style: const TextStyle(
                       color: Colors.white60,
                       fontSize: 12,
@@ -592,7 +736,7 @@ class _TripsOverviewScreenState extends State<TripsOverviewScreen> {
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    firstLeg?.date ?? '--',
+                    _tripDateLabel(trip),
                     style: const TextStyle(
                       color: Colors.white38,
                       fontSize: 11,
@@ -603,6 +747,35 @@ class _TripsOverviewScreenState extends State<TripsOverviewScreen> {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
+                  GestureDetector(
+                    onTap: isDeleting ? null : () => _confirmDeleteTrip(trip),
+                    child: Container(
+                      width: 28,
+                      height: 28,
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFE11D48).withOpacity(0.12),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: isDeleting
+                          ? const SizedBox(
+                              width: 14,
+                              height: 14,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                  Color(0xFFE11D48),
+                                ),
+                              ),
+                            )
+                          : const Icon(
+                              Icons.delete_outline,
+                              color: Color(0xFFE11D48),
+                              size: 16,
+                            ),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
                   Text(
                     trip.trackingEnabled ? 'Active Sentinel' : 'Not Monitored',
                     style: TextStyle(

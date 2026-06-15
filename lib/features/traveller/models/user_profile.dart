@@ -54,6 +54,10 @@ class UserProfile {
     return '?';
   }
 
+  bool get hasUnlimitedFlightMonitoring {
+    return plan == 'Plus' || plan == 'Concierge Pass' || role == 'Admin';
+  }
+
   UserProfile copyWith({
     String? displayName,
     String? phoneNumber,

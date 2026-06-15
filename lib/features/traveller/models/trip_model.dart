@@ -46,14 +46,35 @@ class TripTimelineItem {
       activeAlerts: json['activeAlerts'],
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'isFlight': isFlight,
+      'duration': duration,
+      'riskLevel': riskLevel,
+      'riskColor': riskColor,
+      'info': info,
+      'airlineCode': airlineCode,
+      'from': from,
+      'to': to,
+      'fromTime': fromTime,
+      'toTime': toTime,
+      'date': date,
+      'delayProb': delayProb,
+      'activeAlerts': activeAlerts,
+    };
+  }
 }
 
 class TripModel {
   final String id;
   final String userId;
   final String tripName;
+  final String flightNumber;
   final String origin;
   final String destination;
+  final String departureDate;
+  final String? bookingReference;
   final String? totalDuration;
   final int stops;
   final List<TripTimelineItem> timeline;
@@ -67,8 +88,11 @@ class TripModel {
     required this.id,
     required this.userId,
     required this.tripName,
+    required this.flightNumber,
     required this.origin,
     required this.destination,
+    required this.departureDate,
+    this.bookingReference,
     this.totalDuration,
     required this.stops,
     required this.timeline,
@@ -80,16 +104,21 @@ class TripModel {
   });
 
   factory TripModel.fromJson(Map<String, dynamic> json) {
-    var timelineList = json['timeline'] as List? ?? [];
-    List<TripTimelineItem> timelineItems =
-        timelineList.map((item) => TripTimelineItem.fromJson(item)).toList();
+    final timelineList = json['timeline'] as List? ?? [];
+
+    final timelineItems = timelineList
+        .map((item) => TripTimelineItem.fromJson(item as Map<String, dynamic>))
+        .toList();
 
     return TripModel(
       id: json['_id'] ?? json['id'] ?? '',
       userId: json['userId'] ?? '',
       tripName: json['tripName'] ?? '',
+      flightNumber: json['flightNumber'] ?? json['tripName'] ?? '',
       origin: json['origin'] ?? '',
       destination: json['destination'] ?? '',
+      departureDate: json['departureDate'] ?? json['totalDuration'] ?? '',
+      bookingReference: json['bookingReference'],
       totalDuration: json['totalDuration'],
       stops: json['stops'] ?? 0,
       timeline: timelineItems,
