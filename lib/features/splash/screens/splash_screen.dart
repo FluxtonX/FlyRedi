@@ -27,6 +27,20 @@ class _SplashScreenState extends State<SplashScreen> {
     await Future.delayed(const Duration(seconds: 2));
     if (!mounted) return;
 
+    final hasSeenOnboarding =
+        await _onboardingRepository.getLocalOnboardingStatus();
+    if (!mounted) return;
+
+    if (!hasSeenOnboarding) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const OnboardingScreen(),
+        ),
+      );
+      return;
+    }
+
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) {
       Navigator.pushReplacement(
@@ -38,28 +52,12 @@ class _SplashScreenState extends State<SplashScreen> {
       return;
     }
 
-    try {
-      final isCompleted = await _onboardingRepository.getOnboardingStatus();
-      if (!mounted) return;
-
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => isCompleted
-              ? const TravellerTabsScreen()
-              : const OnboardingScreen(),
-        ),
-      );
-    } catch (_) {
-      if (!mounted) return;
-      // Fallback safely to OnboardingScreen on network/server errors
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => const OnboardingScreen(),
-        ),
-      );
-    }
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const TravellerTabsScreen(),
+      ),
+    );
   }
 
   @override

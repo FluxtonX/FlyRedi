@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../widgets/onboarding_page.dart';
 import '../widgets/plan_selection_page.dart';
+import '../../authentication/screens/sign_in_screen.dart';
 import '../../traveller/screens/traveller_tabs_screen.dart';
 import '../repositories/onboarding_repository.dart';
 
@@ -66,11 +67,15 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
     try {
       final user = FirebaseAuth.instance.currentUser;
-      await _onboardingRepository.completeOnboarding(
-        role: 'User',
-        notificationsEnabled: true,
-        displayName: user?.displayName ?? user?.email?.split('@').first,
-      );
+      await _onboardingRepository.completeLocalOnboarding();
+
+      if (user != null) {
+        await _onboardingRepository.completeOnboarding(
+          role: 'User',
+          notificationsEnabled: true,
+          displayName: user.displayName ?? user.email?.split('@').first,
+        );
+      }
     } catch (e) {
       debugPrint('Failed to complete onboarding: $e');
     } finally {
@@ -78,10 +83,14 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         setState(() {
           _isCompleting = false;
         });
+
+        final user = FirebaseAuth.instance.currentUser;
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (context) => const TravellerTabsScreen(),
+            builder: (context) => user == null
+                ? const SignInScreen()
+                : const TravellerTabsScreen(),
           ),
         );
       }

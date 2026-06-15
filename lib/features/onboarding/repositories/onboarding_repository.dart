@@ -1,8 +1,22 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../../shared/services/api_service.dart';
 
 class OnboardingRepository {
+  static const String _localOnboardingCompletedKey =
+      'local_onboarding_completed';
+
+  Future<bool> getLocalOnboardingStatus() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool(_localOnboardingCompletedKey) ?? false;
+  }
+
+  Future<void> completeLocalOnboarding() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_localOnboardingCompletedKey, true);
+  }
+
   Future<bool> getOnboardingStatus() async {
     try {
       final http.Response response =

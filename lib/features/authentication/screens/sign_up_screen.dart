@@ -1,10 +1,9 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../../../core/widgets/custom_button.dart';
 import '../widgets/auth_textfield.dart';
 import 'sign_in_screen.dart';
-import '../../onboarding/screens/onboarding_screen.dart';
+import '../../traveller/screens/traveller_tabs_screen.dart';
 import '../../../shared/services/api_service.dart';
 
 class SignUpScreen extends StatefulWidget {
@@ -120,18 +119,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
       await userCredential.user?.updateDisplayName(nameController.text.trim());
 
       // Sync new user to backend (creates Firestore profile)
-      final syncResponse = await ApiService.post('/api/auth/sync');
+      await ApiService.post('/api/auth/sync');
 
       if (!mounted) return;
-
-      // For new users, onboarding is always not completed
-      bool onboardingCompleted = false;
-      if (syncResponse.statusCode == 200) {
-        try {
-          final data = jsonDecode(syncResponse.body);
-          onboardingCompleted = data['onboardingCompleted'] == true;
-        } catch (_) {}
-      }
 
       _showSnackBar('Account created successfully!', isError: false);
 
@@ -142,9 +132,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (context) => onboardingCompleted
-              ? const SignInScreen()
-              : const OnboardingScreen(),
+          builder: (context) => const TravellerTabsScreen(),
         ),
       );
     } on FirebaseAuthException catch (e) {
