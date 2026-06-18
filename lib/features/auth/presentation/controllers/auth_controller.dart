@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 import '../../domain/repositories/auth_repository.dart';
 import '../../data/datasources/auth_local_data_source.dart';
@@ -21,6 +22,7 @@ class AuthController extends GetxController {
   final Rxn<UserProfile> userProfile = Rxn<UserProfile>();
   final RxBool isLoading = false.obs;
   final RxnString errorMessage = RxnString();
+  bool _isEndingExpiredSession = false;
 
   bool get isAuthenticated => userProfile.value != null;
 
@@ -55,7 +57,7 @@ class AuthController extends GetxController {
       );
       userProfile.value = response.user;
       isLoading.value = false;
-      
+
       Get.offAllNamed('/home');
       return true;
     } catch (e) {
@@ -77,7 +79,7 @@ class AuthController extends GetxController {
       );
       userProfile.value = response.user;
       isLoading.value = false;
-      
+
       _showSuccessSnackBar('Account created successfully!');
       await Future.delayed(const Duration(milliseconds: 700));
       Get.offAllNamed('/home');
@@ -136,6 +138,39 @@ class AuthController extends GetxController {
       isLoading.value = false;
       Get.offAllNamed('/login');
     }
+  }
+
+  Future<void> handleSessionExpired() async {
+    if (_isEndingExpiredSession) return;
+    _isEndingExpiredSession = true;
+
+    try {
+      await FirebaseAuth.instance.signOut();
+    } catch (_) {}
+
+    try {
+      await _localDataSource.clearSession();
+    } catch (_) {}
+
+    userProfile.value = null;
+    isLoading.value = false;
+
+    if (Get.currentRoute != '/login') {
+      Get.offAllNamed('/login');
+      Get.snackbar(
+        'Session expired',
+        'Please sign in again.',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: const Color(0xFFE11D48),
+        colorText: Colors.white,
+        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        borderRadius: 12,
+        duration: const Duration(seconds: 3),
+        icon: const Icon(Icons.error_outline_rounded, color: Colors.white),
+      );
+    }
+
+    _isEndingExpiredSession = false;
   }
 
   void _showErrorSnackBar(String message) {

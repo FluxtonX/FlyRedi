@@ -63,7 +63,7 @@ class DioClient {
           if (error.response?.statusCode == 401) {
             try {
               final authController = get_x.Get.find<AuthController>();
-              await authController.logout();
+              await authController.handleSessionExpired();
             } catch (_) {}
           }
           return handler.next(error);

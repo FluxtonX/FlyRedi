@@ -4,6 +4,53 @@ import 'package:flutter/foundation.dart';
 import 'package:sky_rightz_360/shared/services/api_service.dart';
 import 'package:sky_rightz_360/features/traveller/models/trip_model.dart';
 
+class FlightLookupResult {
+  final String flightNumber;
+  final String flightDate;
+  final String status;
+  final String origin;
+  final String originAirport;
+  final String destination;
+  final String destinationAirport;
+  final String airline;
+  final String departureScheduled;
+  final String arrivalScheduled;
+  final int departureDelay;
+  final int arrivalDelay;
+
+  FlightLookupResult({
+    required this.flightNumber,
+    required this.flightDate,
+    required this.status,
+    required this.origin,
+    required this.originAirport,
+    required this.destination,
+    required this.destinationAirport,
+    required this.airline,
+    required this.departureScheduled,
+    required this.arrivalScheduled,
+    required this.departureDelay,
+    required this.arrivalDelay,
+  });
+
+  factory FlightLookupResult.fromJson(Map<String, dynamic> json) {
+    return FlightLookupResult(
+      flightNumber: json['flightNumber'] ?? '',
+      flightDate: json['flightDate'] ?? '',
+      status: json['status'] ?? 'planned',
+      origin: json['origin'] ?? '',
+      originAirport: json['originAirport'] ?? '',
+      destination: json['destination'] ?? '',
+      destinationAirport: json['destinationAirport'] ?? '',
+      airline: json['airline'] ?? '',
+      departureScheduled: json['departureScheduled'] ?? '',
+      arrivalScheduled: json['arrivalScheduled'] ?? '',
+      departureDelay: json['departureDelay'] ?? 0,
+      arrivalDelay: json['arrivalDelay'] ?? 0,
+    );
+  }
+}
+
 class TripRepository {
   static final ValueNotifier<int> tripsVersion = ValueNotifier<int>(0);
 
@@ -22,6 +69,35 @@ class TripRepository {
     }
 
     throw Exception('Failed to load trips');
+  }
+
+  Future<FlightLookupResult> lookupFlight({
+    required String flightNumber,
+    String? departureDate,
+  }) async {
+    final response = await ApiService.post(
+      '/api/trips/flight-lookup',
+      body: {
+        'flightNumber': flightNumber,
+        if (departureDate != null && departureDate.isNotEmpty)
+          'departureDate': departureDate,
+      },
+    );
+
+    if (response.statusCode == 200) {
+      return FlightLookupResult.fromJson(
+        jsonDecode(response.body) as Map<String, dynamic>,
+      );
+    }
+
+    final Map<String, dynamic> errorBody;
+    try {
+      errorBody = jsonDecode(response.body) as Map<String, dynamic>;
+    } catch (_) {
+      throw Exception('Flight lookup failed');
+    }
+
+    throw Exception(errorBody['message'] ?? 'Flight lookup failed');
   }
 
   Future<TripModel> createTrip({

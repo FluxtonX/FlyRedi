@@ -12,4 +12,8 @@ class ApiConstants {
   static const String settings = '/api/auth/profile/settings';
   static const String notifications = '/api/auth/profile/notifications';
   static const String account = '/api/auth/account';
+
+  // Flight Endpoints
+  static const String flightStatus = '/api/flights/status';
 }
+

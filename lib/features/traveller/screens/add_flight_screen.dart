@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:sky_rightz_360/core/constants/app_colors.dart';
 import 'package:sky_rightz_360/features/traveller/repositories/trip_repository.dart';
+import '../models/trip_model.dart';
 import '../models/user_profile.dart';
 import '../repositories/profile_repository.dart';
 import '../utils/add_flight_navigation.dart';
 import '../widgets/traveller_bottom_nav.dart';
 import '../widgets/upgrade_to_pro_dialog.dart';
+import 'sentinel_monitor_screen.dart';
 
 class AddFlightScreen extends StatefulWidget {
   const AddFlightScreen({super.key});
@@ -25,8 +27,11 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
   final ProfileRepository _profileRepository = ProfileRepository();
   bool _isUploading = false;
   bool _isSavingTrip = false;
+  bool _isLookingUpFlight = false;
   double _uploadProgress = 0.0;
   String? _uploadedFileName;
+  FlightLookupResult? _flightLookup;
+  String? _flightLookupMessage;
 
   @override
   void dispose() {
@@ -40,6 +45,86 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
 
   String _normalizeFlightNumber(String value) {
     return value.trim().toUpperCase().replaceAll(RegExp(r'\s+'), '');
+  }
+
+  Future<FlightLookupResult?> _lookupFlightDetails({
+    bool showSuccessSnack = false,
+  }) async {
+    final flightNumber = _normalizeFlightNumber(_flightNumberController.text);
+    final departureDate = _dateController.text.trim();
+
+    if (flightNumber.isEmpty || departureDate.isEmpty) {
+      setState(() {
+        _flightLookup = null;
+        _flightLookupMessage = null;
+      });
+      return null;
+    }
+
+    setState(() {
+      _isLookingUpFlight = true;
+      _flightLookupMessage = null;
+    });
+
+    try {
+      final result = await _tripRepository.lookupFlight(
+        flightNumber: flightNumber,
+        departureDate: departureDate,
+      );
+      final airlinePrefix =
+          result.airline.isNotEmpty ? '${result.airline} ' : '';
+
+      if (!mounted) return result;
+      setState(() {
+        _flightLookup = result;
+        _flightNumberController.text = result.flightNumber;
+        if (result.flightDate.isNotEmpty) {
+          _dateController.text = result.flightDate;
+        }
+        if (result.origin.isNotEmpty) {
+          _originController.text = result.origin;
+        }
+        if (result.destination.isNotEmpty) {
+          _destinationController.text = result.destination;
+        }
+        _flightLookupMessage =
+            '$airlinePrefix${result.origin} → ${result.destination} found via Aviationstack';
+      });
+
+      if (showSuccessSnack) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text(
+              'Flight details found and added.',
+              style:
+                  TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+            ),
+            backgroundColor: const Color(0xFF10B981),
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+          ),
+        );
+      }
+
+      return result;
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _flightLookup = null;
+          _flightLookupMessage =
+              'Could not find this flight automatically. You can still enter origin and destination manually.';
+        });
+      }
+      return null;
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLookingUpFlight = false;
+        });
+      }
+    }
   }
 
   void _simulateUpload() {
@@ -102,6 +187,8 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
       setState(() {
         _dateController.text =
             "${picked.year}-${picked.month.toString().padLeft(2, '0')}-${picked.day.toString().padLeft(2, '0')}";
+        _flightLookup = null;
+        _flightLookupMessage = null;
       });
     }
   }
@@ -431,11 +518,41 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
                     return;
                   }
 
+                  final lookupResult = _isManualMode
+                      ? await _lookupFlightDetails()
+                      : null;
+                  final resolvedOrigin =
+                      lookupResult?.origin ?? _originController.text.trim();
+                  final resolvedDestination = lookupResult?.destination ??
+                      _destinationController.text.trim();
+
+                  if (_isManualMode &&
+                      lookupResult == null &&
+                      (resolvedOrigin.isEmpty || resolvedDestination.isEmpty)) {
+                    if (!mounted) return;
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: const Text(
+                          'Flight not found automatically. Please enter origin and destination to save it manually.',
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold),
+                        ),
+                        backgroundColor: const Color(0xFFEF4444),
+                        behavior: SnackBarBehavior.floating,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                    );
+                    return;
+                  }
+
                   final trip = await _tripRepository.createTrip(
                     flightNumber:
                         _normalizeFlightNumber(_flightNumberController.text),
-                    origin: _originController.text.trim(),
-                    destination: _destinationController.text.trim(),
+                    origin: resolvedOrigin,
+                    destination: resolvedDestination,
                     departureDate: _dateController.text.trim(),
                     bookingReference:
                         _bookingRefController.text.trim().isEmpty
@@ -447,7 +564,7 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
                   await _tripRepository.enableTripLiveTracking(trip.id, true);
 
                   if (!mounted) return;
-                  _showSuccessDialog();
+                  _showSuccessDialog(trip);
                 } catch (e) {
                   if (!mounted) return;
                   ScaffoldMessenger.of(context).showSnackBar(
@@ -535,6 +652,13 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
         const SizedBox(height: 8),
         TextField(
           controller: _flightNumberController,
+          textCapitalization: TextCapitalization.characters,
+          onChanged: (_) {
+            setState(() {
+              _flightLookup = null;
+              _flightLookupMessage = null;
+            });
+          },
           style: const TextStyle(color: Colors.white, fontSize: 14),
           decoration: InputDecoration(
             hintText: 'e.g., UA 2847',
@@ -640,6 +764,86 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
             ),
             contentPadding:
                 const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+          ),
+        ),
+
+        const SizedBox(height: 14),
+
+        GestureDetector(
+          onTap: (_isLookingUpFlight || _isSavingTrip)
+              ? null
+              : () async {
+                  if (_flightNumberController.text.trim().isEmpty ||
+                      _dateController.text.trim().isEmpty) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: const Text(
+                          'Enter flight number and departure date first.',
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold),
+                        ),
+                        backgroundColor: const Color(0xFFEF4444),
+                        behavior: SnackBarBehavior.floating,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                    );
+                    return;
+                  }
+                  await _lookupFlightDetails(showSuccessSnack: true);
+                },
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 13),
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.04),
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(
+                color: _flightLookup != null
+                    ? const Color(0xFF10B981).withOpacity(0.45)
+                    : Colors.white.withOpacity(0.08),
+              ),
+            ),
+            child: Row(
+              children: [
+                _isLookingUpFlight
+                    ? const SizedBox(
+                        width: 18,
+                        height: 18,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          valueColor:
+                              AlwaysStoppedAnimation<Color>(Color(0xFFFFC229)),
+                        ),
+                      )
+                    : Icon(
+                        _flightLookup != null
+                            ? Icons.check_circle_outline
+                            : Icons.travel_explore,
+                        color: _flightLookup != null
+                            ? const Color(0xFF10B981)
+                            : const Color(0xFFFFC229),
+                        size: 18,
+                      ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    _isLookingUpFlight
+                        ? 'Finding flight details...'
+                        : (_flightLookupMessage ?? 'Find flight details'),
+                    style: TextStyle(
+                      color: _flightLookup != null
+                          ? const Color(0xFF10B981)
+                          : Colors.white70,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w700,
+                      height: 1.35,
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
 
@@ -840,7 +1044,7 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
     );
   }
 
-  void _showSuccessDialog() {
+  void _showSuccessDialog(TripModel trip) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -892,7 +1096,14 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
                 GestureDetector(
                   onTap: () {
                     Navigator.pop(context); // Pop dialog
-                    Navigator.pop(context); // Pop screen back to overview
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => SentinelMonitorScreen(
+                          initialTrip: trip,
+                        ),
+                      ),
+                    );
                   },
                   child: Container(
                     width: double.infinity,

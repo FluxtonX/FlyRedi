@@ -10,6 +10,7 @@ import 'trips_overview_screen.dart';
 import 'resolve_dashboard_screen.dart';
 import 'border_ready_screen.dart';
 import 'flight_detail_screen.dart';
+import 'personal_information_screen.dart';
 import 'privacy_security_screen.dart';
 import 'help_support_screen.dart';
 
@@ -89,7 +90,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
         content: Row(
           children: [
             Icon(
-              isError ? Icons.error_outline_rounded : Icons.check_circle_outline_rounded,
+              isError
+                  ? Icons.error_outline_rounded
+                  : Icons.check_circle_outline_rounded,
               color: Colors.white,
               size: 18,
             ),
@@ -164,8 +167,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 isSaving
                     ? const Center(
                         child: CircularProgressIndicator(
-                          valueColor: AlwaysStoppedAnimation<Color>(
-                              Color(0xFFFFC229)),
+                          valueColor:
+                              AlwaysStoppedAnimation<Color>(Color(0xFFFFC229)),
                         ),
                       )
                     : ElevatedButton(
@@ -180,9 +183,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             if (ctx.mounted) Navigator.pop(ctx);
                             _showSnackBar('Profile updated successfully!');
                           } catch (_) {
-                            _showSnackBar('Failed to update profile.', isError: true);
+                            _showSnackBar('Failed to update profile.',
+                                isError: true);
                           } finally {
-                            if (ctx.mounted) setModalState(() => isSaving = false);
+                            if (ctx.mounted) {
+                              setModalState(() => isSaving = false);
+                            }
                           }
                         },
                         style: ElevatedButton.styleFrom(
@@ -226,8 +232,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
-          borderSide:
-              const BorderSide(color: Color(0xFFFFC229), width: 1.5),
+          borderSide: const BorderSide(color: Color(0xFFFFC229), width: 1.5),
         ),
       ),
     );
@@ -238,13 +243,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
     if (currentProfile == null) return;
 
     final prev = currentProfile.notificationsEnabled;
-    await _authController.updateProfileState(currentProfile.copyWith(notificationsEnabled: value));
+    await _authController.updateProfileState(
+        currentProfile.copyWith(notificationsEnabled: value));
     try {
       await _repository.updateNotifications(enabled: value);
       _showSnackBar(
           value ? 'Notifications enabled.' : 'Notifications disabled.');
     } catch (_) {
-      await _authController.updateProfileState(currentProfile.copyWith(notificationsEnabled: prev));
+      await _authController.updateProfileState(
+          currentProfile.copyWith(notificationsEnabled: prev));
       _showSnackBar('Failed to update notifications.', isError: true);
     }
   }
@@ -266,8 +273,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('Cancel',
-                style: TextStyle(color: Colors.white54)),
+            child:
+                const Text('Cancel', style: TextStyle(color: Colors.white54)),
           ),
           ElevatedButton(
             onPressed: () async {
@@ -306,8 +313,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('Cancel',
-                style: TextStyle(color: Colors.white54)),
+            child:
+                const Text('Cancel', style: TextStyle(color: Colors.white54)),
           ),
           ElevatedButton(
             onPressed: () async {
@@ -355,7 +362,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
           Obx(() => _profile != null
               ? IconButton(
                   onPressed: _showEditProfileSheet,
-                  icon: const Icon(Icons.edit_outlined, color: Color(0xFFFFC229)),
+                  icon:
+                      const Icon(Icons.edit_outlined, color: Color(0xFFFFC229)),
                   tooltip: 'Edit profile',
                 )
               : const SizedBox.shrink()),
@@ -363,8 +371,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ],
       ),
       body: _buildBody(),
-      bottomNavigationBar:
-          widget.showBottomNav ? const TravellerBottomNav(activeIndex: 4) : null,
+      bottomNavigationBar: widget.showBottomNav
+          ? const TravellerBottomNav(activeIndex: 4)
+          : null,
     );
   }
 
@@ -401,8 +410,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         color: Colors.black, fontWeight: FontWeight.bold)),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFFFFC229),
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 24, vertical: 12),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16)),
                 ),
@@ -422,8 +431,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       backgroundColor: const Color(0xFF10284F),
       child: SingleChildScrollView(
         physics: const AlwaysScrollableScrollPhysics(),
-        padding:
-            const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -491,15 +499,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     Text(
                       profile.phoneNumber,
                       style: TextStyle(
-                          color: Colors.white.withOpacity(0.35),
-                          fontSize: 12),
+                          color: Colors.white.withOpacity(0.35), fontSize: 12),
                     ),
                   ],
                   const SizedBox(height: 14),
                   // Plan badge
                   Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 14, vertical: 6),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
                     decoration: BoxDecoration(
                       color: profile.plan == 'Free'
                           ? Colors.white.withOpacity(0.06)
@@ -632,7 +639,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   icon: Icons.shield_outlined,
                   title: 'Sentinel™\nMonitoring',
                   color: const Color(0xFFFFC229),
-                  onTap: () => Navigator.push(context,
+                  onTap: () => Navigator.push(
+                      context,
                       MaterialPageRoute(
                           builder: (_) => const FlightDetailScreen())),
                 ),
@@ -640,7 +648,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   icon: Icons.check_circle_outline,
                   title: 'BorderReady™',
                   color: const Color(0xFF10B981),
-                  onTap: () => Navigator.push(context,
+                  onTap: () => Navigator.push(
+                      context,
                       MaterialPageRoute(
                           builder: (_) => const BorderReadyScreen())),
                 ),
@@ -648,7 +657,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   icon: Icons.auto_awesome_outlined,
                   title: 'Resolution\nAssistant™',
                   color: const Color(0xFFFFC229),
-                  onTap: () => Navigator.push(context,
+                  onTap: () => Navigator.push(
+                      context,
                       MaterialPageRoute(
                           builder: (_) => const ResolveDashboardScreen())),
                 ),
@@ -656,7 +666,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   icon: Icons.flight_outlined,
                   title: 'My Trips',
                   color: const Color(0xFF3B82F6),
-                  onTap: () => Navigator.push(context,
+                  onTap: () => Navigator.push(
+                      context,
                       MaterialPageRoute(
                           builder: (_) => const TripsOverviewScreen())),
                 ),
@@ -669,8 +680,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             _sectionLabel('Preferences'),
             const SizedBox(height: 14),
             Container(
-              padding:
-                  const EdgeInsets.symmetric(vertical: 6, horizontal: 20),
+              padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 20),
               decoration: BoxDecoration(
                 color: const Color(0xFF0C162A),
                 borderRadius: BorderRadius.circular(16),
@@ -683,8 +693,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   const SizedBox(width: 14),
                   const Expanded(
                     child: Text('Push Notifications',
-                        style:
-                            TextStyle(color: Colors.white, fontSize: 13)),
+                        style: TextStyle(color: Colors.white, fontSize: 13)),
                   ),
                   Switch(
                     value: profile.notificationsEnabled,
@@ -703,7 +712,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
             _buildSettingsItem(
               icon: Icons.person_outline,
               title: 'Personal Information',
-              onTap: _showEditProfileSheet,
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const PersonalInformationScreen(),
+                ),
+              ),
             ),
             const SizedBox(height: 10),
             _buildSettingsItem(
@@ -964,6 +978,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ),
     );
   }
+
   Widget _buildQuickAccessCard({
     required IconData icon,
     required String title,
@@ -1004,8 +1019,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding:
-            const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
         decoration: BoxDecoration(
           color: const Color(0xFF0C162A),
           borderRadius: BorderRadius.circular(16),
@@ -1052,9 +1066,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             const SizedBox(width: 10),
             Text(label,
                 style: TextStyle(
-                    color: color,
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold)),
+                    color: color, fontSize: 14, fontWeight: FontWeight.bold)),
           ],
         ),
       ),

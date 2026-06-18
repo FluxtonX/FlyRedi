@@ -10,7 +10,7 @@ import '../utils/add_flight_navigation.dart';
 import 'active_disruptions_screen.dart';
 import 'upcoming_trips_screen.dart';
 import 'border_ready_screen.dart';
-import 'flight_detail_screen.dart';
+import 'sentinel_monitor_screen.dart';
 
 class TripsOverviewScreen extends StatefulWidget {
   final bool showBottomNav;
@@ -287,6 +287,21 @@ class _TripsOverviewScreenState extends State<TripsOverviewScreen> {
     return 'Date not set';
   }
 
+  String _timeLabel(String? isoLike, String fallback) {
+    if (isoLike == null || isoLike.trim().isEmpty) return fallback;
+    final parsed = DateTime.tryParse(isoLike);
+    if (parsed == null) return isoLike;
+    final local = parsed.toLocal();
+    final hour = local.hour.toString().padLeft(2, '0');
+    final minute = local.minute.toString().padLeft(2, '0');
+    return '$hour:$minute';
+  }
+
+  String _lastCheckedLabel(TripModel trip) {
+    if (!_hasReadableTripValue(trip.lastTrackedAt ?? '')) return 'Pending';
+    return _timeLabel(trip.lastTrackedAt, 'Pending');
+  }
+
   @override
   Widget build(BuildContext context) {
     if (_isLoading) {
@@ -507,6 +522,7 @@ class _TripsOverviewScreenState extends State<TripsOverviewScreen> {
                   return Padding(
                     padding: const EdgeInsets.only(bottom: 12.0),
                     child: _buildProtectedFlightCard(
+                      trip: trip,
                       airlineCode: _tripFlightLabel(trip),
                       risk:
                           '${(firstLeg?.riskLevel ?? 'LOW').toUpperCase()} RISK',
@@ -882,6 +898,7 @@ class _TripsOverviewScreenState extends State<TripsOverviewScreen> {
   }
 
   Widget _buildProtectedFlightCard({
+    required TripModel trip,
     required String airlineCode,
     required String risk,
     required Color riskColor,
@@ -896,28 +913,12 @@ class _TripsOverviewScreenState extends State<TripsOverviewScreen> {
   }) {
     return GestureDetector(
       onTap: () {
-        if (airlineCode == 'UA 2847') {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const FlightDetailScreen()),
-          );
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                'Sentinel™ is tracking $airlineCode live. No disruptions reported.',
-                style: const TextStyle(
-                    color: Colors.white, fontWeight: FontWeight.bold),
-              ),
-              backgroundColor: const Color(0xFF0C162A),
-              behavior: SnackBarBehavior.floating,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-                side: BorderSide(color: Colors.white.withOpacity(0.08)),
-              ),
-            ),
-          );
-        }
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => SentinelMonitorScreen(initialTrip: trip),
+          ),
+        );
       },
       child: Container(
         padding: const EdgeInsets.all(18),
