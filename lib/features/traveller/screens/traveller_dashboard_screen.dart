@@ -43,7 +43,14 @@ class _TravellerDashboardScreenState extends State<TravellerDashboardScreen> {
   final AlertRepository _alertRepository = AlertRepository();
   final TripRepository _tripRepository = TripRepository();
   final ProfileRepository _profileRepository = ProfileRepository();
-  bool _isLoading = true;
+
+  bool _isSummaryLoading = true;
+  bool _isActivitiesLoading = true;
+  bool _isAlertsLoading = true;
+  bool _isTripsLoading = true;
+  bool _isProfileLoading = true;
+  bool _isStatsLoading = true;
+
   bool _hasLoadedData = false;
   String? _errorMessage;
 
@@ -53,6 +60,14 @@ class _TravellerDashboardScreenState extends State<TravellerDashboardScreen> {
   List<TripModel> _trips = [];
   UserProfile? _profile;
   ProfileStats? _stats;
+
+  bool get _anyDataLoaded =>
+      _summary != null ||
+      _activities.isNotEmpty ||
+      _alerts.isNotEmpty ||
+      _trips.isNotEmpty ||
+      _profile != null ||
+      _stats != null;
 
   @override
   void initState() {
@@ -75,52 +90,213 @@ class _TravellerDashboardScreenState extends State<TravellerDashboardScreen> {
     if (!mounted) return;
 
     setState(() {
-      _isLoading = !_hasLoadedData;
       _errorMessage = null;
+      if (!_hasLoadedData) {
+        _isSummaryLoading = true;
+        _isActivitiesLoading = true;
+        _isAlertsLoading = true;
+        _isTripsLoading = true;
+        _isProfileLoading = true;
+        _isStatsLoading = true;
+      }
     });
 
-    try {
-      final results = await Future.wait([
-        _repository.getSummary(),
-        _repository.getActivities(),
-        _alertRepository.fetchAlerts(limit: 5),
-        _tripRepository.fetchUserTrips(),
-        _profileRepository.getProfile(),
-        _profileRepository.getStats(),
-      ]);
+    // Load components progressively in parallel
+    _loadSummary();
+    _loadActivities();
+    _loadAlerts();
+    _loadTrips();
+    _loadProfileAndStats();
+  }
 
+  Future<void> _loadSummary() async {
+    try {
+      final summary = await _repository.getSummary(
+        onCachedData: (cachedData) {
+          if (mounted) {
+            setState(() {
+              _summary = cachedData;
+              _isSummaryLoading = false;
+              _checkAllLoaded();
+            });
+          }
+        },
+      );
       if (mounted) {
         setState(() {
-          _summary = results[0] as DashboardSummary;
-          _activities = results[1] as List<DashboardActivity>;
-          _alerts = (results[2] as AlertListResponse).alerts;
-          _trips = results[3] as List<TripModel>;
-          _profile = results[4] as UserProfile;
-          _stats = results[5] as ProfileStats;
-          _isLoading = false;
-          _hasLoadedData = true;
+          _summary = summary;
+          _isSummaryLoading = false;
+          _checkAllLoaded();
         });
       }
     } catch (e) {
+      _handleLoadError(e);
       if (mounted) {
-        if (_hasLoadedData) {
-          setState(() {
-            _errorMessage = null;
-            _isLoading = false;
-          });
-
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Could not refresh dashboard data.'),
-              backgroundColor: Color(0xFFE11D48),
-            ),
-          );
-          return;
-        }
-
         setState(() {
-          _errorMessage = e.toString().replaceAll('Exception: ', '');
-          _isLoading = false;
+          _isSummaryLoading = false;
+          _checkAllLoaded();
+        });
+      }
+    }
+  }
+
+  Future<void> _loadActivities() async {
+    try {
+      final activities = await _repository.getActivities(
+        onCachedData: (cachedData) {
+          if (mounted) {
+            setState(() {
+              _activities = cachedData;
+              _isActivitiesLoading = false;
+              _checkAllLoaded();
+            });
+          }
+        },
+      );
+      if (mounted) {
+        setState(() {
+          _activities = activities;
+          _isActivitiesLoading = false;
+          _checkAllLoaded();
+        });
+      }
+    } catch (e) {
+      _handleLoadError(e);
+      if (mounted) {
+        setState(() {
+          _isActivitiesLoading = false;
+          _checkAllLoaded();
+        });
+      }
+    }
+  }
+
+  Future<void> _loadAlerts() async {
+    try {
+      final response = await _alertRepository.fetchAlerts(limit: 5);
+      if (mounted) {
+        setState(() {
+          _alerts = response.alerts;
+          _isAlertsLoading = false;
+          _checkAllLoaded();
+        });
+      }
+    } catch (e) {
+      _handleLoadError(e);
+      if (mounted) {
+        setState(() {
+          _isAlertsLoading = false;
+          _checkAllLoaded();
+        });
+      }
+    }
+  }
+
+  Future<void> _loadTrips() async {
+    try {
+      final trips = await _tripRepository.fetchUserTrips(
+        onCachedData: (cachedData) {
+          if (mounted) {
+            setState(() {
+              _trips = cachedData;
+              _isTripsLoading = false;
+              _checkAllLoaded();
+            });
+          }
+        },
+      );
+      if (mounted) {
+        setState(() {
+          _trips = trips;
+          _isTripsLoading = false;
+          _checkAllLoaded();
+        });
+      }
+    } catch (e) {
+      _handleLoadError(e);
+      if (mounted) {
+        setState(() {
+          _isTripsLoading = false;
+          _checkAllLoaded();
+        });
+      }
+    }
+  }
+
+  Future<void> _loadProfileAndStats() async {
+    try {
+      final results = await Future.wait([
+        _profileRepository.getProfile(
+          onCachedData: (cachedData) {
+            if (mounted) {
+              setState(() {
+                _profile = cachedData;
+                _isProfileLoading = false;
+                _checkAllLoaded();
+              });
+            }
+          },
+        ),
+        _profileRepository.getStats(
+          onCachedData: (cachedData) {
+            if (mounted) {
+              setState(() {
+                _stats = cachedData;
+                _isStatsLoading = false;
+                _checkAllLoaded();
+              });
+            }
+          },
+        ),
+      ]);
+      if (mounted) {
+        setState(() {
+          _profile = results[0] as UserProfile;
+          _stats = results[1] as ProfileStats;
+          _isProfileLoading = false;
+          _isStatsLoading = false;
+          _checkAllLoaded();
+        });
+      }
+    } catch (e) {
+      _handleLoadError(e);
+      if (mounted) {
+        setState(() {
+          _isProfileLoading = false;
+          _isStatsLoading = false;
+          _checkAllLoaded();
+        });
+      }
+    }
+  }
+
+  void _handleLoadError(dynamic e) {
+    if (_hasLoadedData) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Failed to update dashboard data: ${e.toString().replaceAll('Exception: ', '')}'),
+          backgroundColor: const Color(0xFFE11D48),
+          duration: const Duration(seconds: 3),
+        ),
+      );
+    }
+  }
+
+  void _checkAllLoaded() {
+    if (!_isSummaryLoading &&
+        !_isActivitiesLoading &&
+        !_isAlertsLoading &&
+        !_isTripsLoading &&
+        !_isProfileLoading &&
+        !_isStatsLoading) {
+      if (mounted) {
+        setState(() {
+          if (_anyDataLoaded) {
+            _hasLoadedData = true;
+            _errorMessage = null;
+          } else {
+            _errorMessage = 'Failed to load dashboard data. Please check your connection.';
+          }
         });
       }
     }
@@ -161,11 +337,7 @@ class _TravellerDashboardScreenState extends State<TravellerDashboardScreen> {
   }
 
   Widget _buildBody(String displayName) {
-    if (_isLoading) {
-      return _buildDashboardSkeleton(displayName);
-    }
-
-    if (_errorMessage != null) {
+    if (_errorMessage != null && !_hasLoadedData) {
       return Center(
         child: Padding(
           padding: const EdgeInsets.all(24.0),
@@ -219,11 +391,11 @@ class _TravellerDashboardScreenState extends State<TravellerDashboardScreen> {
       );
     }
 
-    final summary = _summary!;
+    final summary = _summary;
     final stats = _stats;
     final usedFlights = stats?.flightsMonitored ?? _trips.length;
     final maxFlights = stats?.flightsMonitoredMax ?? freeFlightLimit;
-    final usedClaims = stats?.claimsFiled ?? summary.casesCount;
+    final usedClaims = stats?.claimsFiled ?? (summary?.casesCount ?? 0);
     final maxClaims = stats?.claimsFiledMax ?? 1;
     final usedAiQuestions = stats?.aiAssistantQuestions ?? 0;
     final maxAiQuestions = stats?.aiAssistantQuestionsMax ?? 5;
@@ -237,57 +409,85 @@ class _TravellerDashboardScreenState extends State<TravellerDashboardScreen> {
         children: [
           DashboardHeader(
             displayName: displayName,
-            planLabel: planLabel,
-            notificationCount: summary.alertsCount,
+            planLabel: _isProfileLoading ? 'Free Plan' : planLabel,
+            notificationCount: _isSummaryLoading ? 0 : (summary?.alertsCount ?? 0),
           ),
           const SizedBox(height: 18),
-          MonthlyUsageCard(
-            usedFlights: usedFlights,
-            maxFlights: maxFlights,
-            usedClaims: usedClaims,
-            maxClaims: maxClaims,
-            usedAiQuestions: usedAiQuestions,
-            maxAiQuestions: maxAiQuestions,
-            onViewDetails: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const PlanUsageScreen(),
-                ),
-              );
-            },
-            onLimitTap: () => showUpgradeToProDialog(context),
-          ),
+          if (_isStatsLoading || _isProfileLoading || _isTripsLoading || _isSummaryLoading)
+            const SkeletonBox(height: 128, radius: 22)
+          else
+            MonthlyUsageCard(
+              usedFlights: usedFlights,
+              maxFlights: maxFlights,
+              usedClaims: usedClaims,
+              maxClaims: maxClaims,
+              usedAiQuestions: usedAiQuestions,
+              maxAiQuestions: maxAiQuestions,
+              onViewDetails: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const PlanUsageScreen(),
+                  ),
+                );
+              },
+              onLimitTap: () => showUpgradeToProDialog(context),
+            ),
           const SizedBox(height: 18),
-          AddFlightCard(
-            usedFlights: _trips.length,
-            maxFlights: freeFlightLimit,
-            onTap: _handleAddFlightTap,
-          ),
+          if (_isTripsLoading)
+            const SkeletonBox(height: 82, radius: 20)
+          else
+            AddFlightCard(
+              usedFlights: _trips.length,
+              maxFlights: freeFlightLimit,
+              onTap: _handleAddFlightTap,
+            ),
           const SizedBox(height: 24),
-          SentinelMonitoringSection(
-            alertsCount: summary.alertsCount,
-            casesCount: summary.casesCount,
-            totalSavings: summary.totalSavings,
-            onUpgrade: () => showUpgradeToProDialog(context),
-          ),
+          if (_isSummaryLoading)
+            const SkeletonBox(height: 190, radius: 28)
+          else
+            SentinelMonitoringSection(
+              alertsCount: summary?.alertsCount ?? 0,
+              casesCount: summary?.casesCount ?? 0,
+              totalSavings: (summary?.totalSavings ?? 0.0).toString(),
+              onUpgrade: () => showUpgradeToProDialog(context),
+            ),
           const SizedBox(height: 24),
-          BorderReadySection(isEmpty: _activities.isEmpty),
-          const SizedBox(height: 24),
-          if (_activities.isNotEmpty) ...[
-            DashboardActivityList(activities: _activities),
-            const SizedBox(height: 32),
+          if (_isActivitiesLoading) ...[
+            Row(
+              children: const [
+                SkeletonBox(width: 54, height: 54, radius: 18),
+                SizedBox(width: 16),
+                Expanded(child: SkeletonBox(height: 42, radius: 14)),
+              ],
+            ),
+            const SizedBox(height: 24),
+            const SkeletonBox(height: 220, radius: 28),
+          ] else ...[
+            BorderReadySection(isEmpty: _activities.isEmpty),
+            if (_activities.isNotEmpty) ...[
+              const SizedBox(height: 24),
+              DashboardActivityList(activities: _activities),
+            ],
           ],
-          RecommendedActionsCard(
-            isEmpty: summary.alertsCount == 0 && summary.casesCount == 0,
-            onUpgrade: () => showUpgradeToProDialog(context),
-          ),
           const SizedBox(height: 24),
-          ActiveIssuesSection(
-            isEmpty: summary.alertsCount == 0 && summary.casesCount == 0,
-          ),
+          if (_isSummaryLoading)
+            const SkeletonBox(height: 140, radius: 24)
+          else ...[
+            RecommendedActionsCard(
+              isEmpty: (summary?.alertsCount ?? 0) == 0 && (summary?.casesCount ?? 0) == 0,
+              onUpgrade: () => showUpgradeToProDialog(context),
+            ),
+            const SizedBox(height: 24),
+            ActiveIssuesSection(
+              isEmpty: (summary?.alertsCount ?? 0) == 0 && (summary?.casesCount ?? 0) == 0,
+            ),
+          ],
           const SizedBox(height: 24),
-          DashboardNotificationsSection(alerts: _alerts),
+          if (_isAlertsLoading)
+            const SkeletonBox(height: 140, radius: 24)
+          else
+            DashboardNotificationsSection(alerts: _alerts),
           const SizedBox(height: 24),
         ],
       ),
@@ -297,50 +497,5 @@ class _TravellerDashboardScreenState extends State<TravellerDashboardScreen> {
   String _planLabel(String? plan) {
     if (plan == null || plan.trim().isEmpty) return 'Free Plan';
     return plan.endsWith('Plan') || plan.endsWith('Pass') ? plan : '$plan Plan';
-  }
-
-  Widget _buildDashboardSkeleton(String displayName) {
-    return SingleChildScrollView(
-      physics: const AlwaysScrollableScrollPhysics(),
-      padding: const EdgeInsets.all(24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          DashboardHeader(
-            displayName: displayName,
-            planLabel: 'Free Plan',
-            notificationCount: 0,
-          ),
-          const SizedBox(height: 18),
-          const SkeletonBox(height: 128, radius: 22),
-          const SizedBox(height: 18),
-          const SkeletonBox(height: 82, radius: 20),
-          const SizedBox(height: 24),
-          Row(
-            children: const [
-              SkeletonBox(width: 54, height: 54, radius: 18),
-              SizedBox(width: 16),
-              Expanded(child: SkeletonBox(height: 42, radius: 14)),
-            ],
-          ),
-          const SizedBox(height: 16),
-          const SkeletonBox(height: 190, radius: 28),
-          const SizedBox(height: 16),
-          Row(
-            children: const [
-              Expanded(child: SkeletonBox(height: 112, radius: 24)),
-              SizedBox(width: 18),
-              Expanded(child: SkeletonBox(height: 112, radius: 24)),
-              SizedBox(width: 18),
-              Expanded(child: SkeletonBox(height: 112, radius: 24)),
-            ],
-          ),
-          const SizedBox(height: 24),
-          const SkeletonBox(height: 220, radius: 28),
-          const SizedBox(height: 24),
-          const SkeletonBox(height: 140, radius: 24),
-        ],
-      ),
-    );
   }
 }

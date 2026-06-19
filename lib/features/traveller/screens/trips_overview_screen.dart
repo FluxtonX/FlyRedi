@@ -60,8 +60,32 @@ class _TripsOverviewScreenState extends State<TripsOverviewScreen> {
 
     try {
       final results = await Future.wait([
-        _repository.fetchUserTrips(),
-        _profileRepository.getProfile(),
+        _repository.fetchUserTrips(
+          onCachedData: (cachedData) {
+            if (mounted) {
+              setState(() {
+                _trips = cachedData;
+                if (_profile != null) {
+                  _isLoading = false;
+                  _hasLoadedTrips = true;
+                }
+              });
+            }
+          },
+        ),
+        _profileRepository.getProfile(
+          onCachedData: (cachedData) {
+            if (mounted) {
+              setState(() {
+                _profile = cachedData;
+                if (_trips.isNotEmpty || _hasLoadedTrips) {
+                  _isLoading = false;
+                  _hasLoadedTrips = true;
+                }
+              });
+            }
+          },
+        ),
       ]);
       if (!mounted) return;
       setState(() {
@@ -287,14 +311,22 @@ class _TripsOverviewScreenState extends State<TripsOverviewScreen> {
     return 'Date not set';
   }
 
+  /// Extracts HH:mm from an ISO-8601 string without applying any timezone
+  /// conversion.  Aviationstack embeds the local airport time in the string
+  /// itself (e.g. "2026-06-19T16:15:00+00:00" where 16:15 IS the local time),
+  /// so calling DateTime.parse().toLocal() would shift the value a second time
+  /// (e.g. +5 h on a PKT device → 21:15).  We avoid that by reading the
+  /// time component directly.
   String _timeLabel(String? isoLike, String fallback) {
     if (isoLike == null || isoLike.trim().isEmpty) return fallback;
-    final parsed = DateTime.tryParse(isoLike);
-    if (parsed == null) return isoLike;
-    final local = parsed.toLocal();
-    final hour = local.hour.toString().padLeft(2, '0');
-    final minute = local.minute.toString().padLeft(2, '0');
-    return '$hour:$minute';
+    // ISO string with a 'T' separator — extract the HH:mm after the T.
+    final isoMatch = RegExp(r'T(\d{2}):(\d{2})').firstMatch(isoLike);
+    if (isoMatch != null) return '${isoMatch.group(1)}:${isoMatch.group(2)}';
+    // Plain HH:mm (no date prefix) — return as-is after validation.
+    final plainMatch = RegExp(r'^(\d{2}):(\d{2})').firstMatch(isoLike.trim());
+    if (plainMatch != null) return '${plainMatch.group(1)}:${plainMatch.group(2)}';
+    // Unrecognised format — show the raw string so no data is lost.
+    return isoLike;
   }
 
   String _lastCheckedLabel(TripModel trip) {
@@ -528,9 +560,9 @@ class _TripsOverviewScreenState extends State<TripsOverviewScreen> {
                           '${(firstLeg?.riskLevel ?? 'LOW').toUpperCase()} RISK',
                       riskColor: _getRiskColor(firstLeg?.riskLevel),
                       from: origin,
-                      fromTime: firstLeg?.fromTime ?? 'Departure',
+                      fromTime: _timeLabel(firstLeg?.fromTime, 'Departure'),
                       to: destination,
-                      toTime: firstLeg?.toTime ?? 'Arrival',
+                      toTime: _timeLabel(firstLeg?.toTime, 'Arrival'),
                       statusText: trip.trackingEnabled
                           ? 'ACTIVE'
                           : trip.status.toUpperCase(),

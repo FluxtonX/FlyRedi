@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:sky_rightz_360/core/constants/app_colors.dart';
 import '../models/trip_model.dart';
+import '../models/alert_model.dart';
 import '../repositories/trip_repository.dart';
+import '../repositories/alert_repository.dart';
 import '../widgets/traveller_bottom_nav.dart';
 
 class SentinelMonitorScreen extends StatefulWidget {
@@ -18,11 +20,13 @@ class SentinelMonitorScreen extends StatefulWidget {
 
 class _SentinelMonitorScreenState extends State<SentinelMonitorScreen> {
   final TripRepository _tripRepository = TripRepository();
+  final AlertRepository _alertRepository = AlertRepository();
   bool _pushNotifications = true;
   bool _emailAlerts = true;
   bool _whatsappMessages = true;
   bool _isLoading = true;
   List<TripModel> _trips = [];
+  List<AlertModel> _dbAlerts = [];
   TripModel? _selectedTrip;
   String? _errorMessage;
 
@@ -40,7 +44,13 @@ class _SentinelMonitorScreenState extends State<SentinelMonitorScreen> {
     });
 
     try {
-      final trips = await _tripRepository.fetchUserTrips();
+      final results = await Future.wait([
+        _tripRepository.fetchUserTrips(),
+        _alertRepository.fetchAlerts(limit: 50).catchError((_) => AlertListResponse(alerts: [], page: 1, pages: 1, total: 0)),
+      ]);
+      final trips = results[0] as List<TripModel>;
+      final alertListResponse = results[1] as AlertListResponse;
+      
       if (!mounted) return;
 
       final monitoredTrips =
@@ -58,6 +68,7 @@ class _SentinelMonitorScreenState extends State<SentinelMonitorScreen> {
 
       setState(() {
         _trips = monitoredTrips.isNotEmpty ? monitoredTrips : trips;
+        _dbAlerts = alertListResponse.alerts;
         _selectedTrip = selected;
         _isLoading = false;
       });
@@ -93,10 +104,18 @@ class _SentinelMonitorScreenState extends State<SentinelMonitorScreen> {
   int get _activeAlerts {
     final trip = _selectedTrip;
     if (trip == null) return 0;
-    return trip.timeline.fold<int>(
+    
+    // Sum of timeline active alerts and unread DB alerts for this flight
+    final timelineAlertsCount = trip.timeline.fold<int>(
       0,
       (total, item) => total + (item.activeAlerts ?? 0),
     );
+    
+    final unreadDbAlertsCount = _dbAlerts
+        .where((a) => a.flightCode == trip.flightNumber && !a.isRead)
+        .length;
+        
+    return timelineAlertsCount + unreadDbAlertsCount;
   }
 
   String _readable(String? value, {String fallback = '-'}) {
@@ -111,14 +130,22 @@ class _SentinelMonitorScreenState extends State<SentinelMonitorScreen> {
     return readable[0].toUpperCase() + readable.substring(1);
   }
 
+  /// Extracts HH:mm from an ISO-8601 string without applying any timezone
+  /// conversion.  Aviationstack embeds the local airport time in the string
+  /// itself (e.g. "2026-06-19T16:15:00+00:00" where 16:15 IS the local time),
+  /// so calling DateTime.parse().toLocal() would shift the value a second time
+  /// (e.g. +5 h on a PKT device → 21:15).  We avoid that by reading the
+  /// time component directly.
   String _timeLabel(String? isoLike, String fallback) {
     if (isoLike == null || isoLike.trim().isEmpty) return fallback;
-    final parsed = DateTime.tryParse(isoLike);
-    if (parsed == null) return isoLike;
-    final local = parsed.toLocal();
-    final hour = local.hour.toString().padLeft(2, '0');
-    final minute = local.minute.toString().padLeft(2, '0');
-    return '$hour:$minute';
+    // ISO string with a 'T' separator — extract the HH:mm after the T.
+    final isoMatch = RegExp(r'T(\d{2}):(\d{2})').firstMatch(isoLike);
+    if (isoMatch != null) return '${isoMatch.group(1)}:${isoMatch.group(2)}';
+    // Plain HH:mm (no date prefix) — return as-is after validation.
+    final plainMatch = RegExp(r'^(\d{2}):(\d{2})').firstMatch(isoLike.trim());
+    if (plainMatch != null) return '${plainMatch.group(1)}:${plainMatch.group(2)}';
+    // Unrecognised format — show the raw string so no data is lost.
+    return isoLike;
   }
 
   Color _riskColor(String? risk) {
@@ -585,6 +612,10 @@ class _SentinelMonitorScreenState extends State<SentinelMonitorScreen> {
         .where((item) => (item.activeAlerts ?? 0) > 0 || item.info != null)
         .toList();
 
+    final dbAlertsForFlight = _dbAlerts
+        .where((a) => a.flightCode == trip.flightNumber)
+        .toList();
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -622,7 +653,7 @@ class _SentinelMonitorScreenState extends State<SentinelMonitorScreen> {
           ],
         ),
         const SizedBox(height: 14),
-        if (timelineAlerts.isEmpty)
+        if (timelineAlerts.isEmpty && dbAlertsForFlight.isEmpty)
           _buildAlertCard(
             icon: Icons.check_circle_outline,
             color: const Color(0xFF10B981),
@@ -631,7 +662,23 @@ class _SentinelMonitorScreenState extends State<SentinelMonitorScreen> {
                 'Sentinel is watching ${_flightLabel} and will show delay, cancellation, gate, or route alerts here.',
             time: 'Live',
           )
-        else
+        else ...[
+          ...dbAlertsForFlight.map(
+            (item) => Padding(
+              padding: const EdgeInsets.only(bottom: 12),
+              child: _buildAlertCard(
+                icon: item.priority == 'CRITICAL' || item.priority == 'HIGH'
+                    ? Icons.error_outline
+                    : Icons.info_outline,
+                color: item.priority == 'CRITICAL' || item.priority == 'HIGH' 
+                    ? const Color(0xFFEF4444)
+                    : (item.priority == 'MEDIUM' ? const Color(0xFFFFC229) : const Color(0xFF10B981)),
+                title: '${item.eventType} Alert',
+                message: item.message,
+                time: _timeLabel(item.createdAt, 'Recent'),
+              ),
+            ),
+          ),
           ...timelineAlerts.map(
             (item) => Padding(
               padding: const EdgeInsets.only(bottom: 12),
@@ -648,6 +695,7 @@ class _SentinelMonitorScreenState extends State<SentinelMonitorScreen> {
               ),
             ),
           ),
+        ],
       ],
     );
   }

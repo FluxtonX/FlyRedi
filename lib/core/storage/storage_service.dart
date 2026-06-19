@@ -63,4 +63,22 @@ class StorageService extends GetxService {
     await _prefs.remove(_userProfileKey);
     await _prefs.setBool(_isLoggedInKey, false);
   }
+
+  // --- Generic Caching Methods ---
+
+  Future<void> saveCache(String key, dynamic data) async {
+    await _prefs.setString(key, jsonEncode(data));
+  }
+
+  dynamic getCache(String key) {
+    final str = _prefs.getString(key);
+    if (str != null) {
+      try {
+        return jsonDecode(str);
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
 }

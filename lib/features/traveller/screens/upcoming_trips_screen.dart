@@ -43,8 +43,32 @@ class _UpcomingTripsScreenState extends State<UpcomingTripsScreen> {
   Future<void> _loadLimitData() async {
     try {
       final results = await Future.wait([
-        _tripRepository.fetchUserTrips(),
-        _profileRepository.getProfile(),
+        _tripRepository.fetchUserTrips(
+          onCachedData: (cachedData) {
+            if (mounted) {
+              setState(() {
+                _trips = cachedData;
+                if (_profile != null) {
+                  _isLoading = false;
+                  _errorMessage = null;
+                }
+              });
+            }
+          },
+        ),
+        _profileRepository.getProfile(
+          onCachedData: (cachedData) {
+            if (mounted) {
+              setState(() {
+                _profile = cachedData;
+                if (_trips.isNotEmpty || !_isLoading) {
+                  _isLoading = false;
+                  _errorMessage = null;
+                }
+              });
+            }
+          },
+        ),
       ]);
       if (!mounted) return;
       setState(() {
@@ -173,6 +197,24 @@ class _UpcomingTripsScreenState extends State<UpcomingTripsScreen> {
     return 'Date not set';
   }
 
+  /// Extracts HH:mm from an ISO-8601 string without applying any timezone
+  /// conversion.  Aviationstack embeds the local airport time in the string
+  /// itself (e.g. "2026-06-19T16:15:00+00:00" where 16:15 IS the local time),
+  /// so calling DateTime.parse().toLocal() would shift the value a second time
+  /// (e.g. +5 h on a PKT device → 21:15).  We avoid that by reading the
+  /// time component directly.
+  String _formatFlightTime(String? isoLike, String fallback) {
+    if (isoLike == null || isoLike.trim().isEmpty) return fallback;
+    // ISO string with a 'T' separator — extract the HH:mm after the T.
+    final isoMatch = RegExp(r'T(\d{2}):(\d{2})').firstMatch(isoLike);
+    if (isoMatch != null) return '${isoMatch.group(1)}:${isoMatch.group(2)}';
+    // Plain HH:mm (no date prefix) — return as-is after validation.
+    final plainMatch = RegExp(r'^(\d{2}):(\d{2})').firstMatch(isoLike.trim());
+    if (plainMatch != null) return '${plainMatch.group(1)}:${plainMatch.group(2)}';
+    // Unrecognised format — show the raw string so no data is lost.
+    return isoLike;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -273,10 +315,10 @@ class _UpcomingTripsScreenState extends State<UpcomingTripsScreen> {
                         ? const Color(0xFF10B981)
                         : const Color(0xFFFFC229),
                     from: origin,
-                    fromTime: firstLeg?.fromTime ?? 'Departure',
+                    fromTime: _formatFlightTime(firstLeg?.fromTime, 'Departure'),
                     fromCity: origin,
                     to: destination,
-                    toTime: firstLeg?.toTime ?? 'Arrival',
+                    toTime: _formatFlightTime(firstLeg?.toTime, 'Arrival'),
                     toCity: destination,
                     terminal: 'Terminal not set',
                     gate: 'Gate not set',

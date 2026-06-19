@@ -1,14 +1,28 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:get/get.dart';
 import '../../../shared/services/api_service.dart';
+import '../../../core/storage/storage_service.dart';
 import '../models/user_profile.dart';
 
 class ProfileRepository {
   // GET /api/auth/profile
-  Future<UserProfile> getProfile() async {
+  Future<UserProfile> getProfile({void Function(UserProfile)? onCachedData}) async {
+    final storage = Get.find<StorageService>();
+    final cacheKey = 'user_profile_data';
+    
+    final cachedData = storage.getCache(cacheKey);
+    if (cachedData != null && onCachedData != null) {
+      try {
+        onCachedData(UserProfile.fromJson(cachedData));
+      } catch (_) {}
+    }
+
     final http.Response response = await ApiService.get('/api/auth/profile');
     if (response.statusCode == 200) {
-      return UserProfile.fromJson(jsonDecode(response.body));
+      final data = jsonDecode(response.body);
+      storage.saveCache(cacheKey, data);
+      return UserProfile.fromJson(data);
     }
     throw Exception('Failed to load profile: ${response.statusCode}');
   }
@@ -33,11 +47,23 @@ class ProfileRepository {
   }
 
   // GET /api/auth/profile/stats
-  Future<ProfileStats> getStats() async {
+  Future<ProfileStats> getStats({void Function(ProfileStats)? onCachedData}) async {
+    final storage = Get.find<StorageService>();
+    final cacheKey = 'user_stats';
+
+    final cachedData = storage.getCache(cacheKey);
+    if (cachedData != null && onCachedData != null) {
+      try {
+        onCachedData(ProfileStats.fromJson(cachedData));
+      } catch (_) {}
+    }
+
     final http.Response response =
         await ApiService.get('/api/auth/profile/stats');
     if (response.statusCode == 200) {
-      return ProfileStats.fromJson(jsonDecode(response.body));
+      final data = jsonDecode(response.body);
+      storage.saveCache(cacheKey, data);
+      return ProfileStats.fromJson(data);
     }
     throw Exception('Failed to load stats: ${response.statusCode}');
   }

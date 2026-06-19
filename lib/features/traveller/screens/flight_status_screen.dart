@@ -767,15 +767,27 @@ class _TimeCard extends StatelessWidget {
 
   String _formatTime(String iso) {
     if (iso.isEmpty) return '—';
-    try {
-      final dt = DateTime.parse(iso).toLocal();
-      final h = dt.hour.toString().padLeft(2, '0');
-      final m = dt.minute.toString().padLeft(2, '0');
-      return '$h:$m';
-    } catch (_) {
-      return iso;
+    // Aviationstack returns the local airport time with its UTC offset already
+    // embedded, e.g. "2026-06-19T16:15:00+05:00".  The time component (16:15)
+    // IS the correct local time to display.
+    //
+    // DO NOT call DateTime.parse().toLocal() — that converts the value to UTC
+    // first and then adds the device timezone again, producing a wrong result
+    // (e.g. 16:15 PKT → 11:15 UTC → +5h → 21:15, off by 5 hours).
+    //
+    // Instead, extract HH:mm directly from the ISO string.
+    final match = RegExp(r'T(\d{2}):(\d{2})').firstMatch(iso);
+    if (match != null) {
+      return '${match.group(1)}:${match.group(2)}';
     }
+    // Fallback: plain HH:mm string without T prefix
+    final plain = RegExp(r'^(\d{2}):(\d{2})').firstMatch(iso);
+    if (plain != null) {
+      return '${plain.group(1)}:${plain.group(2)}';
+    }
+    return iso;
   }
+
 
   @override
   Widget build(BuildContext context) {

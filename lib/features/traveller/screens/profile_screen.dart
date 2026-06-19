@@ -54,7 +54,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
     try {
       final results = await Future.wait([
         _authController.refreshProfile(),
-        _repository.getStats(),
+        _repository.getStats(
+          onCachedData: (cachedData) {
+            if (mounted) {
+              setState(() {
+                _stats = cachedData;
+                if (_profile != null) {
+                  _isLoading = false;
+                  _hasLoadedProfile = true;
+                }
+              });
+            }
+          },
+        ),
       ]);
       if (mounted) {
         setState(() {

@@ -1,6 +1,8 @@
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
+import 'package:get/get.dart';
+import 'package:sky_rightz_360/core/storage/storage_service.dart';
 import 'package:sky_rightz_360/shared/services/api_service.dart';
 import 'package:sky_rightz_360/features/traveller/models/trip_model.dart';
 
@@ -58,11 +60,23 @@ class TripRepository {
     tripsVersion.value++;
   }
 
-  Future<List<TripModel>> fetchUserTrips() async {
+  Future<List<TripModel>> fetchUserTrips({void Function(List<TripModel>)? onCachedData}) async {
+    final storage = Get.find<StorageService>();
+    final cacheKey = 'user_trips';
+    
+    final cachedData = storage.getCache(cacheKey);
+    if (cachedData != null && onCachedData != null) {
+      try {
+        final List<dynamic> jsonList = cachedData;
+        onCachedData(jsonList.map((json) => TripModel.fromJson(json as Map<String, dynamic>)).toList());
+      } catch (_) {}
+    }
+
     final response = await ApiService.get('/api/trips');
 
     if (response.statusCode == 200) {
       final List<dynamic> jsonList = jsonDecode(response.body);
+      storage.saveCache(cacheKey, jsonList);
       return jsonList
           .map((json) => TripModel.fromJson(json as Map<String, dynamic>))
           .toList();
