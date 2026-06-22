@@ -10,4 +10,5 @@ abstract class AuthRepository {
   Future<void> forgotPassword(ForgotPasswordRequest request);
   Future<void> logout();
   Future<UserProfile> getProfile();
+  Future<void> updateFcmToken(String token);
 }

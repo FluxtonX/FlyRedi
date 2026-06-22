@@ -50,4 +50,9 @@ class AuthRepositoryImpl implements AuthRepository {
     await _localDataSource.saveUser(userProfile);
     return userProfile;
   }
+
+  @override
+  Future<void> updateFcmToken(String token) async {
+    await _remoteDataSource.updateFcmToken(token);
+  }
 }

@@ -11,6 +11,7 @@ class ApiConstants {
   static const String stats = '/api/auth/profile/stats';
   static const String settings = '/api/auth/profile/settings';
   static const String notifications = '/api/auth/profile/notifications';
+  static const String updateFcmToken = '/api/auth/fcm-token';
   static const String account = '/api/auth/account';
 
   // Flight Endpoints

@@ -96,4 +96,14 @@ class AuthRemoteDataSource {
       throw Exception('Failed to fetch user profile: ${response.statusCode}');
     }
   }
+
+  Future<void> updateFcmToken(String token) async {
+    final response = await _dioClient.post(
+      ApiConstants.updateFcmToken,
+      data: {'fcmToken': token},
+    );
+    if (response.statusCode != 200) {
+      throw Exception('Failed to update FCM token: ${response.statusCode}');
+    }
+  }
 }

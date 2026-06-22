@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:get/get.dart';
 import '../../domain/repositories/auth_repository.dart';
 import '../../data/datasources/auth_local_data_source.dart';
@@ -40,6 +41,7 @@ class AuthController extends GetxController {
           userProfile.value = cachedUser;
           // Asynchronously fetch fresh profile details in background
           refreshProfile();
+          _setupFirebaseMessaging();
         }
       }
     } catch (_) {
@@ -58,6 +60,7 @@ class AuthController extends GetxController {
       userProfile.value = response.user;
       isLoading.value = false;
 
+      _setupFirebaseMessaging();
       Get.offAllNamed('/home');
       return true;
     } catch (e) {
@@ -80,6 +83,7 @@ class AuthController extends GetxController {
       userProfile.value = response.user;
       isLoading.value = false;
 
+      _setupFirebaseMessaging();
       _showSuccessSnackBar('Account created successfully!');
       await Future.delayed(const Duration(milliseconds: 700));
       Get.offAllNamed('/home');
@@ -137,6 +141,28 @@ class AuthController extends GetxController {
       userProfile.value = null;
       isLoading.value = false;
       Get.offAllNamed('/login');
+    }
+  }
+
+  Future<void> _setupFirebaseMessaging() async {
+    try {
+      FirebaseMessaging messaging = FirebaseMessaging.instance;
+      NotificationSettings settings = await messaging.requestPermission(
+        alert: true,
+        badge: true,
+        sound: true,
+      );
+
+      if (settings.authorizationStatus == AuthorizationStatus.authorized ||
+          settings.authorizationStatus == AuthorizationStatus.provisional) {
+        String? token = await messaging.getToken();
+        if (token != null) {
+          debugPrint('FCM Token: $token');
+          await _authRepository.updateFcmToken(token);
+        }
+      }
+    } catch (e) {
+      debugPrint('Error setting up Firebase Messaging: $e');
     }
   }
 
