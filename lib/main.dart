@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'firebase_options.dart';
 import 'core/theme/app_theme.dart';
 import 'core/storage/storage_service.dart';
@@ -21,6 +22,24 @@ void main() async {
 
   // Initialize SharedPreferences wrapper service before runApp starts
   await Get.putAsync(() => StorageService().init());
+
+  // Listen for FCM messages in the foreground and show a top banner
+  FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+    if (message.notification != null) {
+      Get.snackbar(
+        message.notification!.title ?? 'New Alert',
+        message.notification!.body ?? '',
+        snackPosition: SnackPosition.TOP,
+        backgroundColor: const Color(0xFF0F2D24).withOpacity(0.95),
+        colorText: Colors.white,
+        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        borderRadius: 12,
+        duration: const Duration(seconds: 5),
+        icon: const Icon(Icons.flight_takeoff, color: Color(0xFFFFC229)),
+        isDismissible: true,
+      );
+    }
+  });
 
   runApp(const SkyRightz360App());
 }

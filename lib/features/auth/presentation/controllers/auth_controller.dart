@@ -157,6 +157,9 @@ class AuthController extends GetxController {
           settings.authorizationStatus == AuthorizationStatus.provisional) {
         String? token = await messaging.getToken();
         if (token != null) {
+          print('\n\n================================= FCM TOKEN =================================');
+          print(token);
+          print('=============================================================================\n\n');
           debugPrint('FCM Token: $token');
           await _authRepository.updateFcmToken(token);
         }

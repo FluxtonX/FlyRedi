@@ -5,6 +5,8 @@ import '../models/alert_model.dart';
 import '../repositories/trip_repository.dart';
 import '../repositories/alert_repository.dart';
 import '../widgets/traveller_bottom_nav.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'dart:async';
 
 class SentinelMonitorScreen extends StatefulWidget {
   final TripModel? initialTrip;
@@ -29,12 +31,26 @@ class _SentinelMonitorScreenState extends State<SentinelMonitorScreen> {
   List<AlertModel> _dbAlerts = [];
   TripModel? _selectedTrip;
   String? _errorMessage;
+  StreamSubscription<RemoteMessage>? _fcmSubscription;
 
   @override
   void initState() {
     super.initState();
     _selectedTrip = widget.initialTrip;
     _loadTrips();
+    
+    // Listen for incoming FCM messages to instantly refresh the dashboard
+    _fcmSubscription = FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      if (mounted) {
+        _loadTrips();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _fcmSubscription?.cancel();
+    super.dispose();
   }
 
   Future<void> _loadTrips() async {
