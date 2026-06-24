@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import '../widgets/onboarding_page.dart';
 import '../widgets/plan_selection_page.dart';
 import 'package:get/get.dart';
 import '../../auth/presentation/screens/sign_in_screen.dart';
 import '../../traveller/screens/traveller_tabs_screen.dart';
 import '../repositories/onboarding_repository.dart';
+import '../../../core/widgets/custom_button.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
@@ -15,7 +15,6 @@ class OnboardingScreen extends StatefulWidget {
 }
 
 class _OnboardingScreenState extends State<OnboardingScreen> {
-  final PageController _pageController = PageController();
   final OnboardingRepository _onboardingRepository = OnboardingRepository();
 
   int currentIndex = 0;
@@ -92,63 +91,47 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   }
 
   void nextPage() {
-    if (currentIndex < _planPageIndex) {
-      _pageController.nextPage(
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeIn,
-      );
+    if (currentIndex < _totalPages - 1) {
+      setState(() {
+        currentIndex++;
+      });
     } else {
       _finishOnboarding();
     }
   }
 
   void skipToLastPage() {
-    _pageController.jumpToPage(
-      _planPageIndex,
-    );
+    setState(() {
+      currentIndex = _planPageIndex;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
+    final bool isPlanPage = currentIndex == _planPageIndex;
+
     return Scaffold(
       body: Stack(
         children: [
-          PageView.builder(
-            controller: _pageController,
-            onPageChanged: (index) {
-              setState(() {
-                currentIndex = index;
-              });
-            },
-            itemCount: _totalPages,
-            itemBuilder: (context, index) {
-              if (index == _planPageIndex) {
-                return PlanSelectionPage(
-                  onBack: () {
-                    _pageController.previousPage(
-                      duration: const Duration(milliseconds: 300),
-                      curve: Curves.easeIn,
-                    );
-                  },
-                  onContinueFree: _finishOnboarding,
-                  onUpgradeToPro: _finishOnboarding,
-                );
-              }
-
-              final item = onboardingData[index];
-
-              return OnboardingPage(
-                icon: item['icon'],
-                title: item['title'],
-                description: item['description'],
-                currentIndex: currentIndex,
-                totalPages: _totalPages,
-                isLastPage: false,
-                onNext: nextPage,
-                onSkip: skipToLastPage,
-              );
-            },
+          // Show plan selection page or onboarding content
+          AnimatedSwitcher(
+            duration: const Duration(milliseconds: 350),
+            switchInCurve: Curves.easeInOut,
+            switchOutCurve: Curves.easeInOut,
+            child: isPlanPage
+                ? PlanSelectionPage(
+                    key: const ValueKey('plan_page'),
+                    onBack: () {
+                      setState(() {
+                        currentIndex = _planPageIndex - 1;
+                      });
+                    },
+                    onContinueFree: _finishOnboarding,
+                    onUpgradeToPro: _finishOnboarding,
+                  )
+                : _buildOnboardingContent(),
           ),
+          // Loading overlay
           if (_isCompleting)
             Container(
               color: Colors.black.withOpacity(0.5),
@@ -172,6 +155,104 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 ),
               ),
             ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildOnboardingContent() {
+    final item = onboardingData[currentIndex];
+    final bool isLastContentPage = currentIndex == onboardingData.length - 1;
+
+    return Padding(
+      key: const ValueKey('onboarding_content'),
+      padding: const EdgeInsets.all(24),
+      child: Column(
+        children: [
+          const Spacer(),
+
+          // Only this part crossfades — icon, title, description
+          AnimatedSwitcher(
+            duration: const Duration(milliseconds: 300),
+            switchInCurve: Curves.easeInOut,
+            switchOutCurve: Curves.easeInOut,
+            child: Column(
+              key: ValueKey<int>(currentIndex),
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  item['icon'] as IconData,
+                  size: 76,
+                  color: const Color(0xFFFFC229),
+                ),
+                const SizedBox(height: 40),
+                Text(
+                  item['title'] as String,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Text(
+                  item['description'] as String,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    color: Colors.white60,
+                    fontSize: 15,
+                    height: 1.5,
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          const SizedBox(height: 40),
+
+          // Dots — stay in place, just animate width/color smoothly
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: List.generate(_totalPages, (index) {
+              final bool isActive = index == currentIndex;
+
+              return AnimatedContainer(
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeInOut,
+                margin: const EdgeInsets.symmetric(horizontal: 4),
+                width: isActive ? 28 : 8,
+                height: 8,
+                decoration: BoxDecoration(
+                  color: isActive ? const Color(0xFFFFC229) : Colors.white24,
+                  borderRadius: BorderRadius.circular(20),
+                ),
+              );
+            }),
+          ),
+
+          const Spacer(),
+
+          // Button — stays in place, only text changes
+          CustomButton(
+            title: isLastContentPage ? 'Get Started' : 'Next',
+            onTap: nextPage,
+          ),
+          const SizedBox(height: 18),
+
+          // Skip link — stays in place, hidden on last page
+          if (!isLastContentPage)
+            GestureDetector(
+              onTap: skipToLastPage,
+              child: const Text(
+                'Skip',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          const SizedBox(height: 20),
         ],
       ),
     );

@@ -283,7 +283,9 @@ class _TripsOverviewScreenState extends State<TripsOverviewScreen> {
 
   bool _hasReadableTripValue(String value) {
     final normalized = value.trim().toLowerCase();
-    return normalized.isNotEmpty && normalized != 'unknown' && normalized != '--';
+    return normalized.isNotEmpty &&
+        normalized != 'unknown' &&
+        normalized != '--';
   }
 
   String _tripFlightLabel(TripModel trip) {
@@ -324,7 +326,8 @@ class _TripsOverviewScreenState extends State<TripsOverviewScreen> {
     if (isoMatch != null) return '${isoMatch.group(1)}:${isoMatch.group(2)}';
     // Plain HH:mm (no date prefix) — return as-is after validation.
     final plainMatch = RegExp(r'^(\d{2}):(\d{2})').firstMatch(isoLike.trim());
-    if (plainMatch != null) return '${plainMatch.group(1)}:${plainMatch.group(2)}';
+    if (plainMatch != null)
+      return '${plainMatch.group(1)}:${plainMatch.group(2)}';
     // Unrecognised format — show the raw string so no data is lost.
     return isoLike;
   }
@@ -340,8 +343,9 @@ class _TripsOverviewScreenState extends State<TripsOverviewScreen> {
       return Scaffold(
         backgroundColor: AppColors.background,
         body: _buildTripsSkeleton(),
-        bottomNavigationBar:
-            widget.showBottomNav ? const TravellerBottomNav(activeIndex: 1) : null,
+        bottomNavigationBar: widget.showBottomNav
+            ? const TravellerBottomNav(activeIndex: 1)
+            : null,
       );
     }
 
@@ -367,8 +371,9 @@ class _TripsOverviewScreenState extends State<TripsOverviewScreen> {
             ],
           ),
         ),
-        bottomNavigationBar:
-            widget.showBottomNav ? const TravellerBottomNav(activeIndex: 1) : null,
+        bottomNavigationBar: widget.showBottomNav
+            ? const TravellerBottomNav(activeIndex: 1)
+            : null,
       );
     }
 
@@ -498,23 +503,7 @@ class _TripsOverviewScreenState extends State<TripsOverviewScreen> {
                   ),
                   Row(
                     children: [
-                      Container(
-                        width: 8,
-                        height: 8,
-                        decoration: const BoxDecoration(
-                          color: Color(0xFF10B981), // Green
-                          shape: BoxShape.circle,
-                        ),
-                      ),
                       const SizedBox(width: 6),
-                      const Text(
-                        'Active',
-                        style: TextStyle(
-                          color: Color(0xFF10B981),
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
                     ],
                   ),
                 ],
@@ -692,8 +681,9 @@ class _TripsOverviewScreenState extends State<TripsOverviewScreen> {
           ),
         ),
       ),
-      bottomNavigationBar:
-          widget.showBottomNav ? const TravellerBottomNav(activeIndex: 1) : null,
+      bottomNavigationBar: widget.showBottomNav
+          ? const TravellerBottomNav(activeIndex: 1)
+          : null,
     );
   }
 

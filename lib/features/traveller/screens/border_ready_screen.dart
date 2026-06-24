@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:sky_rightz_360/core/constants/app_colors.dart';
+import '../../../../core/constants/countries_data.dart';
+import '../../../../core/constants/airlines_data.dart';
+import '../../../../core/widgets/searchable_bottom_sheet.dart';
 import '../widgets/traveller_bottom_nav.dart';
 
 class BorderReadyScreen extends StatefulWidget {
@@ -20,6 +23,109 @@ class _BorderReadyScreenState extends State<BorderReadyScreen> {
   bool _travellingWithPet = false;
   bool _hasRequiredVaccinations = false;
   bool _hasMicrochip = false;
+
+  // Form Field State
+  Map<String, String>? _nationality;
+  Map<String, String>? _residence;
+  Map<String, String>? _destination;
+  List<Map<String, String>> _transitCountries = [];
+  Map<String, String>? _airline;
+  DateTime? _passportExpiry;
+
+  final TextEditingController _stayDurationController = TextEditingController();
+  final TextEditingController _petTypeController = TextEditingController();
+  final TextEditingController _breedController = TextEditingController();
+  final TextEditingController _petAgeController = TextEditingController();
+
+  @override
+  void dispose() {
+    _stayDurationController.dispose();
+    _petTypeController.dispose();
+    _breedController.dispose();
+    _petAgeController.dispose();
+    super.dispose();
+  }
+
+  void _showCountrySelection(String title, Function(Map<String, String>) onSelected) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => SearchableBottomSheet(
+        title: title,
+        hintText: 'Search countries...',
+        items: CountriesData.countries,
+        onSelected: onSelected,
+      ),
+    );
+  }
+
+  void _showAirlineSelection() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => SearchableBottomSheet(
+        title: 'Select Airline',
+        hintText: 'Search airlines...',
+        items: AirlinesData.airlines,
+        onSelected: (item) {
+          setState(() {
+            _airline = item;
+          });
+        },
+      ),
+    );
+  }
+
+  void _showTransitCountriesSelection() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => SearchableBottomSheet(
+        title: 'Select Transit Countries',
+        hintText: 'Search countries...',
+        items: CountriesData.countries,
+        isMultiSelect: true,
+        initialSelectedItems: _transitCountries,
+        onSelected: (_) {}, // Handled on pop
+      ),
+    ).then((selected) {
+      if (selected != null && selected is List<Map<String, String>>) {
+        setState(() {
+          _transitCountries = selected;
+        });
+      }
+    });
+  }
+
+  Future<void> _selectDate(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: _passportExpiry ?? DateTime.now().add(const Duration(days: 365)),
+      firstDate: DateTime.now(),
+      lastDate: DateTime.now().add(const Duration(days: 3650)),
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: const ColorScheme.dark(
+              primary: AppColors.primary,
+              onPrimary: Colors.black,
+              surface: Color(0xFF0C162A),
+              onSurface: Colors.white,
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+    if (picked != null && picked != _passportExpiry) {
+      setState(() {
+        _passportExpiry = picked;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -138,46 +244,67 @@ class _BorderReadyScreenState extends State<BorderReadyScreen> {
             // TRIP DETAILS SECTION
             _buildSectionTitle('TRIP DETAILS'),
             const SizedBox(height: 16),
-            _buildTextField(
+            _buildDropdownField(
               label: 'NATIONALITY',
               hint: 'Select country',
               icon: Icons.language,
+              value: _nationality?['name'],
+              onTap: () => _showCountrySelection('Select Nationality', (val) => setState(() => _nationality = val)),
             ),
             const SizedBox(height: 16),
-            _buildTextField(
+            _buildDropdownField(
               label: 'COUNTRY OF RESIDENCE',
               hint: 'Where you live',
               icon: Icons.location_on_outlined,
+              value: _residence?['name'],
+              onTap: () => _showCountrySelection('Select Residence', (val) => setState(() => _residence = val)),
             ),
             const SizedBox(height: 16),
-            _buildTextField(
+            _buildDropdownField(
               label: 'DESTINATION',
               hint: 'Final destination',
               icon: Icons.location_on_outlined,
+              value: _destination?['name'],
+              onTap: () => _showCountrySelection('Select Destination', (val) => setState(() => _destination = val)),
             ),
             const SizedBox(height: 16),
-            _buildTextField(
+            _buildMultiSelectDropdownField(
               label: 'TRANSIT COUNTRIES',
               hint: 'Add layover countries',
               icon: Icons.flight_takeoff,
+              selectedItems: _transitCountries,
+              onTap: _showTransitCountriesSelection,
+              onRemove: (item) {
+                setState(() {
+                  _transitCountries.removeWhere((e) => e['code'] == item['code']);
+                });
+              },
             ),
             const SizedBox(height: 16),
-            _buildTextField(
+            _buildDropdownField(
               label: 'AIRLINE / CARRIER',
               hint: 'e.g., Emirates, Lufthansa',
               icon: Icons.flight_takeoff,
+              value: _airline?['name'],
+              onTap: _showAirlineSelection,
             ),
             const SizedBox(height: 16),
-            _buildTextField(
+            _buildDropdownField(
               label: 'PASSPORT EXPIRY',
               hint: 'MM/YYYY',
               icon: Icons.calendar_today_outlined,
+              value: _passportExpiry != null 
+                  ? "${_passportExpiry!.month.toString().padLeft(2, '0')}/${_passportExpiry!.year}"
+                  : null,
+              onTap: () => _selectDate(context),
             ),
             const SizedBox(height: 16),
             _buildTextField(
               label: 'STAY DURATION',
               hint: 'Number of days',
               icon: Icons.calendar_today_outlined,
+              controller: _stayDurationController,
+              keyboardType: TextInputType.number,
             ),
 
             const SizedBox(height: 32),
@@ -210,18 +337,22 @@ class _BorderReadyScreenState extends State<BorderReadyScreen> {
                 label: 'PET TYPE',
                 hint: 'Dog, Cat, etc.',
                 icon: Icons.favorite_border,
+                controller: _petTypeController,
               ),
               const SizedBox(height: 16),
               _buildTextField(
                 label: 'BREED',
                 hint: 'Breed name',
                 icon: Icons.favorite_border,
+                controller: _breedController,
               ),
               const SizedBox(height: 16),
               _buildTextField(
                 label: 'PET AGE',
                 hint: 'Age in years',
                 icon: Icons.calendar_today_outlined,
+                controller: _petAgeController,
+                keyboardType: TextInputType.number,
               ),
               const SizedBox(height: 16),
               _buildSwitchRow('Has required vaccinations', _hasRequiredVaccinations, (val) => setState(() => _hasRequiredVaccinations = val)),
@@ -371,7 +502,133 @@ class _BorderReadyScreenState extends State<BorderReadyScreen> {
     );
   }
 
-  Widget _buildTextField({required String label, required String hint, required IconData icon}) {
+  Widget _buildDropdownField({
+    required String label,
+    required String hint,
+    required IconData icon,
+    required String? value,
+    required VoidCallback onTap,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: const TextStyle(
+            color: Colors.white54,
+            fontSize: 11,
+            fontWeight: FontWeight.bold,
+            letterSpacing: 0.5,
+          ),
+        ),
+        const SizedBox(height: 8),
+        GestureDetector(
+          onTap: onTap,
+          child: Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+            decoration: BoxDecoration(
+              color: const Color(0xFF0C162A),
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Row(
+              children: [
+                Icon(icon, color: Colors.white54, size: 20),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Text(
+                    value ?? hint,
+                    style: TextStyle(
+                      color: value != null ? Colors.white : Colors.white.withOpacity(0.3),
+                      fontSize: 14,
+                    ),
+                  ),
+                ),
+                const Icon(Icons.arrow_drop_down, color: Colors.white54),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildMultiSelectDropdownField({
+    required String label,
+    required String hint,
+    required IconData icon,
+    required List<Map<String, String>> selectedItems,
+    required VoidCallback onTap,
+    required Function(Map<String, String>) onRemove,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: const TextStyle(
+            color: Colors.white54,
+            fontSize: 11,
+            fontWeight: FontWeight.bold,
+            letterSpacing: 0.5,
+          ),
+        ),
+        const SizedBox(height: 8),
+        GestureDetector(
+          onTap: onTap,
+          child: Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            decoration: BoxDecoration(
+              color: const Color(0xFF0C162A),
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Row(
+              children: [
+                Icon(icon, color: Colors.white54, size: 20),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: selectedItems.isEmpty
+                      ? Text(
+                          hint,
+                          style: TextStyle(
+                            color: Colors.white.withOpacity(0.3),
+                            fontSize: 14,
+                          ),
+                        )
+                      : Wrap(
+                          spacing: 8,
+                          runSpacing: 8,
+                          children: selectedItems.map((item) {
+                            return Chip(
+                              label: Text(
+                                item['name'] ?? '',
+                                style: const TextStyle(color: Colors.white, fontSize: 12),
+                              ),
+                              backgroundColor: const Color(0xFF162544),
+                              deleteIconColor: Colors.white54,
+                              onDeleted: () => onRemove(item),
+                              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                            );
+                          }).toList(),
+                        ),
+                ),
+                const Icon(Icons.arrow_drop_down, color: Colors.white54),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildTextField({
+    required String label,
+    required String hint,
+    required IconData icon,
+    TextEditingController? controller,
+    TextInputType? keyboardType,
+  }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -392,6 +649,8 @@ class _BorderReadyScreenState extends State<BorderReadyScreen> {
             borderRadius: BorderRadius.circular(16),
           ),
           child: TextFormField(
+            controller: controller,
+            keyboardType: keyboardType,
             style: const TextStyle(color: Colors.white, fontSize: 14),
             decoration: InputDecoration(
               icon: Icon(icon, color: Colors.white54, size: 20),
