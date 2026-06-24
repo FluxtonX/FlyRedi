@@ -56,7 +56,7 @@ class SkyRightz360App extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       initialBinding: AuthBinding(),
       // initialRoute: '/splash', // TODO: Restore after testing
-      initialRoute: '/onboarding', // TEMP: Force onboarding for testing
+      initialRoute: '/home', // TEMP: Force home for testing
       getPages: [
         // TEMP: Onboarding route for direct testing
         GetPage(

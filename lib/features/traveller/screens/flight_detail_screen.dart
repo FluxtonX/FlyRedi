@@ -5,6 +5,7 @@ import 'flight_details_screen.dart';
 import 'border_ready_screen.dart';
 import 'sentinel_monitor_screen.dart';
 import 'ai_assistant_screen.dart';
+import 'live_flight_tracker_screen.dart';
 
 class FlightDetailScreen extends StatelessWidget {
   const FlightDetailScreen({super.key});
@@ -181,6 +182,53 @@ class FlightDetailScreen extends StatelessWidget {
                   const SizedBox(height: 12),
                   _buildFlightDetailRow(Icons.door_sliding_outlined, 'Gate', 'Gate B24'),
                 ],
+              ),
+            ),
+
+            const SizedBox(height: 16),
+
+            // Live Flight Tracker Button
+            GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const LiveFlightTrackerScreen()),
+                );
+              },
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF0C162A),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: const Color(0xFFFFC229).withOpacity(0.3)),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFFFFC229).withOpacity(0.05),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Row(
+                      children: [
+                        Icon(Icons.map_outlined, color: Color(0xFFFFC229), size: 22),
+                        SizedBox(width: 14),
+                        Text(
+                          'Live Flight Tracker',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                    Icon(Icons.chevron_right, color: Colors.white.withOpacity(0.5), size: 20),
+                  ],
+                ),
               ),
             ),
 

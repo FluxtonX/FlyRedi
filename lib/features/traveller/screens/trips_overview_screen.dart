@@ -11,6 +11,7 @@ import 'active_disruptions_screen.dart';
 import 'upcoming_trips_screen.dart';
 import 'border_ready_screen.dart';
 import 'sentinel_monitor_screen.dart';
+import 'live_flight_tracker_screen.dart';
 
 class TripsOverviewScreen extends StatefulWidget {
   final bool showBottomNav;
@@ -634,6 +635,66 @@ class _TripsOverviewScreenState extends State<TripsOverviewScreen> {
                 }).toList(),
 
               const SizedBox(height: 28),
+
+              // Live Flight Tracker Quick Action
+              GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const LiveFlightTrackerScreen(),
+                    ),
+                  );
+                },
+                child: Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF0C162A),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: const Color(0xFFFFC229).withOpacity(0.3),
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFFFC229).withOpacity(0.1),
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(Icons.map_outlined, color: Color(0xFFFFC229), size: 24),
+                      ),
+                      const SizedBox(width: 16),
+                      const Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Live Flight Tracker',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            SizedBox(height: 4),
+                            Text(
+                              'Track your flight on the map in real-time',
+                              style: TextStyle(
+                                color: Colors.white54,
+                                fontSize: 12,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const Icon(Icons.chevron_right, color: Colors.white54),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
 
               // Two Half-Width bottom action cards
               IntrinsicHeight(
