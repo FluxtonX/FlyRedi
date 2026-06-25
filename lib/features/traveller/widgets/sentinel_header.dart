@@ -16,17 +16,17 @@ class SentinelHeader extends StatelessWidget {
               width: 54,
               height: 54,
               decoration: BoxDecoration(
-                color: const Color(0xFF10284F),
+                color: Theme.of(context).colorScheme.surface,
                 borderRadius: BorderRadius.circular(18),
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.shield_outlined,
                 color: Color(0xFFFFC229),
                 size: 30,
               ),
             ),
-            const SizedBox(width: 16),
-            const Expanded(
+            SizedBox(width: 16),
+            Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -35,7 +35,7 @@ class SentinelHeader extends StatelessWidget {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
-                      color: Colors.white,
+                      color: Theme.of(context).colorScheme.onSurface,
                       fontSize: 21,
                       fontWeight: FontWeight.bold,
                     ),
@@ -46,25 +46,25 @@ class SentinelHeader extends StatelessWidget {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
-                      color: Colors.white54,
+                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.54),
                       fontSize: 15,
                     ),
                   ),
                 ],
               ),
             ),
-            const SizedBox(width: 10),
+            SizedBox(width: 10),
             Row(
               children: [
                 CircleAvatar(
                   radius: 5,
-                  backgroundColor: isEmpty ? Colors.white30 : const Color(0xFF22C55E),
+                  backgroundColor: isEmpty ? Theme.of(context).colorScheme.onSurface.withOpacity(0.3) : const Color(0xFF22C55E),
                 ),
-                const SizedBox(width: 8),
+                SizedBox(width: 8),
                 Text(
                   isEmpty ? 'Idle' : 'Active',
                   style: TextStyle(
-                    color: isEmpty ? Colors.white30 : const Color(0xFF22C55E),
+                    color: isEmpty ? Theme.of(context).colorScheme.onSurface.withOpacity(0.3) : const Color(0xFF22C55E),
                     fontSize: 18,
                   ),
                 ),

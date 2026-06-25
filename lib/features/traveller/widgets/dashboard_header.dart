@@ -27,24 +27,24 @@ class DashboardHeader extends StatelessWidget {
                 'Welcome back, $displayName',
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  color: Colors.white,
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurface,
                   fontSize: 21,
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              const SizedBox(height: 6),
+              SizedBox(height: 6),
               Text(
                 planLabel,
-                style: const TextStyle(
-                  color: Colors.white60,
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                   fontSize: 13,
                 ),
               ),
             ],
           ),
         ),
-        const SizedBox(width: 12),
+        SizedBox(width: 12),
         GestureDetector(
           onTap: () {
             Navigator.push(
@@ -55,14 +55,15 @@ class DashboardHeader extends StatelessWidget {
           child: Stack(
             children: [
               Container(
-                padding: const EdgeInsets.all(10),
+                padding: EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF10284F),
+                  color: Theme.of(context).colorScheme.surface,
                   borderRadius: BorderRadius.circular(14),
+                  border: Border.all(color: Theme.of(context).colorScheme.outline),
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.notifications_none,
-                  color: Colors.white,
+                  color: Theme.of(context).colorScheme.onSurface,
                 ),
               ),
               if (hasNotifications)
@@ -72,15 +73,15 @@ class DashboardHeader extends StatelessWidget {
                   child: Container(
                     width: 18,
                     height: 18,
-                    decoration: const BoxDecoration(
-                      color: Colors.red,
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.error,
                       shape: BoxShape.circle,
                     ),
                     child: Center(
                       child: Text(
                         '$notificationCount',
-                        style: const TextStyle(
-                          color: Colors.white,
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.onError,
                           fontSize: 10,
                           fontWeight: FontWeight.bold,
                         ),

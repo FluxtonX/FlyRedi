@@ -170,38 +170,38 @@ class _AiAssistantScreenState extends State<AiAssistantScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF060B16), // Premium dark theme matching screenshot
+       // Premium dark theme matching screenshot
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(90),
         child: Container(
-          decoration: const BoxDecoration(
-            color: Color(0xFF070F24),
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.surface,
             border: Border(
               bottom: BorderSide(
-                color: Color(0xFF1E2D4D),
+                color: Theme.of(context).colorScheme.surface,
                 width: 0.8,
               ),
             ),
           ),
-          padding: const EdgeInsets.only(top: 40, bottom: 12),
+          padding: EdgeInsets.only(top: 40, bottom: 12),
           child: Row(
             children: [
-              const SizedBox(width: 20),
+              SizedBox(width: 20),
               // Circular icon container with golden sparkle icon
               Container(
-                padding: const EdgeInsets.all(12),
-                decoration: const BoxDecoration(
-                  color: Color(0xFF161E2E),
+                padding: EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.surface,
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.auto_awesome,
                   color: Color(0xFFFFC229),
                   size: 22,
                 ),
               ),
-              const SizedBox(width: 16),
-              const Expanded(
+              SizedBox(width: 16),
+              Expanded(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -209,7 +209,7 @@ class _AiAssistantScreenState extends State<AiAssistantScreen> {
                     Text(
                       'AI Assistant',
                       style: TextStyle(
-                        color: Colors.white,
+                        color: Theme.of(context).colorScheme.onSurface,
                         fontSize: 22,
                         fontWeight: FontWeight.bold,
                       ),
@@ -218,7 +218,7 @@ class _AiAssistantScreenState extends State<AiAssistantScreen> {
                     Text(
                       'Always here to help',
                       style: TextStyle(
-                        color: Colors.white54,
+                        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.54),
                         fontSize: 13,
                       ),
                     ),
@@ -226,12 +226,12 @@ class _AiAssistantScreenState extends State<AiAssistantScreen> {
                 ),
               ),
               IconButton(
-                icon: const Icon(Icons.refresh, color: Colors.white60),
+                icon: Icon(Icons.refresh, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6)),
                 tooltip: 'Reset Conversation',
                 onPressed: _resetChat,
               ),
               IconButton(
-                icon: const Icon(Icons.folder_outlined, color: Colors.white60),
+                icon: Icon(Icons.folder_outlined, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6)),
                 tooltip: 'View Claims',
                 onPressed: () {
                   Navigator.push(
@@ -240,7 +240,7 @@ class _AiAssistantScreenState extends State<AiAssistantScreen> {
                   );
                 },
               ),
-              const SizedBox(width: 8),
+              SizedBox(width: 8),
             ],
           ),
         ),
@@ -251,7 +251,7 @@ class _AiAssistantScreenState extends State<AiAssistantScreen> {
           Expanded(
             child: ListView(
               controller: _scrollController,
-              padding: const EdgeInsets.all(24),
+              padding: EdgeInsets.all(24),
               children: [
                 // Render message feed
                 ..._messages.map((msg) => _buildMessageBubble(msg)),
@@ -259,34 +259,34 @@ class _AiAssistantScreenState extends State<AiAssistantScreen> {
                 // Bouncing/Analyzing Loading State
                 if (_isTyping)
                   Padding(
-                    padding: const EdgeInsets.only(bottom: 20),
+                    padding: EdgeInsets.only(bottom: 20),
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Container(
-                          padding: const EdgeInsets.all(8),
-                          decoration: const BoxDecoration(
-                            color: Color(0xFF161E2E),
+                          padding: EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).colorScheme.surface,
                             shape: BoxShape.circle,
                           ),
-                          child: const Icon(
+                          child: Icon(
                             Icons.auto_awesome,
                             color: Color(0xFFFFC229),
                             size: 14,
                           ),
                         ),
-                        const SizedBox(width: 12),
+                        SizedBox(width: 12),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+                          padding: EdgeInsets.symmetric(horizontal: 18, vertical: 14),
                           decoration: BoxDecoration(
-                            color: const Color(0xFF0F1B35),
+                            color: Theme.of(context).colorScheme.surface,
                             borderRadius: BorderRadius.circular(20),
-                            border: Border.all(color: Colors.white.withOpacity(0.08)),
+                            border: Border.all(color: Theme.of(context).colorScheme.outline),
                           ),
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              const SizedBox(
+                              SizedBox(
                                 width: 12,
                                 height: 12,
                                 child: CircularProgressIndicator(
@@ -294,11 +294,11 @@ class _AiAssistantScreenState extends State<AiAssistantScreen> {
                                   valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFFFC229)),
                                 ),
                               ),
-                              const SizedBox(width: 12),
+                              SizedBox(width: 12),
                               Text(
                                 'Assistant is typing...',
                                 style: TextStyle(
-                                  color: Colors.white.withOpacity(0.5),
+                                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
                                   fontSize: 14,
                                 ),
                               ),
@@ -311,35 +311,35 @@ class _AiAssistantScreenState extends State<AiAssistantScreen> {
 
                 // Quick Questions Section (matches requested image layout perfectly!)
                 if (_showQuickQuestions) ...[
-                  const SizedBox(height: 12),
-                  const Text(
+                  SizedBox(height: 12),
+                  Text(
                     'Quick questions:',
                     style: TextStyle(
-                      color: Colors.white60,
+                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
-                  const SizedBox(height: 16),
+                  SizedBox(height: 16),
                   ..._quickQuestions.map((question) => Padding(
-                        padding: const EdgeInsets.only(bottom: 14),
+                        padding: EdgeInsets.only(bottom: 14),
                         child: GestureDetector(
                           onTap: () => _handleSubmitted(question),
                           child: Container(
                             width: double.infinity,
-                            padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 24),
+                            padding: EdgeInsets.symmetric(vertical: 20, horizontal: 24),
                             decoration: BoxDecoration(
-                              color: const Color(0xFF0B1427),
+                              color: Theme.of(context).colorScheme.surface,
                               borderRadius: BorderRadius.circular(20),
                               border: Border.all(
-                                color: Colors.white.withOpacity(0.08),
+                                color: Theme.of(context).colorScheme.outline,
                                 width: 1.2,
                               ),
                             ),
                             child: Text(
                               question,
-                              style: const TextStyle(
-                                color: Colors.white,
+                              style: TextStyle(
+                                color: Theme.of(context).colorScheme.onSurface,
                                 fontSize: 16,
                                 fontWeight: FontWeight.w500,
                               ),
@@ -355,13 +355,13 @@ class _AiAssistantScreenState extends State<AiAssistantScreen> {
           // Divider above Input Bar
           Container(
             height: 0.8,
-            color: const Color(0xFF1E2D4D),
+            color: Theme.of(context).colorScheme.surface,
           ),
 
           // Input Bar Area
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
-            color: const Color(0xFF060B16),
+            padding: EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+            color: Theme.of(context).colorScheme.surface,
             child: SafeArea(
               top: false,
               child: Row(
@@ -369,19 +369,19 @@ class _AiAssistantScreenState extends State<AiAssistantScreen> {
                   Expanded(
                     child: Container(
                       decoration: BoxDecoration(
-                        color: const Color(0xFF0B1427),
+                        color: Theme.of(context).colorScheme.surface,
                         borderRadius: BorderRadius.circular(24),
                         border: Border.all(
-                          color: const Color(0xFF1E2D4D),
+                          color: Theme.of(context).colorScheme.surface,
                           width: 1,
                         ),
                       ),
                       child: TextField(
                         controller: _textController,
-                        style: const TextStyle(color: Colors.white, fontSize: 15),
-                        decoration: const InputDecoration(
+                        style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 15),
+                        decoration: InputDecoration(
                           hintText: 'Ask a question...',
-                          hintStyle: TextStyle(color: Colors.white30, fontSize: 15),
+                          hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3), fontSize: 15),
                           contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 14),
                           border: InputBorder.none,
                         ),
@@ -389,16 +389,16 @@ class _AiAssistantScreenState extends State<AiAssistantScreen> {
                       ),
                     ),
                   ),
-                  const SizedBox(width: 16),
+                  SizedBox(width: 16),
                   GestureDetector(
                     onTap: () => _handleSubmitted(_textController.text),
                     child: Container(
-                      padding: const EdgeInsets.all(14),
-                      decoration: const BoxDecoration(
+                      padding: EdgeInsets.all(14),
+                      decoration: BoxDecoration(
                         color: Color(0xFFFFC229), // Gold amber Send button
                         shape: BoxShape.circle,
                       ),
-                      child: const Icon(
+                      child: Icon(
                         Icons.send_rounded, // Styled paper plane send icon
                         color: Colors.black,
                         size: 22,
@@ -419,31 +419,31 @@ class _AiAssistantScreenState extends State<AiAssistantScreen> {
   Widget _buildMessageBubble(ChatMessage msg) {
     final isAI = !msg.isUser;
     return Padding(
-      padding: const EdgeInsets.only(bottom: 20),
+      padding: EdgeInsets.only(bottom: 20),
       child: Row(
         mainAxisAlignment: msg.isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           if (isAI) ...[
             Container(
-              padding: const EdgeInsets.all(8),
-              decoration: const BoxDecoration(
-                color: Color(0xFF161E2E),
+              padding: EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.surface,
                 shape: BoxShape.circle,
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.auto_awesome,
                 color: Color(0xFFFFC229),
                 size: 14,
               ),
             ),
-            const SizedBox(width: 12),
+            SizedBox(width: 12),
           ],
           Flexible(
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+              padding: EdgeInsets.symmetric(horizontal: 18, vertical: 14),
               decoration: BoxDecoration(
-                color: msg.isUser ? const Color(0xFFFFC229) : const Color(0xFF0F1B35),
+                color: msg.isUser ? const Color(0xFFFFC229) : Theme.of(context).colorScheme.surface,
                 borderRadius: BorderRadius.only(
                   topLeft: const Radius.circular(20),
                   topRight: const Radius.circular(20),
@@ -452,12 +452,12 @@ class _AiAssistantScreenState extends State<AiAssistantScreen> {
                 ),
                 border: msg.isUser
                     ? null
-                    : Border.all(color: Colors.white.withOpacity(0.08)),
+                    : Border.all(color: Theme.of(context).colorScheme.outline),
               ),
               child: Text(
                 msg.text,
                 style: TextStyle(
-                  color: msg.isUser ? Colors.black : Colors.white,
+                  color: msg.isUser ? Colors.black : Theme.of(context).colorScheme.onSurface,
                   fontSize: 15,
                   height: 1.45,
                 ),
@@ -465,16 +465,16 @@ class _AiAssistantScreenState extends State<AiAssistantScreen> {
             ),
           ),
           if (msg.isUser) ...[
-            const SizedBox(width: 12),
+            SizedBox(width: 12),
             Container(
-              padding: const EdgeInsets.all(8),
-              decoration: const BoxDecoration(
-                color: Color(0xFF161E2E),
+              padding: EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.surface,
                 shape: BoxShape.circle,
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.person_outline,
-                color: Colors.white70,
+                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
                 size: 14,
               ),
             ),

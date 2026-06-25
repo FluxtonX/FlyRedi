@@ -26,7 +26,7 @@ class OnboardingPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(24),
+      padding: EdgeInsets.all(24),
       child: Column(
         children: [
           const Spacer(),
@@ -35,34 +35,34 @@ class OnboardingPage extends StatelessWidget {
             size: 76,
             color: const Color(0xFFFFC229),
           ),
-          const SizedBox(height: 40),
+          SizedBox(height: 40),
           Text(
             title,
             textAlign: TextAlign.center,
-            style: const TextStyle(
+            style: TextStyle(
               color: Colors.white,
               fontSize: 24,
               fontWeight: FontWeight.bold,
             ),
           ),
-          const SizedBox(height: 20),
+          SizedBox(height: 20),
           Text(
             description,
             textAlign: TextAlign.center,
-            style: const TextStyle(
+            style: TextStyle(
               color: Colors.white60,
               fontSize: 15,
               height: 1.5,
             ),
           ),
-          const SizedBox(height: 40),
+          SizedBox(height: 40),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: List.generate(totalPages, (index) {
               final bool isActive = index == currentIndex;
 
               return Container(
-                margin: const EdgeInsets.symmetric(horizontal: 4),
+                margin: EdgeInsets.symmetric(horizontal: 4),
                 width: isActive ? 28 : 8,
                 height: 8,
                 decoration: BoxDecoration(
@@ -77,7 +77,7 @@ class OnboardingPage extends StatelessWidget {
             title: isLastPage ? 'Get Started' : 'Next',
             onTap: onNext,
           ),
-          const SizedBox(height: 18),
+          SizedBox(height: 18),
           if (!isLastPage)
             GestureDetector(
               onTap: onSkip,
@@ -89,7 +89,7 @@ class OnboardingPage extends StatelessWidget {
                 ),
               ),
             ),
-          const SizedBox(height: 20),
+          SizedBox(height: 20),
         ],
       ),
     );

@@ -13,18 +13,18 @@ class FlightDetailScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          icon: Icon(Icons.arrow_back, color: Theme.of(context).colorScheme.onSurface),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Text(
+        title: Text(
           'Flight Details',
           style: TextStyle(
-            color: Colors.white,
+            color: Theme.of(context).colorScheme.onSurface,
             fontSize: 20,
             fontWeight: FontWeight.bold,
           ),
@@ -32,16 +32,16 @@ class FlightDetailScreen extends StatelessWidget {
         titleSpacing: 0,
         actions: [
           Container(
-            margin: const EdgeInsets.only(right: 24, top: 12, bottom: 12),
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+            margin: EdgeInsets.only(right: 24, top: 12, bottom: 12),
+            padding: EdgeInsets.symmetric(horizontal: 10, vertical: 4),
             decoration: BoxDecoration(
-              color: const Color(0xFF0F2D24),
+              color: Theme.of(context).colorScheme.surface,
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: const Color(0xFF10B981).withOpacity(0.2),
+                color: Color(0xFF10B981).withOpacity(0.2),
               ),
             ),
-            child: const Row(
+            child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
                 Icon(Icons.shield, color: Color(0xFF10B981), size: 12),
@@ -60,18 +60,18 @@ class FlightDetailScreen extends StatelessWidget {
         ],
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+        padding: EdgeInsets.symmetric(horizontal: 24, vertical: 8),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             // UA 2847 Flight Information Card
             Container(
-              padding: const EdgeInsets.all(20),
+              padding: EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: const Color(0xFF0C162A),
+                color: Theme.of(context).colorScheme.surface,
                 borderRadius: BorderRadius.circular(22),
                 border: Border.all(
-                  color: Colors.white.withOpacity(0.04),
+                  color: Theme.of(context).colorScheme.outline,
                 ),
               ),
               child: Column(
@@ -80,13 +80,13 @@ class FlightDetailScreen extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Column(
+                      Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
                             'United Airlines',
                             style: TextStyle(
-                              color: Colors.white54,
+                              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.54),
                               fontSize: 12,
                             ),
                           ),
@@ -94,7 +94,7 @@ class FlightDetailScreen extends StatelessWidget {
                           Text(
                             'UA 2847',
                             style: TextStyle(
-                              color: Colors.white,
+                              color: Theme.of(context).colorScheme.onSurface,
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
                             ),
@@ -102,12 +102,12 @@ class FlightDetailScreen extends StatelessWidget {
                         ],
                       ),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                        padding: EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                         decoration: BoxDecoration(
-                          color: const Color(0xFFFFC229).withOpacity(0.1),
+                          color: Color(0xFFFFC229).withOpacity(0.1),
                           borderRadius: BorderRadius.circular(8),
                         ),
-                        child: const Text(
+                        child: Text(
                           'Delayed',
                           style: TextStyle(
                             color: Color(0xFFFFC229),
@@ -118,17 +118,17 @@ class FlightDetailScreen extends StatelessWidget {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 24),
+                  SizedBox(height: 24),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Column(
+                      Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
                             'SFO',
                             style: TextStyle(
-                              color: Colors.white,
+                              color: Theme.of(context).colorScheme.onSurface,
                               fontSize: 28,
                               fontWeight: FontWeight.bold,
                             ),
@@ -137,7 +137,7 @@ class FlightDetailScreen extends StatelessWidget {
                           Text(
                             'San Francisco',
                             style: TextStyle(
-                              color: Colors.white38,
+                              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.38),
                               fontSize: 11,
                             ),
                           ),
@@ -145,16 +145,16 @@ class FlightDetailScreen extends StatelessWidget {
                       ),
                       Icon(
                         Icons.swap_horiz,
-                        color: const Color(0xFFFFC229).withOpacity(0.8),
+                        color: Color(0xFFFFC229).withOpacity(0.8),
                         size: 28,
                       ),
-                      const Column(
+                      Column(
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
                           Text(
                             'JFK',
                             style: TextStyle(
-                              color: Colors.white,
+                              color: Theme.of(context).colorScheme.onSurface,
                               fontSize: 28,
                               fontWeight: FontWeight.bold,
                             ),
@@ -163,7 +163,7 @@ class FlightDetailScreen extends StatelessWidget {
                           Text(
                             'New York',
                             style: TextStyle(
-                              color: Colors.white38,
+                              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.38),
                               fontSize: 11,
                             ),
                           ),
@@ -171,21 +171,21 @@ class FlightDetailScreen extends StatelessWidget {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 24),
-                  Divider(color: Colors.white.withOpacity(0.04)),
-                  const SizedBox(height: 16),
-                  _buildFlightDetailRow(Icons.calendar_today_outlined, 'Date', 'May 15, 2026'),
-                  const SizedBox(height: 12),
-                  _buildFlightDetailRow(Icons.access_time_outlined, 'Duration', '5h 30m'),
-                  const SizedBox(height: 12),
-                  _buildFlightDetailRow(Icons.domain_outlined, 'Terminal', 'Terminal 3'),
-                  const SizedBox(height: 12),
-                  _buildFlightDetailRow(Icons.door_sliding_outlined, 'Gate', 'Gate B24'),
+                  SizedBox(height: 24),
+                  Divider(color: Theme.of(context).colorScheme.outline),
+                  SizedBox(height: 16),
+                  _buildFlightDetailRow(context, Icons.calendar_today_outlined, 'Date', 'May 15, 2026'),
+                  SizedBox(height: 12),
+                  _buildFlightDetailRow(context, Icons.access_time_outlined, 'Duration', '5h 30m'),
+                  SizedBox(height: 12),
+                  _buildFlightDetailRow(context, Icons.domain_outlined, 'Terminal', 'Terminal 3'),
+                  SizedBox(height: 12),
+                  _buildFlightDetailRow(context, Icons.door_sliding_outlined, 'Gate', 'Gate B24'),
                 ],
               ),
             ),
 
-            const SizedBox(height: 16),
+            SizedBox(height: 16),
 
             // Live Flight Tracker Button
             GestureDetector(
@@ -196,14 +196,14 @@ class FlightDetailScreen extends StatelessWidget {
                 );
               },
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF0C162A),
+                  color: Theme.of(context).colorScheme.surface,
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: const Color(0xFFFFC229).withOpacity(0.3)),
+                  border: Border.all(color: Color(0xFFFFC229).withOpacity(0.3)),
                   boxShadow: [
                     BoxShadow(
-                      color: const Color(0xFFFFC229).withOpacity(0.05),
+                      color: Color(0xFFFFC229).withOpacity(0.05),
                       blurRadius: 10,
                       offset: const Offset(0, 4),
                     ),
@@ -212,69 +212,69 @@ class FlightDetailScreen extends StatelessWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Row(
+                    Row(
                       children: [
                         Icon(Icons.map_outlined, color: Color(0xFFFFC229), size: 22),
                         SizedBox(width: 14),
                         Text(
                           'Live Flight Tracker',
                           style: TextStyle(
-                            color: Colors.white,
+                            color: Theme.of(context).colorScheme.onSurface,
                             fontSize: 15,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                       ],
                     ),
-                    Icon(Icons.chevron_right, color: Colors.white.withOpacity(0.5), size: 20),
+                    Icon(Icons.chevron_right, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5), size: 20),
                   ],
                 ),
               ),
             ),
 
-            const SizedBox(height: 16),
+            SizedBox(height: 16),
 
             // Sentinel™ Active Status Box
             Container(
-              padding: const EdgeInsets.all(20),
+              padding: EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: const Color(0xFF0C162A),
+                color: Theme.of(context).colorScheme.surface,
                 borderRadius: BorderRadius.circular(22),
                 border: Border.all(
-                  color: const Color(0xFFFFC229).withOpacity(0.15),
+                  color: Color(0xFFFFC229).withOpacity(0.15),
                 ),
               ),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Icon(
+                  Icon(
                     Icons.shield_outlined,
                     color: Color(0xFFFFC229),
                     size: 22,
                   ),
-                  const SizedBox(width: 14),
+                  SizedBox(width: 14),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
+                        Text(
                           'Sentinel™ Active',
                           style: TextStyle(
-                            color: Colors.white,
+                            color: Theme.of(context).colorScheme.onSurface,
                             fontSize: 14,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        const SizedBox(height: 4),
+                        SizedBox(height: 4),
                         Text(
                           'Real-time monitoring enabled with instant alerts for any changes',
                           style: TextStyle(
-                            color: Colors.white.withOpacity(0.5),
+                            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
                             fontSize: 11,
                             height: 1.35,
                           ),
                         ),
-                        const SizedBox(height: 16),
+                        SizedBox(height: 16),
                         GestureDetector(
                           onTap: () {
                             Navigator.push(
@@ -283,15 +283,15 @@ class FlightDetailScreen extends StatelessWidget {
                             );
                           },
                           child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                             decoration: BoxDecoration(
-                              color: const Color(0xFF1E3A8A).withOpacity(0.4),
+                              color: Theme.of(context).colorScheme.surface.withOpacity(0.4),
                               borderRadius: BorderRadius.circular(10),
                               border: Border.all(
-                                color: const Color(0xFF1E3A8A).withOpacity(0.6),
+                                color: Theme.of(context).colorScheme.surface.withOpacity(0.6),
                               ),
                             ),
-                            child: const Text(
+                            child: Text(
                               'View Monitoring Dashboard',
                               style: TextStyle(
                                 color: Color(0xFFFFC229),
@@ -308,13 +308,13 @@ class FlightDetailScreen extends StatelessWidget {
               ),
             ),
 
-            const SizedBox(height: 16),
+            SizedBox(height: 16),
 
             // Flight Delayed Box
             Container(
-              padding: const EdgeInsets.all(20),
+              padding: EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: const Color(0xFF0C162A),
+                color: Theme.of(context).colorScheme.surface,
                 borderRadius: BorderRadius.circular(22),
                 border: Border.all(
                   color: Colors.red.withOpacity(0.15),
@@ -323,40 +323,40 @@ class FlightDetailScreen extends StatelessWidget {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Icon(
+                  Icon(
                     Icons.error_outline,
                     color: Colors.redAccent,
                     size: 22,
                   ),
-                  const SizedBox(width: 14),
+                  SizedBox(width: 14),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
+                        Text(
                           'Flight Delayed',
                           style: TextStyle(
-                            color: Colors.white,
+                            color: Theme.of(context).colorScheme.onSurface,
                             fontSize: 14,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        const SizedBox(height: 4),
+                        SizedBox(height: 4),
                         Text(
                           'Your flight has been delayed by 2h 30m',
                           style: TextStyle(
-                            color: Colors.white.withOpacity(0.5),
+                            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
                             fontSize: 11,
                           ),
                         ),
-                        const SizedBox(height: 16),
-                        Divider(color: Colors.white.withOpacity(0.04)),
-                        const SizedBox(height: 12),
-                        _buildDelayRow('Original Departure', '8:15 AM'),
-                        const SizedBox(height: 8),
-                        _buildDelayRow('New Departure', '10:45 AM', valueColor: const Color(0xFFFFC229)),
-                        const SizedBox(height: 8),
-                        _buildDelayRow('Reason', 'Air traffic congestion'),
+                        SizedBox(height: 16),
+                        Divider(color: Theme.of(context).colorScheme.outline),
+                        SizedBox(height: 12),
+                        _buildDelayRow(context, 'Original Departure', '8:15 AM'),
+                        SizedBox(height: 8),
+                        _buildDelayRow(context, 'New Departure', '10:45 AM', valueColor: const Color(0xFFFFC229)),
+                        SizedBox(height: 8),
+                        _buildDelayRow(context, 'Reason', 'Air traffic congestion'),
                       ],
                     ),
                   ),
@@ -364,16 +364,16 @@ class FlightDetailScreen extends StatelessWidget {
               ),
             ),
 
-            const SizedBox(height: 16),
+            SizedBox(height: 16),
 
             // Resolution Assistant™ Box
             Container(
-              padding: const EdgeInsets.all(20),
+              padding: EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: const Color(0xFF0C162A),
+                color: Theme.of(context).colorScheme.surface,
                 borderRadius: BorderRadius.circular(22),
                 border: Border.all(
-                  color: Colors.white.withOpacity(0.04),
+                  color: Theme.of(context).colorScheme.outline,
                 ),
               ),
               child: Column(
@@ -382,42 +382,42 @@ class FlightDetailScreen extends StatelessWidget {
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Icon(
+                      Icon(
                         Icons.auto_awesome_outlined,
                         color: Color(0xFFFFC229),
                         size: 22,
                       ),
-                      const SizedBox(width: 14),
+                      SizedBox(width: 14),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Row(
                               children: [
-                                const Text(
+                                Text(
                                   'Resolution Assistant™',
                                   style: TextStyle(
-                                    color: Colors.white,
+                                    color: Theme.of(context).colorScheme.onSurface,
                                     fontSize: 14,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
-                                const SizedBox(width: 6),
+                                SizedBox(width: 6),
                                 Container(
                                   width: 6,
                                   height: 6,
-                                  decoration: const BoxDecoration(
+                                  decoration: BoxDecoration(
                                     color: Colors.red,
                                     shape: BoxShape.circle,
                                   ),
                                 ),
                               ],
                             ),
-                            const SizedBox(height: 4),
+                            SizedBox(height: 4),
                             Text(
                               'Flight UA 2847 delayed by 2h 30m',
                               style: TextStyle(
-                                color: Colors.white.withOpacity(0.4),
+                                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
                                 fontSize: 11,
                               ),
                             ),
@@ -426,25 +426,25 @@ class FlightDetailScreen extends StatelessWidget {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 16),
+                  SizedBox(height: 16),
                   Text(
                     'Your flight delay may qualify for compensation under EU261/2004. We recommend contacting the airline for immediate rebooking options and filing a compensation claim within 6 months.',
                     style: TextStyle(
-                      color: Colors.white.withOpacity(0.6),
+                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                       fontSize: 12,
                       height: 1.45,
                     ),
                   ),
-                  const SizedBox(height: 18),
+                  SizedBox(height: 18),
 
                   // Compensation Eligible Gold Box
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFFFC229).withOpacity(0.1),
+                      color: Color(0xFFFFC229).withOpacity(0.1),
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(
-                        color: const Color(0xFFFFC229).withOpacity(0.2),
+                        color: Color(0xFFFFC229).withOpacity(0.2),
                       ),
                     ),
                     child: Row(
@@ -454,21 +454,21 @@ class FlightDetailScreen extends StatelessWidget {
                           children: [
                             Icon(
                               Icons.description_outlined,
-                              color: const Color(0xFFFFC229).withOpacity(0.8),
+                              color: Color(0xFFFFC229).withOpacity(0.8),
                               size: 16,
                             ),
-                            const SizedBox(width: 8),
-                            const Text(
+                            SizedBox(width: 8),
+                            Text(
                               'Compensation Eligible',
                               style: TextStyle(
-                                color: Colors.white,
+                                color: Theme.of(context).colorScheme.onSurface,
                                 fontSize: 12,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
                           ],
                         ),
-                        const Text(
+                        Text(
                           '\$600',
                           style: TextStyle(
                             color: Color(0xFFFFC229),
@@ -480,23 +480,23 @@ class FlightDetailScreen extends StatelessWidget {
                     ),
                   ),
 
-                  const SizedBox(height: 20),
-                  const Text(
+                  SizedBox(height: 20),
+                  Text(
                     'Recommended Next Steps:',
                     style: TextStyle(
-                      color: Colors.white60,
+                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                       fontSize: 11,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  const SizedBox(height: 14),
-                  _buildStepRow(1, 'Contact airline customer service desk'),
-                  const SizedBox(height: 12),
-                  _buildStepRow(2, 'Request meal vouchers (delay exceeds 2 hours)'),
-                  const SizedBox(height: 12),
-                  _buildStepRow(3, 'File compensation claim for EU261 eligibility'),
+                  SizedBox(height: 14),
+                  _buildStepRow(context, 1, 'Contact airline customer service desk'),
+                  SizedBox(height: 12),
+                  _buildStepRow(context, 2, 'Request meal vouchers (delay exceeds 2 hours)'),
+                  SizedBox(height: 12),
+                  _buildStepRow(context, 3, 'File compensation claim for EU261 eligibility'),
 
-                  const SizedBox(height: 24),
+                  SizedBox(height: 24),
 
                   // Button 1: Start Claim Process
                   GestureDetector(
@@ -508,13 +508,13 @@ class FlightDetailScreen extends StatelessWidget {
                     },
                     child: Container(
                       width: double.infinity,
-                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      padding: EdgeInsets.symmetric(vertical: 16),
                       decoration: BoxDecoration(
                         color: const Color(0xFFFFC229),
                         borderRadius: BorderRadius.circular(14),
                       ),
                       alignment: Alignment.center,
-                      child: const Row(
+                      child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Icon(Icons.arrow_forward, color: Colors.black, size: 16),
@@ -532,7 +532,7 @@ class FlightDetailScreen extends StatelessWidget {
                     ),
                   ),
 
-                  const SizedBox(height: 12),
+                  SizedBox(height: 12),
 
                   // Button 2: Get AI Assistance
                   GestureDetector(
@@ -544,24 +544,24 @@ class FlightDetailScreen extends StatelessWidget {
                     },
                     child: Container(
                       width: double.infinity,
-                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      padding: EdgeInsets.symmetric(vertical: 16),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF0C162A),
+                        color: Theme.of(context).colorScheme.surface,
                         borderRadius: BorderRadius.circular(14),
                         border: Border.all(
-                          color: Colors.white.withOpacity(0.06),
+                          color: Theme.of(context).colorScheme.outline.withOpacity(0.5),
                         ),
                       ),
                       alignment: Alignment.center,
-                      child: const Row(
+                      child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(Icons.arrow_forward, color: Colors.white70, size: 16),
+                          Icon(Icons.arrow_forward, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7), size: 16),
                           SizedBox(width: 8),
                           Text(
                             'Get AI Assistance',
                             style: TextStyle(
-                              color: Colors.white70,
+                              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
                               fontSize: 13,
                               fontWeight: FontWeight.bold,
                             ),
@@ -574,36 +574,36 @@ class FlightDetailScreen extends StatelessWidget {
               ),
             ),
 
-            const SizedBox(height: 16),
+            SizedBox(height: 16),
 
             // Check BorderReady™ Status Box
             GestureDetector(
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const BorderReadyScreen()),
+                  MaterialPageRoute(builder: (context) => BorderReadyScreen()),
                 );
               },
               child: Container(
                 width: double.infinity,
-                padding: const EdgeInsets.symmetric(vertical: 16),
+                padding: EdgeInsets.symmetric(vertical: 16),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF0C162A),
+                  color: Theme.of(context).colorScheme.surface,
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(
-                    color: Colors.white.withOpacity(0.04),
+                    color: Theme.of(context).colorScheme.outline,
                   ),
                 ),
                 alignment: Alignment.center,
-                child: const Row(
+                child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(Icons.check_circle_outline, color: Colors.white70, size: 16),
+                    Icon(Icons.check_circle_outline, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7), size: 16),
                     SizedBox(width: 8),
                     Text(
                       'Check BorderReady™ Status',
                       style: TextStyle(
-                        color: Colors.white70,
+                        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
                         fontSize: 13,
                         fontWeight: FontWeight.bold,
                       ),
@@ -612,7 +612,7 @@ class FlightDetailScreen extends StatelessWidget {
                 ),
               ),
             ),
-            const SizedBox(height: 24),
+            SizedBox(height: 24),
           ],
         ),
       ),
@@ -620,23 +620,23 @@ class FlightDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildFlightDetailRow(IconData icon, String label, String value) {
+  Widget _buildFlightDetailRow(BuildContext context, IconData icon, String label, String value) {
     return Row(
       children: [
-        Icon(icon, color: Colors.white30, size: 15),
-        const SizedBox(width: 10),
+        Icon(icon, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3), size: 15),
+        SizedBox(width: 10),
         Text(
           label,
           style: TextStyle(
-            color: Colors.white.withOpacity(0.35),
+            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.35),
             fontSize: 12,
           ),
         ),
         const Spacer(),
         Text(
           value,
-          style: const TextStyle(
-            color: Colors.white,
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.onSurface,
             fontSize: 12,
             fontWeight: FontWeight.bold,
           ),
@@ -645,21 +645,21 @@ class FlightDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildDelayRow(String label, String value, {Color? valueColor}) {
+  Widget _buildDelayRow(BuildContext context, String label, String value, {Color? valueColor}) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(
           label,
           style: TextStyle(
-            color: Colors.white.withOpacity(0.35),
+            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.35),
             fontSize: 12,
           ),
         ),
         Text(
           value,
           style: TextStyle(
-            color: valueColor ?? Colors.white,
+            color: valueColor ?? Theme.of(context).colorScheme.onSurface,
             fontSize: 12,
             fontWeight: FontWeight.bold,
           ),
@@ -668,33 +668,33 @@ class FlightDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildStepRow(int number, String text) {
+  Widget _buildStepRow(BuildContext context, int number, String text) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Container(
           width: 18,
           height: 18,
-          decoration: const BoxDecoration(
+          decoration: BoxDecoration(
             color: Color(0xFFFFC229),
             shape: BoxShape.circle,
           ),
           alignment: Alignment.center,
           child: Text(
             '$number',
-            style: const TextStyle(
+            style: TextStyle(
               color: Colors.black,
               fontSize: 10,
               fontWeight: FontWeight.bold,
             ),
           ),
         ),
-        const SizedBox(width: 10),
+        SizedBox(width: 10),
         Expanded(
           child: Text(
             text,
             style: TextStyle(
-              color: Colors.white.withOpacity(0.7),
+              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
               fontSize: 12,
               height: 1.3,
             ),

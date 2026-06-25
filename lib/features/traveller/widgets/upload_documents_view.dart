@@ -25,46 +25,46 @@ class _UploadDocumentsViewState extends State<UploadDocumentsView> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         // Title & Subtitle
-        const Text(
+        Text(
           'Step 3: Upload Documents',
           style: TextStyle(
-            color: Colors.white,
+            color: Theme.of(context).colorScheme.onSurface,
             fontSize: 20,
             fontWeight: FontWeight.bold,
           ),
         ),
-        const SizedBox(height: 6),
+        SizedBox(height: 6),
         Text(
           "Provide evidence to support your claim",
           style: TextStyle(
-            color: Colors.white.withOpacity(0.5),
+            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
             fontSize: 14,
           ),
         ),
-        const SizedBox(height: 28),
+        SizedBox(height: 28),
 
         // Required Documents Section
         Row(
           children: [
-            const Text(
+            Text(
               'Required Documents',
               style: TextStyle(
-                color: Colors.white,
+                color: Theme.of(context).colorScheme.onSurface,
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
               ),
             ),
-            const SizedBox(width: 8),
+            SizedBox(width: 8),
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+              padding: EdgeInsets.symmetric(horizontal: 8, vertical: 3),
               decoration: BoxDecoration(
-                color: const Color(0xFFE11D48).withOpacity(0.15),
+                color: Color(0xFFE11D48).withOpacity(0.15),
                 borderRadius: BorderRadius.circular(6),
                 border: Border.all(
-                  color: const Color(0xFFE11D48).withOpacity(0.3),
+                  color: Color(0xFFE11D48).withOpacity(0.3),
                 ),
               ),
-              child: const Text(
+              child: Text(
                 'Required',
                 style: TextStyle(
                   color: Color(0xFFE11D48),
@@ -75,7 +75,7 @@ class _UploadDocumentsViewState extends State<UploadDocumentsView> {
             ),
           ],
         ),
-        const SizedBox(height: 16),
+        SizedBox(height: 16),
 
         // Required Cards
         _buildDocCard(
@@ -103,33 +103,33 @@ class _UploadDocumentsViewState extends State<UploadDocumentsView> {
           },
         ),
 
-        const SizedBox(height: 24),
+        SizedBox(height: 24),
 
         // Optional Documents Section
         Row(
           children: [
-            const Text(
+            Text(
               'Optional Documents',
               style: TextStyle(
-                color: Colors.white,
+                color: Theme.of(context).colorScheme.onSurface,
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
               ),
             ),
-            const SizedBox(width: 8),
+            SizedBox(width: 8),
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+              padding: EdgeInsets.symmetric(horizontal: 8, vertical: 3),
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.08),
+                color: Theme.of(context).colorScheme.outline,
                 borderRadius: BorderRadius.circular(6),
                 border: Border.all(
-                  color: Colors.white.withOpacity(0.12),
+                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.12),
                 ),
               ),
               child: Text(
                 'Optional',
                 style: TextStyle(
-                  color: Colors.white.withOpacity(0.6),
+                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                   fontSize: 10,
                   fontWeight: FontWeight.bold,
                 ),
@@ -137,7 +137,7 @@ class _UploadDocumentsViewState extends State<UploadDocumentsView> {
             ),
           ],
         ),
-        const SizedBox(height: 16),
+        SizedBox(height: 16),
 
         // Optional Cards
         _buildDocCard(
@@ -145,7 +145,7 @@ class _UploadDocumentsViewState extends State<UploadDocumentsView> {
           subtitle: _isBoardingPassUploaded ? 'Uploaded' : 'Strengthens your claim',
           isUploaded: _isBoardingPassUploaded,
           icon: Icons.description_outlined,
-          iconColor: Colors.white70,
+          iconColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
           onUploadPressed: () {
             setState(() {
               _isBoardingPassUploaded = !_isBoardingPassUploaded;
@@ -165,34 +165,34 @@ class _UploadDocumentsViewState extends State<UploadDocumentsView> {
           },
         ),
 
-        const SizedBox(height: 24),
+        SizedBox(height: 24),
 
         // Tip Info Box
         Container(
-          padding: const EdgeInsets.all(20),
+          padding: EdgeInsets.all(20),
           decoration: BoxDecoration(
-            color: const Color(0xFF0C162A),
+            color: Theme.of(context).colorScheme.surface,
             borderRadius: BorderRadius.circular(20),
             border: Border.all(
-              color: Colors.white.withOpacity(0.04),
+              color: Theme.of(context).colorScheme.outline,
             ),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
+              Text(
                 'Tip',
                 style: TextStyle(
-                  color: Colors.white,
+                  color: Theme.of(context).colorScheme.onSurface,
                   fontSize: 14,
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              const SizedBox(height: 8),
+              SizedBox(height: 8),
               Text(
                 "While optional documents aren't required, they significantly increase your claim's success rate. Consider uploading all available documentation.",
                 style: TextStyle(
-                  color: Colors.white.withOpacity(0.5),
+                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
                   fontSize: 13,
                   height: 1.45,
                 ),
@@ -200,20 +200,20 @@ class _UploadDocumentsViewState extends State<UploadDocumentsView> {
             ],
           ),
         ),
-        const SizedBox(height: 32),
+        SizedBox(height: 32),
 
         // Bottom Button
         GestureDetector(
           onTap: widget.onContinue,
           child: Container(
             width: double.infinity,
-            padding: const EdgeInsets.symmetric(vertical: 18),
+            padding: EdgeInsets.symmetric(vertical: 18),
             decoration: BoxDecoration(
               color: const Color(0xFFFFC229), // Brand yellow
               borderRadius: BorderRadius.circular(16),
             ),
             alignment: Alignment.center,
-            child: const Text(
+            child: Text(
               'Continue',
               style: TextStyle(
                 color: Colors.black,
@@ -236,23 +236,23 @@ class _UploadDocumentsViewState extends State<UploadDocumentsView> {
     required VoidCallback onUploadPressed,
   }) {
     return Container(
-      padding: const EdgeInsets.all(20),
-      margin: const EdgeInsets.only(bottom: 16),
+      padding: EdgeInsets.all(20),
+      margin: EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
-        color: const Color(0xFF0C162A), // Dark blue
+        color: Theme.of(context).colorScheme.surface, // Dark blue
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: isUploaded ? const Color(0xFF10B981).withOpacity(0.3) : Colors.white.withOpacity(0.05),
+          color: isUploaded ? Color(0xFF10B981).withOpacity(0.3) : Theme.of(context).colorScheme.onSurface.withOpacity(0.05),
           width: 1,
         ),
       ),
       child: Row(
         children: [
           Container(
-            padding: const EdgeInsets.all(12),
+            padding: EdgeInsets.all(12),
             decoration: BoxDecoration(
               color: isUploaded 
-                  ? const Color(0xFF10B981).withOpacity(0.12)
+                  ? Color(0xFF10B981).withOpacity(0.12)
                   : iconColor.withOpacity(0.1),
               shape: BoxShape.circle,
             ),
@@ -262,34 +262,34 @@ class _UploadDocumentsViewState extends State<UploadDocumentsView> {
               size: 20,
             ),
           ),
-          const SizedBox(width: 16),
+          SizedBox(width: 16),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   title,
-                  style: const TextStyle(
-                    color: Colors.white,
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurface,
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                const SizedBox(height: 6),
+                SizedBox(height: 6),
                 Row(
                   children: [
                     if (isUploaded) ...[
-                      const Icon(
+                      Icon(
                         Icons.check_circle_outline,
                         color: Color(0xFF10B981),
                         size: 14,
                       ),
-                      const SizedBox(width: 6),
+                      SizedBox(width: 6),
                     ],
                     Text(
                       subtitle,
                       style: TextStyle(
-                        color: isUploaded ? const Color(0xFF10B981) : Colors.white.withOpacity(0.4),
+                        color: isUploaded ? const Color(0xFF10B981) : Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
                         fontSize: 13,
                         fontWeight: isUploaded ? FontWeight.w500 : FontWeight.normal,
                       ),
@@ -299,30 +299,30 @@ class _UploadDocumentsViewState extends State<UploadDocumentsView> {
               ],
             ),
           ),
-          const SizedBox(width: 12),
+          SizedBox(width: 12),
           GestureDetector(
             onTap: onUploadPressed,
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+              padding: EdgeInsets.symmetric(horizontal: 14, vertical: 10),
               decoration: BoxDecoration(
-                color: isUploaded ? Colors.white.withOpacity(0.05) : const Color(0xFF08101E),
+                color: isUploaded ? Theme.of(context).colorScheme.onSurface.withOpacity(0.05) : Theme.of(context).colorScheme.surface,
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
-                  color: Colors.white.withOpacity(0.1),
+                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.1),
                 ),
               ),
               child: Row(
                 children: [
                   Icon(
                     isUploaded ? Icons.cached_outlined : Icons.upload_outlined,
-                    color: Colors.white,
+                    color: Theme.of(context).colorScheme.onSurface,
                     size: 16,
                   ),
-                  const SizedBox(width: 6),
+                  SizedBox(width: 6),
                   Text(
                     isUploaded ? 'Re-upload' : 'Upload',
-                    style: const TextStyle(
-                      color: Colors.white,
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurface,
                       fontSize: 12,
                       fontWeight: FontWeight.bold,
                     ),

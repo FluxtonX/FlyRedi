@@ -16,7 +16,7 @@ class PlanSelectionPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return SafeArea(
       child: SingleChildScrollView(
-        padding: const EdgeInsets.fromLTRB(32, 26, 32, 32),
+        padding: EdgeInsets.fromLTRB(32, 26, 32, 32),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -25,7 +25,7 @@ class PlanSelectionPage extends StatelessWidget {
               children: [
                 IconButton(
                   onPressed: onBack,
-                  icon: const Icon(
+                  icon: Icon(
                     Icons.arrow_back,
                     color: Color(0xFF9AA8BD),
                     size: 26,
@@ -36,8 +36,8 @@ class PlanSelectionPage extends StatelessWidget {
                     minHeight: 34,
                   ),
                 ),
-                const SizedBox(width: 10),
-                const Column(
+                SizedBox(width: 10),
+                Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
@@ -60,12 +60,12 @@ class PlanSelectionPage extends StatelessWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 30),
+            SizedBox(height: 30),
             _BasicPlanCard(onContinueFree: onContinueFree),
-            const SizedBox(height: 18),
+            SizedBox(height: 18),
             _ProPlanCard(onUpgradeToPro: onUpgradeToPro),
-            const SizedBox(height: 36),
-            const Center(
+            SizedBox(height: 36),
+            Center(
               child: Text(
                 'Trusted by frequent travelers worldwide',
                 style: TextStyle(
@@ -74,8 +74,8 @@ class PlanSelectionPage extends StatelessWidget {
                 ),
               ),
             ),
-            const SizedBox(height: 10),
-            const Center(
+            SizedBox(height: 10),
+            Center(
               child: Text(
                 '✓ Cancel anytime   ✓ Secure payments',
                 style: TextStyle(
@@ -100,11 +100,11 @@ class _BasicPlanCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.fromLTRB(22, 22, 22, 22),
+      padding: EdgeInsets.fromLTRB(22, 22, 22, 22),
       decoration: BoxDecoration(
-        color: const Color(0xFF111F45),
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: const Color(0xFF2B3B68), width: 1.2),
+        border: Border.all(color: Theme.of(context).colorScheme.surface, width: 1.2),
         boxShadow: const [
           BoxShadow(
             color: Color(0x33000000),
@@ -118,12 +118,12 @@ class _BasicPlanCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              const Icon(
+              Icon(
                 Icons.bolt_outlined,
                 color: Color(0xFF93A2BB),
                 size: 22,
               ),
-              const SizedBox(width: 10),
+              SizedBox(width: 10),
               const Expanded(
                 child: Text(
                   'Traveler Basic',
@@ -136,9 +136,9 @@ class _BasicPlanCard extends StatelessWidget {
               ),
               Container(
                 padding:
-                    const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                    EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF17274F),
+                  color: Theme.of(context).colorScheme.surface,
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: const Text(
@@ -151,7 +151,7 @@ class _BasicPlanCard extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: 16),
           const Text(
             'Free',
             style: TextStyle(
@@ -160,9 +160,9 @@ class _BasicPlanCard extends StatelessWidget {
               fontWeight: FontWeight.w400,
             ),
           ),
-          const SizedBox(height: 18),
-          const Divider(color: Color(0xFF29375D), thickness: 1),
-          const SizedBox(height: 12),
+          SizedBox(height: 18),
+          Divider(color: Theme.of(context).colorScheme.surface, thickness: 1),
+          SizedBox(height: 12),
           const _FeatureRow(text: '2 flights per month'),
           const _FeatureRow(text: 'Basic Sentinel™ monitoring'),
           const _FeatureRow(text: 'Basic BorderReady™ checklist'),
@@ -170,7 +170,7 @@ class _BasicPlanCard extends StatelessWidget {
           const _FeatureRow(text: '1 AI complaint letter/month'),
           const _FeatureRow(text: '5 AI Assistant questions/month'),
           const _FeatureRow(text: 'Email notifications only'),
-          const SizedBox(height: 16),
+          SizedBox(height: 16),
           SizedBox(
             height: 54,
             width: double.infinity,
@@ -178,7 +178,7 @@ class _BasicPlanCard extends StatelessWidget {
               onPressed: onContinueFree,
               style: OutlinedButton.styleFrom(
                 foregroundColor: Colors.white,
-                side: const BorderSide(color: Color(0xFF2B3B68), width: 1.2),
+                side: BorderSide(color: Theme.of(context).colorScheme.surface, width: 1.2),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
                 ),
@@ -207,9 +207,9 @@ class _ProPlanCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.fromLTRB(22, 18, 22, 24),
+      padding: EdgeInsets.fromLTRB(22, 18, 22, 24),
       decoration: BoxDecoration(
-        color: const Color(0xFF08182F),
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(24),
         border: Border.all(color: const Color(0xFFFFC229), width: 1.2),
       ),
@@ -219,20 +219,20 @@ class _ProPlanCard extends StatelessWidget {
           Align(
             alignment: Alignment.centerRight,
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               decoration: BoxDecoration(
                 color: const Color(0xFFFFC229),
                 borderRadius: BorderRadius.circular(18),
               ),
-              child: const Row(
+              child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(Icons.auto_awesome, color: Color(0xFF08182F), size: 14),
+                  Icon(Icons.auto_awesome, color: Theme.of(context).colorScheme.surface, size: 14),
                   SizedBox(width: 4),
                   Text(
                     'BEST VALUE',
                     style: TextStyle(
-                      color: Color(0xFF08182F),
+                      color: Theme.of(context).colorScheme.surface,
                       fontSize: 12,
                       fontWeight: FontWeight.w800,
                     ),
@@ -241,8 +241,8 @@ class _ProPlanCard extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(height: 6),
-          const Row(
+          SizedBox(height: 6),
+          Row(
             children: [
               Icon(Icons.workspace_premium_outlined,
                   color: Color(0xFFFFC229), size: 24),
@@ -257,8 +257,8 @@ class _ProPlanCard extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 14),
-          const Row(
+          SizedBox(height: 14),
+          Row(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Text(
@@ -282,7 +282,7 @@ class _ProPlanCard extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 4),
+          SizedBox(height: 4),
           const Text(
             'Cancel anytime',
             style: TextStyle(
@@ -290,9 +290,9 @@ class _ProPlanCard extends StatelessWidget {
               fontSize: 13,
             ),
           ),
-          const SizedBox(height: 20),
-          const Divider(color: Color(0xFF564A22), thickness: 1),
-          const SizedBox(height: 12),
+          SizedBox(height: 20),
+          Divider(color: Theme.of(context).colorScheme.surface, thickness: 1),
+          SizedBox(height: 12),
           const _FeatureRow(text: 'Unlimited flight monitoring', pro: true),
           const _FeatureRow(text: 'Real-time disruption alerts', pro: true),
           const _FeatureRow(text: 'WhatsApp + Email + Push alerts', pro: true),
@@ -312,21 +312,21 @@ class _ProPlanCard extends StatelessWidget {
           const _FeatureRow(text: 'Unlimited AI Assistant', pro: true),
           const _FeatureRow(text: 'Smart follow-up reminders', pro: true),
           const _FeatureRow(text: 'Priority support', pro: true),
-          const SizedBox(height: 18),
+          SizedBox(height: 18),
           SizedBox(
             height: 64,
             width: double.infinity,
             child: ElevatedButton(
               onPressed: onUpgradeToPro,
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFFFFC943),
+                
                 foregroundColor: Colors.black,
                 elevation: 0,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(15),
                 ),
               ),
-              child: const Row(
+              child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(Icons.workspace_premium_outlined, size: 19),
@@ -342,8 +342,8 @@ class _ProPlanCard extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(height: 20),
-          const Center(
+          SizedBox(height: 20),
+          Center(
             child: Text(
               '7-day free trial • No credit card required',
               style: TextStyle(
@@ -370,7 +370,7 @@ class _FeatureRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 5),
+      padding: EdgeInsets.symmetric(vertical: 5),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -379,7 +379,7 @@ class _FeatureRow extends StatelessWidget {
             color: pro ? const Color(0xFFFFC229) : const Color(0xFF96A4B9),
             size: 18,
           ),
-          const SizedBox(width: 14),
+          SizedBox(width: 14),
           Expanded(
             child: Text(
               text,

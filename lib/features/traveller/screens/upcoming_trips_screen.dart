@@ -103,25 +103,25 @@ class _UpcomingTripsScreenState extends State<UpcomingTripsScreen> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          backgroundColor: const Color(0xFF0C162A),
+          backgroundColor: Theme.of(context).colorScheme.surface,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(18),
           ),
-          title: const Text(
+          title: Text(
             'Delete this trip?',
-            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+            style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.bold),
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context, false),
-              child: const Text(
+              child: Text(
                 'Cancel',
-                style: TextStyle(color: Colors.white70),
+                style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7)),
               ),
             ),
             TextButton(
               onPressed: () => Navigator.pop(context, true),
-              child: const Text(
+              child: Text(
                 'Delete',
                 style: TextStyle(
                   color: Color(0xFFEF4444),
@@ -166,9 +166,9 @@ class _UpcomingTripsScreenState extends State<UpcomingTripsScreen> {
         SnackBar(
           content: Text(
             'Failed to delete trip: $e',
-            style: const TextStyle(color: Colors.white),
+            style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
           ),
-          backgroundColor: const Color(0xFFE11D48),
+          
         ),
       );
     }
@@ -218,18 +218,18 @@ class _UpcomingTripsScreenState extends State<UpcomingTripsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          icon: Icon(Icons.arrow_back, color: Theme.of(context).colorScheme.onSurface),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Text(
+        title: Text(
           'Upcoming Trips',
           style: TextStyle(
-            color: Colors.white,
+            color: Theme.of(context).colorScheme.onSurface,
             fontSize: 20,
             fontWeight: FontWeight.bold,
           ),
@@ -237,10 +237,10 @@ class _UpcomingTripsScreenState extends State<UpcomingTripsScreen> {
         titleSpacing: 0,
         actions: [
           IconButton(
-            icon: const Icon(Icons.add, color: Colors.white),
+            icon: Icon(Icons.add, color: Theme.of(context).colorScheme.onSurface),
             onPressed: _handleAddFlightTap,
           ),
-          const SizedBox(width: 12),
+          SizedBox(width: 12),
         ],
       ),
       body: _buildBody(),
@@ -250,7 +250,7 @@ class _UpcomingTripsScreenState extends State<UpcomingTripsScreen> {
 
   Widget _buildBody() {
     if (_isLoading) {
-      return const Center(
+      return Center(
         child: CircularProgressIndicator(
           valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFFFC229)),
         ),
@@ -260,36 +260,36 @@ class _UpcomingTripsScreenState extends State<UpcomingTripsScreen> {
     if (_errorMessage != null) {
       return Center(
         child: Padding(
-          padding: const EdgeInsets.all(24),
+          padding: EdgeInsets.all(24),
           child: Text(
             'Failed to load trips:\n$_errorMessage',
             textAlign: TextAlign.center,
-            style: const TextStyle(color: Colors.white),
+            style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
           ),
         ),
       );
     }
 
     return SingleChildScrollView(
-        padding: const EdgeInsets.all(24),
+        padding: EdgeInsets.all(24),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             if (_trips.isEmpty)
               Container(
-                padding: const EdgeInsets.symmetric(vertical: 36),
+                padding: EdgeInsets.symmetric(vertical: 36),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF0C162A),
+                  color: Theme.of(context).colorScheme.surface,
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(
-                    color: Colors.white.withOpacity(0.04),
+                    color: Theme.of(context).colorScheme.outline,
                   ),
                 ),
                 alignment: Alignment.center,
                 child: Text(
                   'No upcoming trip for now',
                   style: TextStyle(
-                    color: Colors.white.withOpacity(0.4),
+                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
                     fontSize: 12,
                     fontWeight: FontWeight.bold,
                   ),
@@ -306,7 +306,7 @@ class _UpcomingTripsScreenState extends State<UpcomingTripsScreen> {
                 final departureDate = _tripDateLabel(trip);
 
                 return Padding(
-                  padding: const EdgeInsets.only(bottom: 14),
+                  padding: EdgeInsets.only(bottom: 14),
                   child: _buildUpcomingFlightCard(
                     airlineName: flightLabel,
                     flightCode: flightLabel,
@@ -351,12 +351,12 @@ class _UpcomingTripsScreenState extends State<UpcomingTripsScreen> {
     required VoidCallback onDelete,
   }) {
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: const Color(0xFF0C162A),
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(22),
         border: Border.all(
-          color: Colors.white.withOpacity(0.04),
+          color: Theme.of(context).colorScheme.outline,
         ),
       ),
       child: Column(
@@ -370,15 +370,15 @@ class _UpcomingTripsScreenState extends State<UpcomingTripsScreen> {
                   Text(
                     airlineName,
                     style: TextStyle(
-                      color: Colors.white.withOpacity(0.4),
+                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
                       fontSize: 11,
                     ),
                   ),
-                  const SizedBox(height: 2),
+                  SizedBox(height: 2),
                   Text(
                     flightCode,
-                    style: const TextStyle(
-                      color: Colors.white,
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurface,
                       fontSize: 14,
                       fontWeight: FontWeight.bold,
                     ),
@@ -389,7 +389,7 @@ class _UpcomingTripsScreenState extends State<UpcomingTripsScreen> {
                 children: [
                   Container(
                     padding:
-                        const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                        EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                     decoration: BoxDecoration(
                       color: statusColor.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(6),
@@ -403,7 +403,7 @@ class _UpcomingTripsScreenState extends State<UpcomingTripsScreen> {
                       ),
                     ),
                   ),
-                  const SizedBox(width: 8),
+                  SizedBox(width: 8),
                   GestureDetector(
                     onTap: isDeleting ? null : onDelete,
                     child: Container(
@@ -411,11 +411,11 @@ class _UpcomingTripsScreenState extends State<UpcomingTripsScreen> {
                       height: 28,
                       alignment: Alignment.center,
                       decoration: BoxDecoration(
-                        color: const Color(0xFFE11D48).withOpacity(0.12),
+                        color: Color(0xFFE11D48).withOpacity(0.12),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: isDeleting
-                          ? const SizedBox(
+                          ? SizedBox(
                               width: 14,
                               height: 14,
                               child: CircularProgressIndicator(
@@ -425,7 +425,7 @@ class _UpcomingTripsScreenState extends State<UpcomingTripsScreen> {
                                 ),
                               ),
                             )
-                          : const Icon(
+                          : Icon(
                               Icons.delete_outline,
                               color: Color(0xFFE11D48),
                               size: 16,
@@ -436,7 +436,7 @@ class _UpcomingTripsScreenState extends State<UpcomingTripsScreen> {
               ),
             ],
           ),
-          const SizedBox(height: 20),
+          SizedBox(height: 20),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -445,34 +445,34 @@ class _UpcomingTripsScreenState extends State<UpcomingTripsScreen> {
                 children: [
                   Text(
                     from,
-                    style: const TextStyle(
-                      color: Colors.white,
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurface,
                       fontSize: 22,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  const SizedBox(height: 4),
+                  SizedBox(height: 4),
                   Text(
                     fromTime,
-                    style: const TextStyle(
-                      color: Colors.white,
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurface,
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
-                  const SizedBox(height: 2),
+                  SizedBox(height: 2),
                   Text(
                     fromCity,
                     style: TextStyle(
-                      color: Colors.white.withOpacity(0.35),
+                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.35),
                       fontSize: 10,
                     ),
                   ),
                 ],
               ),
-              const Icon(
+              Icon(
                 Icons.swap_horiz,
-                color: Colors.white24,
+                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.24),
                 size: 24,
               ),
               Column(
@@ -480,26 +480,26 @@ class _UpcomingTripsScreenState extends State<UpcomingTripsScreen> {
                 children: [
                   Text(
                     to,
-                    style: const TextStyle(
-                      color: Colors.white,
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurface,
                       fontSize: 22,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  const SizedBox(height: 4),
+                  SizedBox(height: 4),
                   Text(
                     toTime,
-                    style: const TextStyle(
-                      color: Colors.white,
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurface,
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
-                  const SizedBox(height: 2),
+                  SizedBox(height: 2),
                   Text(
                     toCity,
                     style: TextStyle(
-                      color: Colors.white.withOpacity(0.35),
+                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.35),
                       fontSize: 10,
                     ),
                   ),
@@ -507,20 +507,20 @@ class _UpcomingTripsScreenState extends State<UpcomingTripsScreen> {
               ),
             ],
           ),
-          const SizedBox(height: 20),
-          Divider(color: Colors.white.withOpacity(0.04)),
-          const SizedBox(height: 12),
+          SizedBox(height: 20),
+          Divider(color: Theme.of(context).colorScheme.outline),
+          SizedBox(height: 12),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Row(
                 children: [
-                  const Icon(Icons.location_on_outlined, color: Colors.white30, size: 14),
-                  const SizedBox(width: 4),
+                  Icon(Icons.location_on_outlined, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3), size: 14),
+                  SizedBox(width: 4),
                   Text(
                     '$terminal  •  $gate',
                     style: TextStyle(
-                      color: Colors.white.withOpacity(0.5),
+                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
                       fontSize: 11,
                     ),
                   ),
@@ -529,7 +529,7 @@ class _UpcomingTripsScreenState extends State<UpcomingTripsScreen> {
               Text(
                 date,
                 style: TextStyle(
-                  color: Colors.white.withOpacity(0.35),
+                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.35),
                   fontSize: 11,
                 ),
               ),

@@ -9,7 +9,7 @@ class ProBenefitsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      
       body: PlanSelectionPage(
         onBack: () => Navigator.pop(context),
         onContinueFree: () => Navigator.pop(context),

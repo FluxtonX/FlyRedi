@@ -25,11 +25,11 @@ class MonthlyUsageCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(18),
+      padding: EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: const Color(0xFF101B30),
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(22),
-        border: Border.all(color: const Color(0xFF263657)),
+        border: Border.all(color: Theme.of(context).colorScheme.outline),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -37,13 +37,13 @@ class MonthlyUsageCard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
+              Text(
                 'Monthly Usage',
-                style: TextStyle(color: Color(0xFF8D99AD), fontSize: 12),
+                style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5), fontSize: 12),
               ),
               GestureDetector(
                 onTap: onViewDetails,
-                child: const Text(
+                child: Text(
                   'View details',
                   style: TextStyle(
                     color: Color(0xFFFFC229),
@@ -54,7 +54,7 @@ class MonthlyUsageCard extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 14),
+          SizedBox(height: 14),
           _UsageMiniRow(
             label: 'Flights',
             value: '$usedFlights/$maxFlights',
@@ -62,7 +62,7 @@ class MonthlyUsageCard extends StatelessWidget {
             progress: _progress(usedFlights, maxFlights),
             onTap: onLimitTap,
           ),
-          const SizedBox(height: 10),
+          SizedBox(height: 10),
           _UsageMiniRow(
             label: 'Claims',
             value: '$usedClaims/$maxClaims',
@@ -70,7 +70,7 @@ class MonthlyUsageCard extends StatelessWidget {
             progress: _progress(usedClaims, maxClaims),
             onTap: onLimitTap,
           ),
-          const SizedBox(height: 10),
+          SizedBox(height: 10),
           _UsageMiniRow(
             label: 'AI Questions',
             value: '$usedAiQuestions/$maxAiQuestions',
@@ -116,21 +116,21 @@ class _UsageMiniRow extends StatelessWidget {
             children: [
               Text(
                 label,
-                style: const TextStyle(color: Color(0xFF9CA7BC), fontSize: 12),
+                style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7), fontSize: 12),
               ),
               Row(
                 children: [
                   Text(
                     value,
-                    style: const TextStyle(
+                    style: TextStyle(
                       color: Color(0xFFFF4D5E),
                       fontSize: 12,
                       fontWeight: FontWeight.w700,
                     ),
                   ),
-                  const SizedBox(width: 7),
+                  SizedBox(width: 7),
                   if (locked)
-                    const Icon(
+                    Icon(
                       Icons.error_outline,
                       color: Color(0xFFFF4D5E),
                       size: 14,
@@ -139,13 +139,13 @@ class _UsageMiniRow extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 6),
+          SizedBox(height: 6),
           ClipRRect(
             borderRadius: BorderRadius.circular(999),
             child: LinearProgressIndicator(
               value: progress,
               minHeight: 5,
-              backgroundColor: const Color(0xFF38445A),
+              backgroundColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.1),
               valueColor:
                   const AlwaysStoppedAnimation<Color>(Color(0xFFFF4D5E)),
             ),

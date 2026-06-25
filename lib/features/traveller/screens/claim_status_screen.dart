@@ -23,18 +23,18 @@ class ClaimStatusScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          icon: Icon(Icons.arrow_back, color: Theme.of(context).colorScheme.onSurface),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Text(
+        title: Text(
           'Claim Status',
           style: TextStyle(
-            color: Colors.white,
+            color: Theme.of(context).colorScheme.onSurface,
             fontSize: 20,
             fontWeight: FontWeight.bold,
           ),
@@ -42,18 +42,18 @@ class ClaimStatusScreen extends StatelessWidget {
         titleSpacing: 0,
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24),
+        padding: EdgeInsets.all(24),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             // Top Main Info Card
             Container(
-              padding: const EdgeInsets.all(20),
+              padding: EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: const Color(0xFF0C162A),
+                color: Theme.of(context).colorScheme.surface,
                 borderRadius: BorderRadius.circular(22),
                 border: Border.all(
-                  color: Colors.white.withOpacity(0.04),
+                  color: Theme.of(context).colorScheme.outline,
                 ),
               ),
               child: Column(
@@ -65,42 +65,42 @@ class ClaimStatusScreen extends StatelessWidget {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
+                          Text(
                             'Claim #1',
                             style: TextStyle(
-                              color: Colors.white38,
+                              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.38),
                               fontSize: 11,
                             ),
                           ),
-                          const SizedBox(height: 4),
+                          SizedBox(height: 4),
                           Text(
                             flightCode,
-                            style: const TextStyle(
-                              color: Colors.white,
+                            style: TextStyle(
+                              color: Theme.of(context).colorScheme.onSurface,
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          const SizedBox(height: 4),
+                          SizedBox(height: 4),
                           Text(
                             route,
                             style: TextStyle(
-                              color: Colors.white.withOpacity(0.6),
+                              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                               fontSize: 13,
                             ),
                           ),
                         ],
                       ),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                        padding: EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.06),
+                          color: Theme.of(context).colorScheme.outline.withOpacity(0.5),
                           borderRadius: BorderRadius.circular(6),
                         ),
                         child: Text(
                           status,
-                          style: const TextStyle(
-                            color: Colors.white70,
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
                             fontSize: 10,
                             fontWeight: FontWeight.bold,
                           ),
@@ -108,62 +108,62 @@ class ClaimStatusScreen extends StatelessWidget {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 18),
-                  Divider(color: Colors.white.withOpacity(0.04)),
-                  const SizedBox(height: 12),
-                  _buildStatusRow('Flight Date', date),
-                  const SizedBox(height: 8),
-                  _buildStatusRow('Submitted', submittedDate),
-                  const SizedBox(height: 8),
-                  _buildStatusRow('Claim Amount', amount, isGold: true),
+                  SizedBox(height: 18),
+                  Divider(color: Theme.of(context).colorScheme.outline),
+                  SizedBox(height: 12),
+                  _buildStatusRow(context, 'Flight Date', date),
+                  SizedBox(height: 8),
+                  _buildStatusRow(context, 'Submitted', submittedDate),
+                  SizedBox(height: 8),
+                  _buildStatusRow(context, 'Claim Amount', amount, isGold: true),
                 ],
               ),
             ),
 
-            const SizedBox(height: 28),
+            SizedBox(height: 28),
 
             // Claim Progress Section Header
-            const Text(
+            Text(
               'Claim Progress',
               style: TextStyle(
-                color: Colors.white,
+                color: Theme.of(context).colorScheme.onSurface,
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
               ),
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: 16),
 
             // Progress Node timeline
             Container(
-              padding: const EdgeInsets.all(22),
+              padding: EdgeInsets.all(22),
               decoration: BoxDecoration(
-                color: const Color(0xFF0C162A),
+                color: Theme.of(context).colorScheme.surface,
                 borderRadius: BorderRadius.circular(22),
                 border: Border.all(
-                  color: Colors.white.withOpacity(0.04),
+                  color: Theme.of(context).colorScheme.outline,
                 ),
               ),
               child: Column(
                 children: [
-                  _buildTimelineNode(
+                  _buildTimelineNode(context, 
                     title: 'Claim Submitted',
                     date: submittedDate,
                     isCompleted: true,
                     isLast: false,
                   ),
-                  _buildTimelineNode(
+                  _buildTimelineNode(context, 
                     title: 'Under Review',
                     date: 'May 17, 2026',
                     isCompleted: true,
                     isLast: false,
                   ),
-                  _buildTimelineNode(
+                  _buildTimelineNode(context, 
                     title: 'Awaiting Response',
                     date: 'Pending',
                     isCompleted: false,
                     isLast: false,
                   ),
-                  _buildTimelineNode(
+                  _buildTimelineNode(context, 
                     title: 'Payment Processed',
                     date: 'Pending',
                     isCompleted: false,
@@ -173,40 +173,40 @@ class ClaimStatusScreen extends StatelessWidget {
               ),
             ),
 
-            const SizedBox(height: 16),
+            SizedBox(height: 16),
 
             // View Documents Card
             Container(
-              padding: const EdgeInsets.all(18),
+              padding: EdgeInsets.all(18),
               decoration: BoxDecoration(
-                color: const Color(0xFF0C162A),
+                color: Theme.of(context).colorScheme.surface,
                 borderRadius: BorderRadius.circular(20),
                 border: Border.all(
-                  color: Colors.white.withOpacity(0.04),
+                  color: Theme.of(context).colorScheme.outline,
                 ),
               ),
               child: Row(
                 children: [
                   Container(
-                    padding: const EdgeInsets.all(10),
+                    padding: EdgeInsets.all(10),
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.04),
+                      color: Theme.of(context).colorScheme.outline,
                       shape: BoxShape.circle,
                     ),
-                    child: const Icon(
+                    child: Icon(
                       Icons.description_outlined,
-                      color: Colors.white70,
+                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
                       size: 20,
                     ),
                   ),
-                  const SizedBox(width: 14),
-                  const Column(
+                  SizedBox(width: 14),
+                  Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
                         'View Documents',
                         style: TextStyle(
-                          color: Colors.white,
+                          color: Theme.of(context).colorScheme.onSurface,
                           fontSize: 14,
                           fontWeight: FontWeight.bold,
                         ),
@@ -215,7 +215,7 @@ class ClaimStatusScreen extends StatelessWidget {
                       Text(
                         'Boarding pass, complaint letter',
                         style: TextStyle(
-                          color: Colors.white38,
+                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.38),
                           fontSize: 11,
                         ),
                       ),
@@ -231,23 +231,23 @@ class ClaimStatusScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildStatusRow(String label, String value, {bool isGold = false}) {
+  Widget _buildStatusRow(BuildContext context, String label, String value, {bool isGold = false}) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
+      padding: EdgeInsets.symmetric(vertical: 4),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(
             label,
             style: TextStyle(
-              color: Colors.white.withOpacity(0.35),
+              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.35),
               fontSize: 12,
             ),
           ),
           Text(
             value,
             style: TextStyle(
-              color: isGold ? const Color(0xFFFFC229) : Colors.white,
+              color: isGold ? const Color(0xFFFFC229) : Theme.of(context).colorScheme.onSurface,
               fontSize: 12,
               fontWeight: FontWeight.bold,
             ),
@@ -257,7 +257,7 @@ class ClaimStatusScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildTimelineNode({
+  Widget _buildTimelineNode(BuildContext context, {
     required String title,
     required String date,
     required bool isCompleted,
@@ -273,47 +273,47 @@ class ClaimStatusScreen extends StatelessWidget {
                 width: 24,
                 height: 24,
                 decoration: BoxDecoration(
-                  color: isCompleted ? const Color(0xFFFFC229).withOpacity(0.12) : Colors.white.withOpacity(0.03),
+                  color: isCompleted ? Color(0xFFFFC229).withOpacity(0.12) : Theme.of(context).colorScheme.onSurface.withOpacity(0.03),
                   shape: BoxShape.circle,
                   border: Border.all(
-                    color: isCompleted ? const Color(0xFFFFC229) : Colors.white12,
+                    color: isCompleted ? const Color(0xFFFFC229) : Theme.of(context).colorScheme.onSurface.withOpacity(0.12),
                     width: 1.5,
                   ),
                 ),
                 alignment: Alignment.center,
                 child: isCompleted
-                    ? const Icon(Icons.check, size: 12, color: Color(0xFFFFC229))
-                    : const Icon(Icons.access_time, size: 12, color: Colors.white24),
+                    ? Icon(Icons.check, size: 12, color: Color(0xFFFFC229))
+                    : Icon(Icons.access_time, size: 12, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.24)),
               ),
               if (!isLast)
                 Expanded(
                   child: Container(
                     width: 1.5,
-                    color: isCompleted ? const Color(0xFFFFC229) : Colors.white12,
+                    color: isCompleted ? const Color(0xFFFFC229) : Theme.of(context).colorScheme.onSurface.withOpacity(0.12),
                   ),
                 ),
             ],
           ),
-          const SizedBox(width: 16),
+          SizedBox(width: 16),
           Expanded(
             child: Padding(
-              padding: const EdgeInsets.only(bottom: 24),
+              padding: EdgeInsets.only(bottom: 24),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     title,
                     style: TextStyle(
-                      color: isCompleted ? Colors.white : Colors.white30,
+                      color: isCompleted ? Colors.white : Theme.of(context).colorScheme.onSurface.withOpacity(0.3),
                       fontSize: 13,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  const SizedBox(height: 4),
+                  SizedBox(height: 4),
                   Text(
                     date,
                     style: TextStyle(
-                      color: isCompleted ? Colors.white54 : Colors.white12,
+                      color: isCompleted ? Theme.of(context).colorScheme.onSurface.withOpacity(0.54) : Theme.of(context).colorScheme.onSurface.withOpacity(0.12),
                       fontSize: 11,
                     ),
                   ),

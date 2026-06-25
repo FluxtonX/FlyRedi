@@ -19,19 +19,19 @@ class ActiveIssuesSection extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             _buildTotalExpensesHeader(context),
-            const SizedBox(height: 14),
+            SizedBox(height: 14),
             _buildTotalExpensesCard(context, isEmpty),
             if (!isEmpty) ...[
-              const SizedBox(height: 32),
-              const Text(
+              SizedBox(height: 32),
+              Text(
                 'Active Issues',
                 style: TextStyle(
-                  color: Colors.white,
+                  color: Theme.of(context).colorScheme.onSurface,
                   fontSize: 21,
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              const SizedBox(height: 24),
+              SizedBox(height: 24),
               _buildIssueCard(
                 context: context,
                 flightCode: 'W3 205',
@@ -41,7 +41,7 @@ class ActiveIssuesSection extends StatelessWidget {
                 airline: 'Air Peace',
                 issueDescription: 'Flight Cancelled',
               ),
-              const SizedBox(height: 16),
+              SizedBox(height: 16),
               _buildIssueCard(
                 context: context,
                 flightCode: 'AA 301',
@@ -52,11 +52,11 @@ class ActiveIssuesSection extends StatelessWidget {
                 issueDescription: '4 Hour Delay',
               ),
             ],
-            const SizedBox(height: 32),
+            SizedBox(height: 32),
             _buildActiveClaimsHeader(context),
-            const SizedBox(height: 20),
+            SizedBox(height: 20),
             _buildActiveClaimsCard(context, isEmpty),
-            const SizedBox(height: 24),
+            SizedBox(height: 24),
             _buildUpgradeCard(context),
           ],
         );
@@ -66,10 +66,10 @@ class ActiveIssuesSection extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        const Text(
+        Text(
           'Total Expenses',
           style: TextStyle(
-            color: Colors.white,
+            color: Theme.of(context).colorScheme.onSurface,
             fontSize: 21,
             fontWeight: FontWeight.bold,
           ),
@@ -81,7 +81,7 @@ class ActiveIssuesSection extends StatelessWidget {
               MaterialPageRoute(builder: (context) => const ExpenseTrackerScreen()),
             );
           },
-          child: const Text(
+          child: Text(
             'View all',
             style: TextStyle(
               color: Color(0xFFFFC229),
@@ -103,36 +103,36 @@ class ActiveIssuesSection extends StatelessWidget {
         );
       },
       child: Container(
-        padding: const EdgeInsets.all(24),
+        padding: EdgeInsets.all(24),
         decoration: BoxDecoration(
-          color: const Color(0xFF0C1931),
+          color: Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.circular(24),
           border: Border.all(
-            color: const Color(0xFFFFC229).withOpacity(0.3),
+            color: Color(0xFFFFC229).withOpacity(0.3),
             width: 1,
           ),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
+            Text(
               'Total Expenses',
               style: TextStyle(
-                color: Colors.white54,
+                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.54),
                 fontSize: 16,
               ),
             ),
-            const SizedBox(height: 8),
+            SizedBox(height: 8),
             Text(
               isEmpty ? '\$00.00' : '\$290.00',
-              style: const TextStyle(
-                color: Colors.white,
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onSurface,
                 fontSize: 36,
                 fontWeight: FontWeight.w500,
               ),
             ),
-            const SizedBox(height: 16),
-            const Center(
+            SizedBox(height: 16),
+            Center(
               child: Text(
                 'View all',
                 style: TextStyle(
@@ -158,12 +158,12 @@ class ActiveIssuesSection extends StatelessWidget {
     required String issueDescription,
   }) {
     return Container(
-      padding: const EdgeInsets.all(24),
+      padding: EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: const Color(0xFF101B30),
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(24),
         border: Border.all(
-          color: Colors.white.withOpacity(0.08),
+          color: Theme.of(context).colorScheme.outline,
         ),
       ),
       child: Column(
@@ -176,15 +176,15 @@ class ActiveIssuesSection extends StatelessWidget {
                 children: [
                   Text(
                     flightCode,
-                    style: const TextStyle(
-                      color: Colors.white,
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurface,
                       fontSize: 18,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
-                  const SizedBox(width: 12),
+                  SizedBox(width: 12),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                     decoration: BoxDecoration(
                       color: severityColor.withOpacity(0.2),
                       borderRadius: BorderRadius.circular(12),
@@ -205,37 +205,37 @@ class ActiveIssuesSection extends StatelessWidget {
               ),
               Text(
                 timeAgo,
-                style: const TextStyle(
-                  color: Colors.white54,
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.54),
                   fontSize: 14,
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 8),
+          SizedBox(height: 8),
           Text(
             airline,
-            style: const TextStyle(
-              color: Colors.white54,
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.54),
               fontSize: 16,
             ),
           ),
-          const SizedBox(height: 20),
+          SizedBox(height: 20),
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
             decoration: BoxDecoration(
-              color: const Color(0xFF1E2F4D),
+              color: Theme.of(context).colorScheme.surface,
               borderRadius: BorderRadius.circular(16),
             ),
             child: Text(
               issueDescription,
-              style: const TextStyle(
-                color: Colors.white,
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onSurface,
                 fontSize: 16,
               ),
             ),
           ),
-          const SizedBox(height: 20),
+          SizedBox(height: 20),
           GestureDetector(
             onTap: () {
               Navigator.push(
@@ -244,13 +244,13 @@ class ActiveIssuesSection extends StatelessWidget {
               );
             },
             child: Container(
-              padding: const EdgeInsets.symmetric(vertical: 16),
+              padding: EdgeInsets.symmetric(vertical: 16),
               decoration: BoxDecoration(
                 color: const Color(0xFFFFC229),
                 borderRadius: BorderRadius.circular(20),
               ),
               alignment: Alignment.center,
-              child: const Text(
+              child: Text(
                 'Start Resolution',
                 style: TextStyle(
                   color: Colors.black,
@@ -272,22 +272,22 @@ class ActiveIssuesSection extends StatelessWidget {
         Row(
           children: [
             Container(
-              padding: const EdgeInsets.all(8),
+              padding: EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.08),
+                color: Theme.of(context).colorScheme.outline,
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.task_outlined,
-                color: Colors.white54,
+                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.54),
                 size: 20,
               ),
             ),
-            const SizedBox(width: 12),
-            const Text(
+            SizedBox(width: 12),
+            Text(
               'Active Claims',
               style: TextStyle(
-                color: Colors.white,
+                color: Theme.of(context).colorScheme.onSurface,
                 fontSize: 21,
                 fontWeight: FontWeight.bold,
               ),
@@ -301,7 +301,7 @@ class ActiveIssuesSection extends StatelessWidget {
               MaterialPageRoute(builder: (context) => const TripsOverviewScreen()),
             );
           },
-          child: const Text(
+          child: Text(
             '1/1 used',
             style: TextStyle(
               color: Color(0xFFFFC229),
@@ -323,20 +323,20 @@ class ActiveIssuesSection extends StatelessWidget {
         );
       },
       child: Container(
-        padding: const EdgeInsets.all(24),
+        padding: EdgeInsets.all(24),
         decoration: BoxDecoration(
-          color: const Color(0xFF101B30),
+          color: Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.circular(24),
           border: Border.all(
-            color: Colors.white.withOpacity(0.08),
+            color: Theme.of(context).colorScheme.outline,
           ),
         ),
         child: isEmpty
-            ? const Center(
+            ? Center(
                 child: Text(
                   'No active claims for now',
                   style: TextStyle(
-                    color: Colors.white38,
+                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.38),
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
                   ),
@@ -345,13 +345,13 @@ class ActiveIssuesSection extends StatelessWidget {
             : Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Column(
+                  Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
                         '2 claims in progress',
                         style: TextStyle(
-                          color: Colors.white,
+                          color: Theme.of(context).colorScheme.onSurface,
                           fontSize: 18,
                         ),
                       ),
@@ -359,7 +359,7 @@ class ActiveIssuesSection extends StatelessWidget {
                       Text(
                         'Est. \$1,240 compensation',
                         style: TextStyle(
-                          color: Colors.white54,
+                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.54),
                           fontSize: 14,
                         ),
                       ),
@@ -373,12 +373,12 @@ class ActiveIssuesSection extends StatelessWidget {
                       );
                     },
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF3B2F1F),
+                        color: Theme.of(context).colorScheme.surface,
                         borderRadius: BorderRadius.circular(20),
                       ),
-                      child: const Text(
+                      child: Text(
                         'In Review',
                         style: TextStyle(
                           color: Color(0xFFFFC229),
@@ -402,16 +402,16 @@ class ActiveIssuesSection extends StatelessWidget {
         );
       },
       child: Container(
-        padding: const EdgeInsets.all(22),
+        padding: EdgeInsets.all(22),
         decoration: BoxDecoration(
-          color: const Color(0xFF101B30),
+          color: Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.circular(22),
           border: Border.all(color: const Color(0xFFFFC229)),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const Row(
+            Row(
               children: [
                 Icon(
                   Icons.workspace_premium_outlined,
@@ -426,7 +426,7 @@ class ActiveIssuesSection extends StatelessWidget {
                       Text(
                         'Upgrade to Pro',
                         style: TextStyle(
-                          color: Colors.white,
+                          color: Theme.of(context).colorScheme.onSurface,
                           fontSize: 18,
                           fontWeight: FontWeight.w600,
                         ),
@@ -435,7 +435,7 @@ class ActiveIssuesSection extends StatelessWidget {
                       Text(
                         'Unlimited everything for \$9/month',
                         style: TextStyle(
-                          color: Colors.white54,
+                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.54),
                           fontSize: 13,
                         ),
                       ),
@@ -444,7 +444,7 @@ class ActiveIssuesSection extends StatelessWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 18),
+            SizedBox(height: 18),
             Container(
               height: 56,
               alignment: Alignment.center,
@@ -452,7 +452,7 @@ class ActiveIssuesSection extends StatelessWidget {
                 color: const Color(0xFFFFC943),
                 borderRadius: BorderRadius.circular(14),
               ),
-              child: const Row(
+              child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(

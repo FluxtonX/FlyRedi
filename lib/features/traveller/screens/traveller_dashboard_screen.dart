@@ -279,7 +279,7 @@ class _TravellerDashboardScreenState extends State<TravellerDashboardScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Failed to update dashboard data: ${e.toString().replaceAll('Exception: ', '')}'),
-          backgroundColor: const Color(0xFFE11D48),
+          
           duration: const Duration(seconds: 3),
         ),
       );
@@ -318,14 +318,13 @@ class _TravellerDashboardScreenState extends State<TravellerDashboardScreen> {
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: RefreshIndicator(
           onRefresh: _loadDashboardData,
           color: const Color(0xFFFFC229),
-          backgroundColor: const Color(0xFF10284F),
+          backgroundColor: Theme.of(context).colorScheme.surface,
           child: _buildBody(_displayName),
         ),
       ),
@@ -339,46 +338,46 @@ class _TravellerDashboardScreenState extends State<TravellerDashboardScreen> {
     if (_errorMessage != null && !_hasLoadedData) {
       return Center(
         child: Padding(
-          padding: const EdgeInsets.all(24.0),
+          padding: EdgeInsets.all(24.0),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(
+              Icon(
                 Icons.error_outline_rounded,
                 color: Color(0xFFE11D48),
                 size: 60,
               ),
-              const SizedBox(height: 16),
-              const Text(
+              SizedBox(height: 16),
+              Text(
                 'Something went wrong',
                 style: TextStyle(
-                  color: Colors.white,
+                  color: Theme.of(context).colorScheme.onSurface,
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              const SizedBox(height: 8),
+              SizedBox(height: 8),
               Text(
                 _errorMessage!,
                 textAlign: TextAlign.center,
-                style: const TextStyle(
-                  color: Colors.white54,
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
                   fontSize: 14,
                 ),
               ),
-              const SizedBox(height: 24),
+              SizedBox(height: 24),
               ElevatedButton.icon(
                 onPressed: _loadDashboardData,
-                icon: const Icon(Icons.refresh_rounded, color: Colors.black),
-                label: const Text(
+                icon: Icon(Icons.refresh_rounded, color: Colors.black),
+                label: Text(
                   'Try Again',
                   style: TextStyle(
                       color: Colors.black, fontWeight: FontWeight.bold),
                 ),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFFFC229),
+                  
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                      EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16),
                   ),
@@ -402,7 +401,7 @@ class _TravellerDashboardScreenState extends State<TravellerDashboardScreen> {
 
     return SingleChildScrollView(
       physics: const AlwaysScrollableScrollPhysics(),
-      padding: const EdgeInsets.all(24),
+      padding: EdgeInsets.all(24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -411,7 +410,7 @@ class _TravellerDashboardScreenState extends State<TravellerDashboardScreen> {
             planLabel: _isProfileLoading ? 'Free Plan' : planLabel,
             notificationCount: _isSummaryLoading ? 0 : (summary?.alertsCount ?? 0),
           ),
-          const SizedBox(height: 18),
+          SizedBox(height: 18),
           if (_isStatsLoading || _isProfileLoading || _isTripsLoading || _isSummaryLoading)
             const SkeletonBox(height: 128, radius: 22)
           else
@@ -430,9 +429,14 @@ class _TravellerDashboardScreenState extends State<TravellerDashboardScreen> {
                   ),
                 );
               },
-              onLimitTap: () => showUpgradeToProDialog(context),
+              onLimitTap: () async {
+                final upgraded = await showUpgradeToProDialog(context);
+                if (upgraded == true && mounted) {
+                  _loadDashboardData();
+                }
+              },
             ),
-          const SizedBox(height: 18),
+          SizedBox(height: 18),
           if (_isTripsLoading)
             const SkeletonBox(height: 82, radius: 20)
           else
@@ -441,7 +445,7 @@ class _TravellerDashboardScreenState extends State<TravellerDashboardScreen> {
               maxFlights: freeFlightLimit,
               onTap: _handleAddFlightTap,
             ),
-          const SizedBox(height: 24),
+          SizedBox(height: 24),
           if (_isSummaryLoading)
             const SkeletonBox(height: 190, radius: 28)
           else
@@ -449,45 +453,55 @@ class _TravellerDashboardScreenState extends State<TravellerDashboardScreen> {
               alertsCount: summary?.alertsCount ?? 0,
               casesCount: summary?.casesCount ?? 0,
               totalSavings: (summary?.totalSavings ?? 0.0).toString(),
-              onUpgrade: () => showUpgradeToProDialog(context),
+              onUpgrade: () async {
+                final upgraded = await showUpgradeToProDialog(context);
+                if (upgraded == true && mounted) {
+                  _loadDashboardData();
+                }
+              },
             ),
-          const SizedBox(height: 24),
+          SizedBox(height: 24),
           if (_isActivitiesLoading) ...[
             Row(
-              children: const [
+              children: [
                 SkeletonBox(width: 54, height: 54, radius: 18),
                 SizedBox(width: 16),
                 Expanded(child: SkeletonBox(height: 42, radius: 14)),
               ],
             ),
-            const SizedBox(height: 24),
+            SizedBox(height: 24),
             const SkeletonBox(height: 220, radius: 28),
           ] else ...[
             BorderReadySection(isEmpty: _activities.isEmpty),
             if (_activities.isNotEmpty) ...[
-              const SizedBox(height: 24),
+              SizedBox(height: 24),
               DashboardActivityList(activities: _activities),
             ],
           ],
-          const SizedBox(height: 24),
+          SizedBox(height: 24),
           if (_isSummaryLoading)
             const SkeletonBox(height: 140, radius: 24)
           else ...[
             RecommendedActionsCard(
               isEmpty: (summary?.alertsCount ?? 0) == 0 && (summary?.casesCount ?? 0) == 0,
-              onUpgrade: () => showUpgradeToProDialog(context),
+              onUpgrade: () async {
+                final upgraded = await showUpgradeToProDialog(context);
+                if (upgraded == true && mounted) {
+                  _loadDashboardData();
+                }
+              },
             ),
-            const SizedBox(height: 24),
+            SizedBox(height: 24),
             ActiveIssuesSection(
               isEmpty: (summary?.alertsCount ?? 0) == 0 && (summary?.casesCount ?? 0) == 0,
             ),
           ],
-          const SizedBox(height: 24),
+          SizedBox(height: 24),
           if (_isAlertsLoading)
             const SkeletonBox(height: 140, radius: 24)
           else
             DashboardNotificationsSection(alerts: _alerts),
-          const SizedBox(height: 24),
+          SizedBox(height: 24),
         ],
       ),
     );

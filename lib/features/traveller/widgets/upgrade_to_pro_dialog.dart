@@ -1,28 +1,67 @@
 import 'package:flutter/material.dart';
+import '../repositories/profile_repository.dart';
 
-void showUpgradeToProDialog(BuildContext context) {
-  showDialog<void>(
+Future<bool?> showUpgradeToProDialog(BuildContext context) {
+  return showDialog<bool>(
     context: context,
     barrierColor: Colors.black.withOpacity(0.58),
     builder: (context) => const UpgradeToProDialog(),
   );
 }
 
-class UpgradeToProDialog extends StatelessWidget {
+class UpgradeToProDialog extends StatefulWidget {
   const UpgradeToProDialog({super.key});
+
+  @override
+  State<UpgradeToProDialog> createState() => _UpgradeToProDialogState();
+}
+
+class _UpgradeToProDialogState extends State<UpgradeToProDialog> {
+  bool _isLoading = false;
+
+  Future<void> _handleUpgrade() async {
+    setState(() => _isLoading = true);
+    try {
+      // Send mock request to update plan to Plus, giving max 999 limit
+      final repository = ProfileRepository();
+      await repository.updateProfile(plan: 'Plus');
+      
+      if (!mounted) return;
+      Navigator.pop(context, true); // Return true indicating success
+      
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Successfully upgraded to Pro! Welcome aboard.'),
+          
+        ),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Failed to upgrade: $e'),
+          
+        ),
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Dialog(
-      insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+      insetPadding: EdgeInsets.symmetric(horizontal: 24, vertical: 24),
       backgroundColor: Colors.transparent,
       child: Container(
         width: double.infinity,
-        padding: const EdgeInsets.fromLTRB(32, 28, 32, 28),
+        padding: EdgeInsets.fromLTRB(32, 28, 32, 28),
         decoration: BoxDecoration(
-          color: const Color(0xFF111F45),
+          color: Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.circular(28),
-          border: Border.all(color: const Color(0xFF34466F)),
+          border: Border.all(color: Theme.of(context).colorScheme.surface),
         ),
         child: SingleChildScrollView(
           child: Column(
@@ -32,10 +71,10 @@ class UpgradeToProDialog extends StatelessWidget {
                 alignment: Alignment.centerRight,
                 child: IconButton(
                   onPressed: () => Navigator.pop(context),
-                  icon: const Icon(Icons.close, color: Colors.white, size: 24),
+                  icon: Icon(Icons.close, color: Theme.of(context).colorScheme.onSurface, size: 24),
                 ),
               ),
-              const SizedBox(height: 8),
+              SizedBox(height: 8),
               Center(
                 child: Stack(
                   clipBehavior: Clip.none,
@@ -43,11 +82,11 @@ class UpgradeToProDialog extends StatelessWidget {
                     Container(
                       width: 110,
                       height: 110,
-                      decoration: const BoxDecoration(
-                        color: Color(0xFF2B3348),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.surface,
                         shape: BoxShape.circle,
                       ),
-                      child: const Icon(
+                      child: Icon(
                         Icons.flight_takeoff,
                         color: Color(0xFFFFC943),
                         size: 54,
@@ -65,49 +104,49 @@ class UpgradeToProDialog extends StatelessWidget {
                   ],
                 ),
               ),
-              const SizedBox(height: 28),
-              const Text(
+              SizedBox(height: 28),
+              Text(
                 'Add More Flights',
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  color: Colors.white,
+                  color: Theme.of(context).colorScheme.onSurface,
                   fontSize: 23,
                   fontWeight: FontWeight.w800,
                 ),
               ),
-              const SizedBox(height: 14),
-              const Text(
+              SizedBox(height: 14),
+              Text(
                 "You've reached your monthly\nlimit of 2 flights",
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  color: Color(0xFF9CA7BC),
+                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                   fontSize: 16,
                   height: 1.45,
                 ),
               ),
-              const SizedBox(height: 30),
-              const Text(
+              SizedBox(height: 30),
+              Text(
                 'Included in Pro:',
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  color: Color(0xFF9CA7BC),
+                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                   fontSize: 15,
                 ),
               ),
-              const SizedBox(height: 16),
+              SizedBox(height: 16),
               const _DialogFeature(text: 'Monitor unlimited flights'),
               const _DialogFeature(text: 'Real-time disruption alerts'),
               const _DialogFeature(text: 'WhatsApp + Email + Push\nnotifications'),
               const _DialogFeature(text: 'Advanced flight risk analysis'),
-              const SizedBox(height: 20),
+              SizedBox(height: 20),
               Container(
-                padding: const EdgeInsets.all(18),
+                padding: EdgeInsets.all(18),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF202837),
+                  color: Theme.of(context).colorScheme.surface,
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(color: const Color(0xFF5A4D25)),
                 ),
-                child: const Row(
+                child: Row(
                   children: [
                     Expanded(
                       child: Column(
@@ -116,7 +155,7 @@ class UpgradeToProDialog extends StatelessWidget {
                           Text(
                             'Traveler Pro',
                             style: TextStyle(
-                              color: Color(0xFF9CA7BC),
+                              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                               fontSize: 14,
                             ),
                           ),
@@ -127,7 +166,7 @@ class UpgradeToProDialog extends StatelessWidget {
                               Text(
                                 '\$9',
                                 style: TextStyle(
-                                  color: Colors.white,
+                                  color: Theme.of(context).colorScheme.onSurface,
                                   fontSize: 30,
                                 ),
                               ),
@@ -136,7 +175,7 @@ class UpgradeToProDialog extends StatelessWidget {
                                 child: Text(
                                   '/month',
                                   style: TextStyle(
-                                    color: Color(0xFF9CA7BC),
+                                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                                     fontSize: 15,
                                   ),
                                 ),
@@ -154,42 +193,51 @@ class UpgradeToProDialog extends StatelessWidget {
                   ],
                 ),
               ),
-              const SizedBox(height: 26),
+              SizedBox(height: 26),
               SizedBox(
                 height: 60,
                 child: ElevatedButton(
-                  onPressed: () => Navigator.pop(context),
+                  onPressed: _isLoading ? null : _handleUpgrade,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFFFC943),
+                    
                     foregroundColor: Colors.black,
                     elevation: 0,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(15),
                     ),
                   ),
-                  child: const Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.workspace_premium_outlined, size: 19),
-                      SizedBox(width: 12),
-                      Text(
-                        'Upgrade to Pro',
-                        style: TextStyle(
-                          fontSize: 17,
-                          fontWeight: FontWeight.w900,
+                  child: _isLoading 
+                    ? SizedBox(
+                        width: 24,
+                        height: 24,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          valueColor: AlwaysStoppedAnimation<Color>(Colors.black),
                         ),
+                      )
+                    : Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.workspace_premium_outlined, size: 19),
+                          SizedBox(width: 12),
+                          Text(
+                            'Upgrade to Pro',
+                            style: TextStyle(
+                              fontSize: 17,
+                              fontWeight: FontWeight.w900,
+                            ),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
                 ),
               ),
-              const SizedBox(height: 24),
+              SizedBox(height: 24),
               TextButton(
                 onPressed: () => Navigator.pop(context),
-                child: const Text(
+                child: Text(
                   'Maybe Later',
                   style: TextStyle(
-                    color: Colors.white,
+                    color: Theme.of(context).colorScheme.onSurface,
                     fontSize: 17,
                     fontWeight: FontWeight.w800,
                   ),
@@ -211,22 +259,22 @@ class _DialogFeature extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
+      padding: EdgeInsets.only(bottom: 12),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 13),
+        padding: EdgeInsets.symmetric(horizontal: 18, vertical: 13),
         decoration: BoxDecoration(
-          color: const Color(0xFF343946),
+          color: Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.circular(24),
         ),
         child: Row(
           children: [
-            const Icon(Icons.check, color: Color(0xFFFFC943), size: 20),
-            const SizedBox(width: 16),
+            Icon(Icons.check, color: Color(0xFFFFC943), size: 20),
+            SizedBox(width: 16),
             Expanded(
               child: Text(
                 text,
-                style: const TextStyle(
-                  color: Colors.white,
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurface,
                   fontSize: 15,
                   height: 1.3,
                 ),

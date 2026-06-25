@@ -10,15 +10,15 @@ class ComplaintReadyScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             // Top Green Gradient Header Banner
             Container(
-              padding: const EdgeInsets.only(top: 60, bottom: 32, left: 24, right: 24),
-              decoration: const BoxDecoration(
+              padding: EdgeInsets.only(top: 60, bottom: 32, left: 24, right: 24),
+              decoration: BoxDecoration(
                 gradient: LinearGradient(
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
@@ -36,34 +36,34 @@ class ComplaintReadyScreen extends StatelessWidget {
                 children: [
                   // Circular Check Icon
                   Container(
-                    padding: const EdgeInsets.all(18),
-                    decoration: const BoxDecoration(
-                      color: Colors.white24,
+                    padding: EdgeInsets.all(18),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.24),
                       shape: BoxShape.circle,
                     ),
-                    child: const Icon(
+                    child: Icon(
                       Icons.check,
-                      color: Colors.white,
+                      color: Theme.of(context).colorScheme.onSurface,
                       size: 32,
                     ),
                   ),
-                  const SizedBox(height: 24),
-                  const Text(
+                  SizedBox(height: 24),
+                  Text(
                     'Your Complaint is Ready',
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      color: Colors.white,
+                      color: Theme.of(context).colorScheme.onSurface,
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
                       letterSpacing: -0.5,
                     ),
                   ),
-                  const SizedBox(height: 10),
+                  SizedBox(height: 10),
                   Text(
                     "We've prepared a professional email\nbased on your case",
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      color: Colors.white.withOpacity(0.85),
+                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.85),
                       fontSize: 14,
                       height: 1.4,
                     ),
@@ -73,18 +73,18 @@ class ComplaintReadyScreen extends StatelessWidget {
             ),
 
             Padding(
-              padding: const EdgeInsets.all(24),
+              padding: EdgeInsets.all(24),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   // Email Generated Card
                   Container(
-                    padding: const EdgeInsets.all(20),
+                    padding: EdgeInsets.all(20),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF0C162A),
+                      color: Theme.of(context).colorScheme.surface,
                       borderRadius: BorderRadius.circular(26),
                       border: Border.all(
-                        color: Colors.white.withOpacity(0.04),
+                        color: Theme.of(context).colorScheme.outline,
                       ),
                     ),
                     child: Column(
@@ -93,26 +93,26 @@ class ComplaintReadyScreen extends StatelessWidget {
                         Row(
                           children: [
                             Container(
-                              padding: const EdgeInsets.all(10),
+                              padding: EdgeInsets.all(10),
                               decoration: BoxDecoration(
-                                color: const Color(0xFFB47C1C).withOpacity(0.12),
+                                color: Color(0xFFB47C1C).withOpacity(0.12),
                                 shape: BoxShape.circle,
                               ),
-                              child: const Icon(
+                              child: Icon(
                                 Icons.email_outlined,
                                 color: Color(0xFFFFC229),
                                 size: 18,
                               ),
                             ),
-                            const SizedBox(width: 14),
-                            const Expanded(
+                            SizedBox(width: 14),
+                            Expanded(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
                                     'Email Generated',
                                     style: TextStyle(
-                                      color: Colors.white,
+                                      color: Theme.of(context).colorScheme.onSurface,
                                       fontSize: 15,
                                       fontWeight: FontWeight.bold,
                                     ),
@@ -121,7 +121,7 @@ class ComplaintReadyScreen extends StatelessWidget {
                                   Text(
                                     'Ready to review and send',
                                     style: TextStyle(
-                                      color: Colors.white38,
+                                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.38),
                                       fontSize: 12,
                                     ),
                                   ),
@@ -130,76 +130,76 @@ class ComplaintReadyScreen extends StatelessWidget {
                             ),
                           ],
                         ),
-                        const SizedBox(height: 20),
+                        SizedBox(height: 20),
 
                         // Nested Email Details Box
                         Container(
                           width: double.infinity,
-                          padding: const EdgeInsets.all(18),
+                          padding: EdgeInsets.all(18),
                           decoration: BoxDecoration(
-                            color: const Color(0xFF08101E),
+                            color: Theme.of(context).colorScheme.surface,
                             borderRadius: BorderRadius.circular(18),
                             border: Border.all(
-                              color: Colors.white.withOpacity(0.04),
+                              color: Theme.of(context).colorScheme.outline,
                             ),
                           ),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text(
+                              Text(
                                 'To',
                                 style: TextStyle(
-                                  color: Colors.white38,
+                                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.38),
                                   fontSize: 12,
                                 ),
                               ),
-                              const SizedBox(height: 4),
-                              const Text(
+                              SizedBox(height: 4),
+                              Text(
                                 'complaints@airpeace.com',
                                 style: TextStyle(
-                                  color: Colors.white,
+                                  color: Theme.of(context).colorScheme.onSurface,
                                   fontSize: 14,
                                   fontWeight: FontWeight.w500,
                                 ),
                               ),
-                              const SizedBox(height: 14),
-                              const Text(
+                              SizedBox(height: 14),
+                              Text(
                                 'Subject',
                                 style: TextStyle(
-                                  color: Colors.white38,
+                                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.38),
                                   fontSize: 12,
                                 ),
                               ),
-                              const SizedBox(height: 4),
-                              const Text(
+                              SizedBox(height: 4),
+                              Text(
                                 'Flight Cancellation Complaint - W3 205 (27 Apr 2026)',
                                 style: TextStyle(
-                                  color: Colors.white,
+                                  color: Theme.of(context).colorScheme.onSurface,
                                   fontSize: 14,
                                   fontWeight: FontWeight.bold,
                                   height: 1.35,
                                 ),
                               ),
-                              const SizedBox(height: 16),
-                              const Text(
+                              SizedBox(height: 16),
+                              Text(
                                 'Attachments',
                                 style: TextStyle(
-                                  color: Colors.white38,
+                                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.38),
                                   fontSize: 12,
                                 ),
                               ),
-                              const SizedBox(height: 8),
+                              SizedBox(height: 8),
                               Row(
                                 children: [
-                                  _buildAttachmentChip('Ticket.pdf'),
-                                  const SizedBox(width: 8),
-                                  _buildAttachmentChip('Passport.pdf'),
+                                  _buildAttachmentChip(context, 'Ticket.pdf'),
+                                  SizedBox(width: 8),
+                                  _buildAttachmentChip(context, 'Passport.pdf'),
                                 ],
                               ),
                             ],
                           ),
                         ),
-                        const SizedBox(height: 16),
+                        SizedBox(height: 16),
 
                         // Action Buttons
                         Row(
@@ -215,12 +215,12 @@ class ComplaintReadyScreen extends StatelessWidget {
                                   );
                                 },
                                 child: Container(
-                                  padding: const EdgeInsets.symmetric(vertical: 14),
+                                  padding: EdgeInsets.symmetric(vertical: 14),
                                   decoration: BoxDecoration(
-                                    color: Colors.white.withOpacity(0.04),
+                                    color: Theme.of(context).colorScheme.outline,
                                     borderRadius: BorderRadius.circular(14),
                                     border: Border.all(
-                                      color: Colors.white.withOpacity(0.08),
+                                      color: Theme.of(context).colorScheme.outline,
                                     ),
                                   ),
                                   child: Row(
@@ -228,14 +228,14 @@ class ComplaintReadyScreen extends StatelessWidget {
                                     children: [
                                       Icon(
                                         Icons.edit_note,
-                                        color: Colors.white.withOpacity(0.8),
+                                        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.8),
                                         size: 18,
                                       ),
-                                      const SizedBox(width: 6),
-                                      const Text(
+                                      SizedBox(width: 6),
+                                      Text(
                                         'Preview Email',
                                         style: TextStyle(
-                                          color: Colors.white,
+                                          color: Theme.of(context).colorScheme.onSurface,
                                           fontSize: 13,
                                           fontWeight: FontWeight.bold,
                                         ),
@@ -245,22 +245,22 @@ class ComplaintReadyScreen extends StatelessWidget {
                                 ),
                               ),
                             ),
-                            const SizedBox(width: 12),
+                            SizedBox(width: 12),
                             Expanded(
                               child: Container(
-                                padding: const EdgeInsets.symmetric(vertical: 14),
+                                padding: EdgeInsets.symmetric(vertical: 14),
                                 decoration: BoxDecoration(
-                                  color: const Color(0xFF08101E),
+                                  color: Theme.of(context).colorScheme.surface,
                                   borderRadius: BorderRadius.circular(14),
                                   border: Border.all(
-                                    color: Colors.white.withOpacity(0.08),
+                                    color: Theme.of(context).colorScheme.outline,
                                   ),
                                 ),
                                 alignment: Alignment.center,
-                                child: const Text(
+                                child: Text(
                                   'Edit Details',
                                   style: TextStyle(
-                                    color: Colors.white,
+                                    color: Theme.of(context).colorScheme.onSurface,
                                     fontSize: 13,
                                     fontWeight: FontWeight.bold,
                                   ),
@@ -273,45 +273,45 @@ class ComplaintReadyScreen extends StatelessWidget {
                     ),
                   ),
 
-                  const SizedBox(height: 24),
+                  SizedBox(height: 24),
 
                   // What Happens Next Card
                   Container(
-                    padding: const EdgeInsets.all(22),
+                    padding: EdgeInsets.all(22),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF0C162A),
+                      color: Theme.of(context).colorScheme.surface,
                       borderRadius: BorderRadius.circular(26),
                       border: Border.all(
-                        color: Colors.white.withOpacity(0.04),
+                        color: Theme.of(context).colorScheme.outline,
                       ),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
+                        Text(
                           'What Happens Next',
                           style: TextStyle(
-                            color: Colors.white,
+                            color: Theme.of(context).colorScheme.onSurface,
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        const SizedBox(height: 20),
-                        _buildStepRow(
+                        SizedBox(height: 20),
+                        _buildStepRow(context, 
                           stepNumber: '1',
                           title: 'Review Your Email',
                           subtitle: 'Check the details and make any necessary edits',
                           isActive: true,
                         ),
-                        const SizedBox(height: 18),
-                        _buildStepRow(
+                        SizedBox(height: 18),
+                        _buildStepRow(context, 
                           stepNumber: '2',
                           title: 'Send from Your Email',
                           subtitle: 'You remain in full control of this communication',
                           isActive: false,
                         ),
-                        const SizedBox(height: 18),
-                        _buildStepRow(
+                        SizedBox(height: 18),
+                        _buildStepRow(context, 
                           stepNumber: '3',
                           title: 'Track Follow-ups',
                           subtitle: "We'll remind you if no response is received",
@@ -321,30 +321,30 @@ class ComplaintReadyScreen extends StatelessWidget {
                     ),
                   ),
 
-                  const SizedBox(height: 24),
+                  SizedBox(height: 24),
 
                   // Note Box
                   Container(
-                    padding: const EdgeInsets.all(20),
+                    padding: EdgeInsets.all(20),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF0C162A),
+                      color: Theme.of(context).colorScheme.surface,
                       borderRadius: BorderRadius.circular(20),
                       border: Border.all(
-                        color: const Color(0xFFFFC229).withOpacity(0.15),
+                        color: Color(0xFFFFC229).withOpacity(0.15),
                       ),
                     ),
                     child: RichText(
                       text: TextSpan(
                         style: TextStyle(
-                          color: Colors.white.withOpacity(0.6),
+                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                           fontSize: 13,
                           height: 1.45,
                         ),
-                        children: const [
+                        children: [
                           TextSpan(
                             text: 'Note: ',
                             style: TextStyle(
-                              color: Colors.white,
+                              color: Theme.of(context).colorScheme.onSurface,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
@@ -356,7 +356,7 @@ class ComplaintReadyScreen extends StatelessWidget {
                     ),
                   ),
 
-                  const SizedBox(height: 32),
+                  SizedBox(height: 32),
 
                   // Bottom Button
                   GestureDetector(
@@ -370,12 +370,12 @@ class ComplaintReadyScreen extends StatelessWidget {
                     },
                     child: Container(
                       width: double.infinity,
-                      padding: const EdgeInsets.symmetric(vertical: 18),
+                      padding: EdgeInsets.symmetric(vertical: 18),
                       decoration: BoxDecoration(
                         color: const Color(0xFFFFC229), // Yellow button
                         borderRadius: BorderRadius.circular(16),
                       ),
-                      child: const Row(
+                      child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
@@ -406,28 +406,28 @@ class ComplaintReadyScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildAttachmentChip(String filename) {
+  Widget _buildAttachmentChip(BuildContext context, String filename) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
-        color: const Color(0xFF1E3A8A).withOpacity(0.4), // Blue tint chip
+        color: Theme.of(context).colorScheme.surface.withOpacity(0.4), // Blue tint chip
         borderRadius: BorderRadius.circular(10),
         border: Border.all(
-          color: const Color(0xFF3B82F6).withOpacity(0.2),
+          color: Color(0xFF3B82F6).withOpacity(0.2),
         ),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Icon(
+          Icon(
             Icons.description_outlined,
             color: Color(0xFF60A5FA),
             size: 14,
           ),
-          const SizedBox(width: 6),
+          SizedBox(width: 6),
           Text(
             filename,
-            style: const TextStyle(
+            style: TextStyle(
               color: Color(0xFF93C5FD),
               fontSize: 12,
               fontWeight: FontWeight.w500,
@@ -438,7 +438,7 @@ class ComplaintReadyScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildStepRow({
+  Widget _buildStepRow(BuildContext context, {
     required String stepNumber,
     required String title,
     required String subtitle,
@@ -451,37 +451,37 @@ class ComplaintReadyScreen extends StatelessWidget {
           width: 28,
           height: 28,
           decoration: BoxDecoration(
-            color: isActive ? const Color(0xFFFFC229) : Colors.white.withOpacity(0.06),
+            color: isActive ? const Color(0xFFFFC229) : Theme.of(context).colorScheme.outline.withOpacity(0.5),
             shape: BoxShape.circle,
           ),
           alignment: Alignment.center,
           child: Text(
             stepNumber,
             style: TextStyle(
-              color: isActive ? Colors.black : Colors.white60,
+              color: isActive ? Colors.black : Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
               fontSize: 13,
               fontWeight: FontWeight.bold,
             ),
           ),
         ),
-        const SizedBox(width: 16),
+        SizedBox(width: 16),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
                 title,
-                style: const TextStyle(
-                  color: Colors.white,
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurface,
                   fontSize: 14,
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              const SizedBox(height: 4),
+              SizedBox(height: 4),
               Text(
                 subtitle,
                 style: TextStyle(
-                  color: Colors.white.withOpacity(0.4),
+                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
                   fontSize: 12,
                   height: 1.35,
                 ),

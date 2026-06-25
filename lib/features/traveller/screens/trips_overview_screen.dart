@@ -36,11 +36,13 @@ class _TripsOverviewScreenState extends State<TripsOverviewScreen> {
   String? _errorMessage;
 
   // Reusable decoration — avoids recreating identical objects per card per rebuild
-  static final _cardDecoration = BoxDecoration(
-    color: const Color(0xFF0C162A),
-    borderRadius: BorderRadius.circular(18),
-    border: Border.all(color: Colors.white.withOpacity(0.04)),
-  );
+  BoxDecoration _getCardDecoration(BuildContext context) {
+    return BoxDecoration(
+      color: Theme.of(context).colorScheme.surface,
+      borderRadius: BorderRadius.circular(18),
+      border: Border.all(color: Theme.of(context).colorScheme.outline),
+    );
+  }
 
   @override
   void initState() {
@@ -112,7 +114,7 @@ class _TripsOverviewScreenState extends State<TripsOverviewScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Could not refresh trips.'),
-            backgroundColor: Color(0xFFE11D48),
+            
           ),
         );
         return;
@@ -172,23 +174,23 @@ class _TripsOverviewScreenState extends State<TripsOverviewScreen> {
             children: [
               Icon(
                 newStatus ? Icons.check_circle : Icons.info_outline,
-                color: newStatus ? const Color(0xFF10B981) : Colors.white70,
+                color: newStatus ? const Color(0xFF10B981) : Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
               ),
-              const SizedBox(width: 10),
+              SizedBox(width: 10),
               Text(
                 newStatus
                     ? 'Sentinel™ Protection Enabled!'
                     : 'Sentinel™ Protection Disabled.',
-                style: const TextStyle(
-                    color: Colors.white, fontWeight: FontWeight.bold),
+                style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.bold),
               ),
             ],
           ),
-          backgroundColor: const Color(0xFF0C162A),
+          backgroundColor: Theme.of(context).colorScheme.surface,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
-            side: BorderSide(color: Colors.white.withOpacity(0.08)),
+            side: BorderSide(color: Theme.of(context).colorScheme.outline),
           ),
         ),
       );
@@ -205,7 +207,7 @@ class _TripsOverviewScreenState extends State<TripsOverviewScreen> {
         SnackBar(
           content: Text(
             'Failed to update tracking: $e',
-            style: const TextStyle(color: Colors.white),
+            style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
           ),
           backgroundColor: Colors.red,
         ),
@@ -218,25 +220,25 @@ class _TripsOverviewScreenState extends State<TripsOverviewScreen> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          backgroundColor: const Color(0xFF0C162A),
+          backgroundColor: Theme.of(context).colorScheme.surface,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(18),
           ),
-          title: const Text(
+          title: Text(
             'Delete this trip?',
-            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+            style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.bold),
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context, false),
-              child: const Text(
+              child: Text(
                 'Cancel',
-                style: TextStyle(color: Colors.white70),
+                style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7)),
               ),
             ),
             TextButton(
               onPressed: () => Navigator.pop(context, true),
-              child: const Text(
+              child: Text(
                 'Delete',
                 style: TextStyle(
                   color: Color(0xFFEF4444),
@@ -281,9 +283,9 @@ class _TripsOverviewScreenState extends State<TripsOverviewScreen> {
         SnackBar(
           content: Text(
             'Failed to delete trip: $e',
-            style: const TextStyle(color: Colors.white),
+            style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
           ),
-          backgroundColor: const Color(0xFFE11D48),
+          
         ),
       );
     }
@@ -349,7 +351,7 @@ class _TripsOverviewScreenState extends State<TripsOverviewScreen> {
   Widget build(BuildContext context) {
     if (_isLoading) {
       return Scaffold(
-        backgroundColor: AppColors.background,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         body: _buildTripsSkeleton(),
         bottomNavigationBar: widget.showBottomNav
             ? const TravellerBottomNav(activeIndex: 1)
@@ -359,22 +361,22 @@ class _TripsOverviewScreenState extends State<TripsOverviewScreen> {
 
     if (_errorMessage != null) {
       return Scaffold(
-        backgroundColor: AppColors.background,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         body: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(Icons.error_outline, color: Colors.red, size: 48),
-              const SizedBox(height: 16),
+              Icon(Icons.error_outline, color: Colors.red, size: 48),
+              SizedBox(height: 16),
               Text(
                 'Failed to load trips:\n$_errorMessage',
                 textAlign: TextAlign.center,
-                style: const TextStyle(color: Colors.white),
+                style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
               ),
-              const SizedBox(height: 24),
+              SizedBox(height: 24),
               ElevatedButton(
                 onPressed: _loadTrips,
-                child: const Text('Retry'),
+                child: Text('Retry'),
               ),
             ],
           ),
@@ -397,10 +399,10 @@ class _TripsOverviewScreenState extends State<TripsOverviewScreen> {
         _trips.where((t) => t.trackingEnabled).toList();
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24),
+          padding: EdgeInsets.all(24),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
@@ -408,13 +410,13 @@ class _TripsOverviewScreenState extends State<TripsOverviewScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Column(
+                  Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
                         'My Trips',
                         style: TextStyle(
-                          color: Colors.white,
+                          color: Theme.of(context).colorScheme.onSurface,
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
                         ),
@@ -423,20 +425,20 @@ class _TripsOverviewScreenState extends State<TripsOverviewScreen> {
                       Text(
                         'Manage all your flights',
                         style: TextStyle(
-                          color: Colors.white54,
+                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.54),
                           fontSize: 13,
                         ),
                       ),
                     ],
                   ),
                   IconButton(
-                    icon: const Icon(Icons.add, color: Colors.white),
+                    icon: Icon(Icons.add, color: Theme.of(context).colorScheme.onSurface),
                     onPressed: _handleAddFlightTap,
                   ),
                 ],
               ),
 
-              const SizedBox(height: 24),
+              SizedBox(height: 24),
 
               // Overview 3-Card Row
               Row(
@@ -457,7 +459,7 @@ class _TripsOverviewScreenState extends State<TripsOverviewScreen> {
                       },
                     ),
                   ),
-                  const SizedBox(width: 12),
+                  SizedBox(width: 12),
                   Expanded(
                     child: _buildStatCard(
                       icon: Icons.error_outline,
@@ -475,7 +477,7 @@ class _TripsOverviewScreenState extends State<TripsOverviewScreen> {
                       },
                     ),
                   ),
-                  const SizedBox(width: 12),
+                  SizedBox(width: 12),
                   Expanded(
                     child: _buildStatCard(
                       icon: Icons.check_circle_outline,
@@ -495,94 +497,93 @@ class _TripsOverviewScreenState extends State<TripsOverviewScreen> {
                 ],
               ),
 
-              const SizedBox(height: 28),
+              SizedBox(height: 28),
 
               // Sentinel Protected Section Header
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
+                  Text(
                     'Sentinel™ Protected',
                     style: TextStyle(
-                      color: Colors.white,
+                      color: Theme.of(context).colorScheme.onSurface,
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                   Row(
                     children: [
-                      const SizedBox(width: 6),
+                      SizedBox(width: 6),
                     ],
                   ),
                 ],
               ),
-              const SizedBox(height: 14),
+              SizedBox(height: 14),
 
               if (monitoredTrips.isEmpty)
                 Container(
-                  padding: const EdgeInsets.symmetric(vertical: 36),
+                  padding: EdgeInsets.symmetric(vertical: 36),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF0C162A),
+                    color: Theme.of(context).colorScheme.surface,
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(
-                      color: Colors.white.withOpacity(0.04),
+                      color: Theme.of(context).colorScheme.outline,
                     ),
                   ),
                   alignment: Alignment.center,
                   child: Text(
                     'We have no sentinel activity',
                     style: TextStyle(
-                      color: Colors.white.withOpacity(0.4),
+                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
                       fontSize: 12,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                 )
               else
-                ...monitoredTrips.map((trip) {
-                  final firstLeg =
-                      trip.timeline.isNotEmpty ? trip.timeline.first : null;
-                  final origin =
-                      _tripLocationLabel(trip.origin, 'Origin not set');
-                  final destination = _tripLocationLabel(
-                    trip.destination,
-                    'Destination not set',
-                  );
-                  return Padding(
-                    padding: const EdgeInsets.only(bottom: 12.0),
-                    child: _buildProtectedFlightCard(
-                      trip: trip,
-                      airlineCode: _tripFlightLabel(trip),
-                      risk:
-                          '${(firstLeg?.riskLevel ?? 'LOW').toUpperCase()} RISK',
-                      riskColor: _getRiskColor(firstLeg?.riskLevel),
-                      from: origin,
-                      fromTime: _timeLabel(firstLeg?.fromTime, 'Departure'),
-                      to: destination,
-                      toTime: _timeLabel(firstLeg?.toTime, 'Arrival'),
-                      statusText: trip.trackingEnabled
-                          ? 'ACTIVE'
-                          : trip.status.toUpperCase(),
-                      delayProb: firstLeg?.delayProb ?? '0%',
-                      activeAlerts: firstLeg?.activeAlerts ?? 0,
-                      date: _tripDateLabel(trip),
-                    ),
-                  );
-                }).toList(),
+                ListView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: monitoredTrips.length,
+                  itemBuilder: (context, index) {
+                    final trip = monitoredTrips[index];
+                    final firstLeg = trip.timeline.isNotEmpty ? trip.timeline.first : null;
+                    final origin = _tripLocationLabel(trip.origin, 'Origin not set');
+                    final destination = _tripLocationLabel(trip.destination, 'Destination not set');
+                    
+                    return Padding(
+                      padding: EdgeInsets.only(bottom: 12.0),
+                      child: _buildProtectedFlightCard(
+                        trip: trip,
+                        airlineCode: _tripFlightLabel(trip),
+                        risk: '${(firstLeg?.riskLevel ?? 'LOW').toUpperCase()} RISK',
+                        riskColor: _getRiskColor(firstLeg?.riskLevel),
+                        from: origin,
+                        fromTime: _timeLabel(firstLeg?.fromTime, 'Departure'),
+                        to: destination,
+                        toTime: _timeLabel(firstLeg?.toTime, 'Arrival'),
+                        statusText: trip.trackingEnabled ? 'ACTIVE' : trip.status.toUpperCase(),
+                        delayProb: firstLeg?.delayProb ?? '0%',
+                        activeAlerts: firstLeg?.activeAlerts ?? 0,
+                        date: _tripDateLabel(trip),
+                      ),
+                    );
+                  },
+                ),
 
-              const SizedBox(height: 28), // ── Upcoming Trips Section ──
+              SizedBox(height: 28), // ── Upcoming Trips Section ──
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Row(
                     children: [
                       Icon(Icons.flight_takeoff,
-                          color: Colors.white.withOpacity(0.5), size: 18),
-                      const SizedBox(width: 8),
-                      const Text(
+                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5), size: 18),
+                      SizedBox(width: 8),
+                      Text(
                         'Upcoming Trips',
                         style: TextStyle(
-                          color: Colors.white,
+                          color: Theme.of(context).colorScheme.onSurface,
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
                         ),
@@ -598,7 +599,7 @@ class _TripsOverviewScreenState extends State<TripsOverviewScreen> {
                         ),
                       );
                     },
-                    child: const Text(
+                    child: Text(
                       'View all',
                       style: TextStyle(
                         color: Color(0xFFFFC229),
@@ -609,39 +610,44 @@ class _TripsOverviewScreenState extends State<TripsOverviewScreen> {
                   ),
                 ],
               ),
-              const SizedBox(height: 14),
+              SizedBox(height: 14),
 
               if (isEmpty)
                 Container(
-                  padding: const EdgeInsets.symmetric(vertical: 36),
+                  padding: EdgeInsets.symmetric(vertical: 36),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF0C162A),
+                    color: Theme.of(context).colorScheme.surface,
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(
-                      color: Colors.white.withOpacity(0.04),
+                      color: Theme.of(context).colorScheme.outline,
                     ),
                   ),
                   alignment: Alignment.center,
                   child: Text(
                     'No upcoming trip for now',
                     style: TextStyle(
-                      color: Colors.white.withOpacity(0.4),
+                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
                       fontSize: 12,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                 )
               else
-                ..._trips.map((trip) {
-                  final firstLeg =
-                      trip.timeline.isNotEmpty ? trip.timeline.first : null;
-                  return Padding(
-                    padding: const EdgeInsets.only(bottom: 12.0),
-                    child: _buildUpcomingCard(trip, firstLeg),
-                  );
-                }).toList(),
+                ListView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: _trips.length,
+                  itemBuilder: (context, index) {
+                    final trip = _trips[index];
+                    final firstLeg = trip.timeline.isNotEmpty ? trip.timeline.first : null;
+                    return Padding(
+                      padding: EdgeInsets.only(bottom: 12.0),
+                      child: _buildUpcomingCard(trip, firstLeg),
+                    );
+                  },
+                ),
 
-              const SizedBox(height: 28),
+              SizedBox(height: 28),
 
               // Live Flight Tracker Quick Action
               GestureDetector(
@@ -654,33 +660,33 @@ class _TripsOverviewScreenState extends State<TripsOverviewScreen> {
                   );
                 },
                 child: Container(
-                  padding: const EdgeInsets.all(16),
+                  padding: EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF0C162A),
+                    color: Theme.of(context).colorScheme.surface,
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(
-                      color: const Color(0xFFFFC229).withOpacity(0.3),
+                      color: Color(0xFFFFC229).withOpacity(0.3),
                     ),
                   ),
                   child: Row(
                     children: [
                       Container(
-                        padding: const EdgeInsets.all(10),
+                        padding: EdgeInsets.all(10),
                         decoration: BoxDecoration(
-                          color: const Color(0xFFFFC229).withOpacity(0.1),
+                          color: Color(0xFFFFC229).withOpacity(0.1),
                           shape: BoxShape.circle,
                         ),
-                        child: const Icon(Icons.map_outlined, color: Color(0xFFFFC229), size: 24),
+                        child: Icon(Icons.map_outlined, color: Color(0xFFFFC229), size: 24),
                       ),
-                      const SizedBox(width: 16),
-                      const Expanded(
+                      SizedBox(width: 16),
+                      Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
                               'Live Flight Tracker',
                               style: TextStyle(
-                                color: Colors.white,
+                                color: Theme.of(context).colorScheme.onSurface,
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -689,19 +695,19 @@ class _TripsOverviewScreenState extends State<TripsOverviewScreen> {
                             Text(
                               'Track your flight on the map in real-time',
                               style: TextStyle(
-                                color: Colors.white54,
+                                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.54),
                                 fontSize: 12,
                               ),
                             ),
                           ],
                         ),
                       ),
-                      const Icon(Icons.chevron_right, color: Colors.white54),
+                      Icon(Icons.chevron_right, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.54)),
                     ],
                   ),
                 ),
               ),
-              const SizedBox(height: 12),
+              SizedBox(height: 12),
 
               // Two Half-Width bottom action cards
               IntrinsicHeight(
@@ -725,14 +731,14 @@ class _TripsOverviewScreenState extends State<TripsOverviewScreen> {
                         ),
                       ),
                     ),
-                    const SizedBox(width: 12),
+                    SizedBox(width: 12),
                     Expanded(
                       child: GestureDetector(
                         onTap: () {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => const BorderReadyScreen(),
+                              builder: (context) => BorderReadyScreen(),
                             ),
                           );
                         },
@@ -758,20 +764,20 @@ class _TripsOverviewScreenState extends State<TripsOverviewScreen> {
   Widget _buildTripsSkeleton() {
     return SafeArea(
       child: SingleChildScrollView(
-        padding: const EdgeInsets.all(24),
+        padding: EdgeInsets.all(24),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: const [
+              children: [
                 SkeletonBox(width: 130, height: 50, radius: 14),
                 SkeletonBox(width: 42, height: 42, radius: 14),
               ],
             ),
-            const SizedBox(height: 24),
+            SizedBox(height: 24),
             Row(
-              children: const [
+              children: [
                 Expanded(child: SkeletonBox(height: 96, radius: 18)),
                 SizedBox(width: 12),
                 Expanded(child: SkeletonBox(height: 96, radius: 18)),
@@ -779,15 +785,15 @@ class _TripsOverviewScreenState extends State<TripsOverviewScreen> {
                 Expanded(child: SkeletonBox(height: 96, radius: 18)),
               ],
             ),
-            const SizedBox(height: 28),
+            SizedBox(height: 28),
             const SkeletonBox(width: 180, height: 24, radius: 12),
-            const SizedBox(height: 14),
+            SizedBox(height: 14),
             const SkeletonBox(height: 132, radius: 20),
-            const SizedBox(height: 28),
+            SizedBox(height: 28),
             const SkeletonBox(width: 160, height: 24, radius: 12),
-            const SizedBox(height: 14),
+            SizedBox(height: 14),
             const SkeletonBox(height: 112, radius: 18),
-            const SizedBox(height: 12),
+            SizedBox(height: 12),
             const SkeletonBox(height: 112, radius: 18),
           ],
         ),
@@ -807,8 +813,8 @@ class _TripsOverviewScreenState extends State<TripsOverviewScreen> {
     final isDeleting = _deletingTripIds.contains(trip.id);
 
     return Container(
-      padding: const EdgeInsets.all(18),
-      decoration: _cardDecoration,
+      padding: EdgeInsets.all(18),
+      decoration: _getCardDecoration(context),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -820,25 +826,25 @@ class _TripsOverviewScreenState extends State<TripsOverviewScreen> {
                 children: [
                   Text(
                     _tripFlightLabel(trip),
-                    style: const TextStyle(
-                      color: Colors.white,
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurface,
                       fontSize: 14,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  const SizedBox(height: 4),
+                  SizedBox(height: 4),
                   Text(
                     _tripRouteLabel(trip),
-                    style: const TextStyle(
-                      color: Colors.white60,
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                       fontSize: 12,
                     ),
                   ),
-                  const SizedBox(height: 2),
+                  SizedBox(height: 2),
                   Text(
                     _tripDateLabel(trip),
-                    style: const TextStyle(
-                      color: Colors.white38,
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.38),
                       fontSize: 11,
                     ),
                   ),
@@ -854,11 +860,11 @@ class _TripsOverviewScreenState extends State<TripsOverviewScreen> {
                       height: 28,
                       alignment: Alignment.center,
                       decoration: BoxDecoration(
-                        color: const Color(0xFFE11D48).withOpacity(0.12),
+                        color: Color(0xFFE11D48).withOpacity(0.12),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: isDeleting
-                          ? const SizedBox(
+                          ? SizedBox(
                               width: 14,
                               height: 14,
                               child: CircularProgressIndicator(
@@ -868,39 +874,39 @@ class _TripsOverviewScreenState extends State<TripsOverviewScreen> {
                                 ),
                               ),
                             )
-                          : const Icon(
+                          : Icon(
                               Icons.delete_outline,
                               color: Color(0xFFE11D48),
                               size: 16,
                             ),
                     ),
                   ),
-                  const SizedBox(height: 8),
+                  SizedBox(height: 8),
                   Text(
                     trip.trackingEnabled ? 'Active Sentinel' : 'Not Monitored',
                     style: TextStyle(
                       color: trip.trackingEnabled
                           ? const Color(0xFF10B981)
-                          : Colors.white30,
+                          : Theme.of(context).colorScheme.onSurface.withOpacity(0.3),
                       fontSize: 11,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  const SizedBox(height: 8),
+                  SizedBox(height: 8),
                   GestureDetector(
                     onTap: () => _toggleTracking(trip),
                     child: Container(
-                      padding: const EdgeInsets.symmetric(
+                      padding: EdgeInsets.symmetric(
                           horizontal: 14, vertical: 6),
                       decoration: BoxDecoration(
                         color: trip.trackingEnabled
-                            ? const Color(0xFF10B981).withOpacity(0.12)
-                            : const Color(0xFFFFC229).withOpacity(0.1),
+                            ? Color(0xFF10B981).withOpacity(0.12)
+                            : Color(0xFFFFC229).withOpacity(0.1),
                         borderRadius: BorderRadius.circular(10),
                         border: Border.all(
                           color: trip.trackingEnabled
-                              ? const Color(0xFF10B981).withOpacity(0.3)
-                              : const Color(0xFFFFC229).withOpacity(0.3),
+                              ? Color(0xFF10B981).withOpacity(0.3)
+                              : Color(0xFFFFC229).withOpacity(0.3),
                         ),
                       ),
                       child: Text(
@@ -936,18 +942,18 @@ class _TripsOverviewScreenState extends State<TripsOverviewScreen> {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.all(16),
+        padding: EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: const Color(0xFF0C162A),
+          color: Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.circular(18),
           border: Border.all(
-            color: Colors.white.withOpacity(0.04),
+            color: Theme.of(context).colorScheme.outline,
           ),
         ),
         child: Column(
           children: [
             Container(
-              padding: const EdgeInsets.all(8),
+              padding: EdgeInsets.all(8),
               decoration: BoxDecoration(
                 color: iconColor.withOpacity(0.1),
                 shape: BoxShape.circle,
@@ -958,20 +964,20 @@ class _TripsOverviewScreenState extends State<TripsOverviewScreen> {
                 size: 18,
               ),
             ),
-            const SizedBox(height: 12),
+            SizedBox(height: 12),
             Text(
               count,
-              style: const TextStyle(
-                color: Colors.white,
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onSurface,
                 fontSize: 22,
                 fontWeight: FontWeight.bold,
               ),
             ),
-            const SizedBox(height: 4),
+            SizedBox(height: 4),
             Text(
               label,
               style: TextStyle(
-                color: Colors.white.withOpacity(0.4),
+                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
                 fontSize: 11,
               ),
             ),
@@ -1005,12 +1011,12 @@ class _TripsOverviewScreenState extends State<TripsOverviewScreen> {
         );
       },
       child: Container(
-        padding: const EdgeInsets.all(18),
+        padding: EdgeInsets.all(18),
         decoration: BoxDecoration(
-          color: const Color(0xFF0C162A),
+          color: Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: Colors.white.withOpacity(0.04),
+            color: Theme.of(context).colorScheme.outline,
           ),
         ),
         child: Column(
@@ -1020,16 +1026,16 @@ class _TripsOverviewScreenState extends State<TripsOverviewScreen> {
               children: [
                 Row(
                   children: [
-                    const Text(
+                    Text(
                       'Sentinel™ Monitoring',
                       style: TextStyle(
-                        color: Colors.white38,
+                        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.38),
                         fontSize: 11,
                       ),
                     ),
-                    const SizedBox(width: 6),
+                    SizedBox(width: 6),
                     Container(
-                      padding: const EdgeInsets.symmetric(
+                      padding: EdgeInsets.symmetric(
                           horizontal: 6, vertical: 2),
                       decoration: BoxDecoration(
                         color: riskColor.withOpacity(0.1),
@@ -1048,15 +1054,15 @@ class _TripsOverviewScreenState extends State<TripsOverviewScreen> {
                 ),
                 Text(
                   airlineCode,
-                  style: const TextStyle(
-                    color: Colors.white,
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurface,
                     fontSize: 13,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: 16),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -1065,25 +1071,25 @@ class _TripsOverviewScreenState extends State<TripsOverviewScreen> {
                   children: [
                     Text(
                       from,
-                      style: const TextStyle(
-                        color: Colors.white,
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onSurface,
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    const SizedBox(height: 4),
+                    SizedBox(height: 4),
                     Text(
                       fromTime,
                       style: TextStyle(
-                        color: Colors.white.withOpacity(0.4),
+                        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
                         fontSize: 11,
                       ),
                     ),
                   ],
                 ),
-                const Icon(
+                Icon(
                   Icons.swap_horiz,
-                  color: Colors.white24,
+                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.24),
                   size: 20,
                 ),
                 Column(
@@ -1091,13 +1097,13 @@ class _TripsOverviewScreenState extends State<TripsOverviewScreen> {
                   children: [
                     Text(
                       to,
-                      style: const TextStyle(
-                        color: Colors.white,
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onSurface,
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    const SizedBox(height: 4),
+                    SizedBox(height: 4),
                     Text(
                       statusText,
                       style: TextStyle(
@@ -1110,9 +1116,9 @@ class _TripsOverviewScreenState extends State<TripsOverviewScreen> {
                 ),
               ],
             ),
-            const SizedBox(height: 16),
-            Divider(color: Colors.white.withOpacity(0.04)),
-            const SizedBox(height: 10),
+            SizedBox(height: 16),
+            Divider(color: Theme.of(context).colorScheme.outline),
+            SizedBox(height: 10),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -1121,14 +1127,14 @@ class _TripsOverviewScreenState extends State<TripsOverviewScreen> {
                     Text(
                       'Delay Probability: ',
                       style: TextStyle(
-                        color: Colors.white.withOpacity(0.35),
+                        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.35),
                         fontSize: 11,
                       ),
                     ),
                     Text(
                       delayProb,
-                      style: const TextStyle(
-                        color: Colors.white,
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onSurface,
                         fontSize: 11,
                         fontWeight: FontWeight.bold,
                       ),
@@ -1140,7 +1146,7 @@ class _TripsOverviewScreenState extends State<TripsOverviewScreen> {
                     Text(
                       'Active Alerts: ',
                       style: TextStyle(
-                        color: Colors.white.withOpacity(0.35),
+                        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.35),
                         fontSize: 11,
                       ),
                     ),
@@ -1149,7 +1155,7 @@ class _TripsOverviewScreenState extends State<TripsOverviewScreen> {
                       style: TextStyle(
                         color: activeAlerts > 0
                             ? const Color(0xFFEF4444)
-                            : Colors.white,
+                            : Theme.of(context).colorScheme.onSurface,
                         fontSize: 11,
                         fontWeight: FontWeight.bold,
                       ),
@@ -1158,13 +1164,13 @@ class _TripsOverviewScreenState extends State<TripsOverviewScreen> {
                 ),
               ],
             ),
-            const SizedBox(height: 8),
+            SizedBox(height: 8),
             Align(
               alignment: Alignment.centerLeft,
               child: Text(
                 date,
                 style: TextStyle(
-                  color: Colors.white.withOpacity(0.25),
+                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.25),
                   fontSize: 10,
                 ),
               ),
@@ -1180,12 +1186,12 @@ class _TripsOverviewScreenState extends State<TripsOverviewScreen> {
     required String label,
   }) {
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 18),
+      padding: EdgeInsets.symmetric(vertical: 18),
       decoration: BoxDecoration(
-        color: const Color(0xFF0C162A),
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: Colors.white.withOpacity(0.04),
+          color: Theme.of(context).colorScheme.outline,
         ),
       ),
       child: Column(
@@ -1193,15 +1199,15 @@ class _TripsOverviewScreenState extends State<TripsOverviewScreen> {
         children: [
           Icon(
             icon,
-            color: Colors.white.withOpacity(0.8),
+            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.8),
             size: 20,
           ),
-          const SizedBox(height: 8),
+          SizedBox(height: 8),
           Text(
             label,
             textAlign: TextAlign.center,
-            style: const TextStyle(
-              color: Colors.white,
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.onSurface,
               fontSize: 12,
               fontWeight: FontWeight.bold,
               height: 1.35,

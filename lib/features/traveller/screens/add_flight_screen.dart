@@ -94,12 +94,12 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
       if (showSuccessSnack) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text(
+            content: Text(
               'Flight details found and added.',
               style:
-                  TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                  TextStyle(color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.bold),
             ),
-            backgroundColor: const Color(0xFF10B981),
+            
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
@@ -171,13 +171,13 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
-            colorScheme: const ColorScheme.dark(
-              primary: Color(0xFFFFC229), // Yellow
+            colorScheme: ColorScheme.dark(
+              primary: AppColors.primary,
               onPrimary: Colors.black,
-              surface: Color(0xFF0C162A),
-              onSurface: Colors.white,
+              surface: Theme.of(context).colorScheme.surface,
+              onSurface: Theme.of(context).colorScheme.onSurface,
             ),
-            dialogBackgroundColor: const Color(0xFF0C162A),
+            dialogBackgroundColor: Theme.of(context).colorScheme.surface,
           ),
           child: child!,
         );
@@ -196,21 +196,21 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          icon: Icon(Icons.arrow_back, color: Theme.of(context).colorScheme.onSurface),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Column(
+        title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               'Add Flight',
               style: TextStyle(
-                color: Colors.white,
+                color: Theme.of(context).colorScheme.onSurface,
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
               ),
@@ -219,7 +219,7 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
             Text(
               'Start Sentinel™ monitoring',
               style: TextStyle(
-                color: Colors.white54,
+                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.54),
                 fontSize: 12,
                 fontWeight: FontWeight.normal,
               ),
@@ -229,52 +229,52 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
         titleSpacing: 0,
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24),
+        padding: EdgeInsets.all(24),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             // Sentinel Protection Info Card
             Container(
-              padding: const EdgeInsets.all(18),
+              padding: EdgeInsets.all(18),
               decoration: BoxDecoration(
-                color: const Color(0xFF0C162A),
+                color: Theme.of(context).colorScheme.surface,
                 borderRadius: BorderRadius.circular(20),
                 border: Border.all(
-                  color: Colors.white.withOpacity(0.04),
+                  color: Theme.of(context).colorScheme.outline,
                 ),
               ),
               child: Row(
                 children: [
                   Container(
-                    padding: const EdgeInsets.all(12),
+                    padding: EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFFFC229).withOpacity(0.1),
+                      color: Color(0xFFFFC229).withOpacity(0.1),
                       shape: BoxShape.circle,
                     ),
-                    child: const Icon(
+                    child: Icon(
                       Icons.shield_outlined,
                       color: Color(0xFFFFC229),
                       size: 20,
                     ),
                   ),
-                  const SizedBox(width: 16),
+                  SizedBox(width: 16),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
+                        Text(
                           'Sentinel™ Protection',
                           style: TextStyle(
-                            color: Colors.white,
+                            color: Theme.of(context).colorScheme.onSurface,
                             fontSize: 14,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        const SizedBox(height: 4),
+                        SizedBox(height: 4),
                         Text(
                           'Real-time monitoring for delays, cancellations, gate changes, and disruptions',
                           style: TextStyle(
-                            color: Colors.white.withOpacity(0.4),
+                            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
                             fontSize: 11,
                             height: 1.35,
                           ),
@@ -286,13 +286,13 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
               ),
             ),
 
-            const SizedBox(height: 24),
+            SizedBox(height: 24),
 
             // Segmented Switcher Tab
             Container(
-              padding: const EdgeInsets.all(4),
+              padding: EdgeInsets.all(4),
               decoration: BoxDecoration(
-                color: const Color(0xFF0C162A),
+                color: Theme.of(context).colorScheme.surface,
                 borderRadius: BorderRadius.circular(14),
               ),
               child: Row(
@@ -305,15 +305,15 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
                         });
                       },
                       child: Container(
-                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        padding: EdgeInsets.symmetric(vertical: 12),
                         decoration: BoxDecoration(
                           color: _isManualMode
-                              ? const Color(0xFF08101E)
+                              ? Theme.of(context).colorScheme.surface
                               : Colors.transparent,
                           borderRadius: BorderRadius.circular(10),
                           border: Border.all(
                             color: _isManualMode
-                                ? Colors.white.withOpacity(0.08)
+                                ? Theme.of(context).colorScheme.outline
                                 : Colors.transparent,
                           ),
                         ),
@@ -324,16 +324,16 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
                               Icons.flight_takeoff,
                               color: _isManualMode
                                   ? const Color(0xFFFFC229)
-                                  : Colors.white60,
+                                  : Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                               size: 16,
                             ),
-                            const SizedBox(width: 8),
+                            SizedBox(width: 8),
                             Text(
                               'Manual Entry',
                               style: TextStyle(
                                 color: _isManualMode
                                     ? Colors.white
-                                    : Colors.white60,
+                                    : Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                                 fontSize: 13,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -351,15 +351,15 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
                         });
                       },
                       child: Container(
-                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        padding: EdgeInsets.symmetric(vertical: 12),
                         decoration: BoxDecoration(
                           color: !_isManualMode
-                              ? const Color(0xFF08101E)
+                              ? Theme.of(context).colorScheme.surface
                               : Colors.transparent,
                           borderRadius: BorderRadius.circular(10),
                           border: Border.all(
                             color: !_isManualMode
-                                ? Colors.white.withOpacity(0.08)
+                                ? Theme.of(context).colorScheme.outline
                                 : Colors.transparent,
                           ),
                         ),
@@ -370,16 +370,16 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
                               Icons.upload_file_outlined,
                               color: !_isManualMode
                                   ? const Color(0xFFFFC229)
-                                  : Colors.white60,
+                                  : Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                               size: 16,
                             ),
-                            const SizedBox(width: 8),
+                            SizedBox(width: 8),
                             Text(
                               'Upload Booking',
                               style: TextStyle(
                                 color: !_isManualMode
                                     ? Colors.white
-                                    : Colors.white60,
+                                    : Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                                 fontSize: 13,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -393,23 +393,23 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
               ),
             ),
 
-            const SizedBox(height: 24),
+            SizedBox(height: 24),
 
             // Form container depending on selection
             _isManualMode ? _buildManualForm() : _buildUploadForm(),
 
-            const SizedBox(height: 28),
+            SizedBox(height: 28),
 
             // Sentinel Checklist monitor
-            const Text(
+            Text(
               'Sentinel™ will monitor for:',
               style: TextStyle(
-                color: Colors.white,
+                color: Theme.of(context).colorScheme.onSurface,
                 fontSize: 14,
                 fontWeight: FontWeight.bold,
               ),
             ),
-            const SizedBox(height: 14),
+            SizedBox(height: 14),
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -417,21 +417,21 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
                   child: Column(
                     children: [
                       _buildCheckItem('Flight delays'),
-                      const SizedBox(height: 10),
+                      SizedBox(height: 10),
                       _buildCheckItem('Gate changes'),
-                      const SizedBox(height: 10),
+                      SizedBox(height: 10),
                       _buildCheckItem('Airport disruptions'),
                     ],
                   ),
                 ),
-                const SizedBox(width: 12),
+                SizedBox(width: 12),
                 Expanded(
                   child: Column(
                     children: [
                       _buildCheckItem('Cancellations'),
-                      const SizedBox(height: 10),
+                      SizedBox(height: 10),
                       _buildCheckItem('Weather alerts'),
-                      const SizedBox(height: 10),
+                      SizedBox(height: 10),
                       _buildCheckItem('Connection risks'),
                     ],
                   ),
@@ -439,7 +439,7 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
               ],
             ),
 
-            const SizedBox(height: 36),
+            SizedBox(height: 36),
 
             // Start Monitoring Button
             GestureDetector(
@@ -450,12 +450,12 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
                     _flightNumberController.text.trim().isEmpty) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: const Text(
+                      content: Text(
                         'Please enter a valid Flight Number.',
                         style: TextStyle(
-                            color: Colors.white, fontWeight: FontWeight.bold),
+                            color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.bold),
                       ),
-                      backgroundColor: const Color(0xFFEF4444),
+                      
                       behavior: SnackBarBehavior.floating,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
@@ -467,12 +467,12 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
                 if (_isManualMode && _dateController.text.trim().isEmpty) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: const Text(
+                      content: Text(
                         'Please select a Departure Date.',
                         style: TextStyle(
-                            color: Colors.white, fontWeight: FontWeight.bold),
+                            color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.bold),
                       ),
-                      backgroundColor: const Color(0xFFEF4444),
+                      
                       behavior: SnackBarBehavior.floating,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
@@ -484,12 +484,12 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
                 if (!_isManualMode && _uploadedFileName == null) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: const Text(
+                      content: Text(
                         'Please upload your booking confirmation first.',
                         style: TextStyle(
-                            color: Colors.white, fontWeight: FontWeight.bold),
+                            color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.bold),
                       ),
-                      backgroundColor: const Color(0xFFEF4444),
+                      
                       behavior: SnackBarBehavior.floating,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
@@ -532,13 +532,13 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
                     if (!mounted) return;
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: const Text(
+                        content: Text(
                           'Flight not found automatically. Please enter origin and destination to save it manually.',
                           style: TextStyle(
-                              color: Colors.white,
+                              color: Theme.of(context).colorScheme.onSurface,
                               fontWeight: FontWeight.bold),
                         ),
-                        backgroundColor: const Color(0xFFEF4444),
+                        
                         behavior: SnackBarBehavior.floating,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
@@ -571,10 +571,10 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
                     SnackBar(
                       content: Text(
                         'Failed to save trip: $e',
-                        style: const TextStyle(
-                            color: Colors.white, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                            color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.bold),
                       ),
-                      backgroundColor: const Color(0xFFEF4444),
+                      
                       behavior: SnackBarBehavior.floating,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
@@ -591,13 +591,13 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
               },
               child: Container(
                 width: double.infinity,
-                padding: const EdgeInsets.symmetric(vertical: 18),
+                padding: EdgeInsets.symmetric(vertical: 18),
                 decoration: BoxDecoration(
                   color: const Color(0xFFFFC229), // Yellow
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: _isSavingTrip
-                    ? const Center(
+                    ? Center(
                         child: SizedBox(
                           height: 18,
                           width: 18,
@@ -608,7 +608,7 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
                           ),
                         ),
                     )
-                    : const Row(
+                    : Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Icon(
@@ -641,15 +641,15 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         // Flight Number
-        const Text(
+        Text(
           'Flight Number',
           style: TextStyle(
-            color: Colors.white70,
+            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
             fontSize: 13,
             fontWeight: FontWeight.w500,
           ),
         ),
-        const SizedBox(height: 8),
+        SizedBox(height: 8),
         TextField(
           controller: _flightNumberController,
           textCapitalization: TextCapitalization.characters,
@@ -659,115 +659,115 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
               _flightLookupMessage = null;
             });
           },
-          style: const TextStyle(color: Colors.white, fontSize: 14),
+          style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 14),
           decoration: InputDecoration(
             hintText: 'e.g., UA 2847',
-            hintStyle: const TextStyle(color: Colors.white30, fontSize: 14),
-            fillColor: const Color(0xFF0C162A),
+            hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3), fontSize: 14),
+            fillColor: Theme.of(context).colorScheme.surface,
             filled: true,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(14),
               borderSide: BorderSide.none,
             ),
             contentPadding:
-                const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+                EdgeInsets.symmetric(horizontal: 18, vertical: 16),
           ),
         ),
 
-        const SizedBox(height: 20),
+        SizedBox(height: 20),
 
         // Origin
-        const Text(
+        Text(
           'Origin (Optional)',
           style: TextStyle(
-            color: Colors.white70,
+            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
             fontSize: 13,
             fontWeight: FontWeight.w500,
           ),
         ),
-        const SizedBox(height: 8),
+        SizedBox(height: 8),
         TextField(
           controller: _originController,
           textCapitalization: TextCapitalization.characters,
-          style: const TextStyle(color: Colors.white, fontSize: 14),
+          style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 14),
           decoration: InputDecoration(
             hintText: 'e.g., SFO',
-            hintStyle: const TextStyle(color: Colors.white30, fontSize: 14),
-            fillColor: const Color(0xFF0C162A),
+            hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3), fontSize: 14),
+            fillColor: Theme.of(context).colorScheme.surface,
             filled: true,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(14),
               borderSide: BorderSide.none,
             ),
             contentPadding:
-                const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+                EdgeInsets.symmetric(horizontal: 18, vertical: 16),
           ),
         ),
 
-        const SizedBox(height: 20),
+        SizedBox(height: 20),
 
         // Destination
-        const Text(
+        Text(
           'Destination (Optional)',
           style: TextStyle(
-            color: Colors.white70,
+            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
             fontSize: 13,
             fontWeight: FontWeight.w500,
           ),
         ),
-        const SizedBox(height: 8),
+        SizedBox(height: 8),
         TextField(
           controller: _destinationController,
           textCapitalization: TextCapitalization.characters,
-          style: const TextStyle(color: Colors.white, fontSize: 14),
+          style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 14),
           decoration: InputDecoration(
             hintText: 'e.g., JFK',
-            hintStyle: const TextStyle(color: Colors.white30, fontSize: 14),
-            fillColor: const Color(0xFF0C162A),
+            hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3), fontSize: 14),
+            fillColor: Theme.of(context).colorScheme.surface,
             filled: true,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(14),
               borderSide: BorderSide.none,
             ),
             contentPadding:
-                const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+                EdgeInsets.symmetric(horizontal: 18, vertical: 16),
           ),
         ),
 
-        const SizedBox(height: 20),
+        SizedBox(height: 20),
 
         // Departure Date
-        const Text(
+        Text(
           'Departure Date',
           style: TextStyle(
-            color: Colors.white70,
+            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
             fontSize: 13,
             fontWeight: FontWeight.w500,
           ),
         ),
-        const SizedBox(height: 8),
+        SizedBox(height: 8),
         TextField(
           controller: _dateController,
           readOnly: true,
           onTap: () => _selectDate(context),
-          style: const TextStyle(color: Colors.white, fontSize: 14),
+          style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 14),
           decoration: InputDecoration(
             hintText: 'Select Date',
-            hintStyle: const TextStyle(color: Colors.white30, fontSize: 14),
-            fillColor: const Color(0xFF0C162A),
+            hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3), fontSize: 14),
+            fillColor: Theme.of(context).colorScheme.surface,
             filled: true,
-            suffixIcon: const Icon(Icons.calendar_today_outlined,
-                color: Colors.white30, size: 18),
+            suffixIcon: Icon(Icons.calendar_today_outlined,
+                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3), size: 18),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(14),
               borderSide: BorderSide.none,
             ),
             contentPadding:
-                const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+                EdgeInsets.symmetric(horizontal: 18, vertical: 16),
           ),
         ),
 
-        const SizedBox(height: 14),
+        SizedBox(height: 14),
 
         GestureDetector(
           onTap: (_isLookingUpFlight || _isSavingTrip)
@@ -777,13 +777,13 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
                       _dateController.text.trim().isEmpty) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: const Text(
+                        content: Text(
                           'Enter flight number and departure date first.',
                           style: TextStyle(
-                              color: Colors.white,
+                              color: Theme.of(context).colorScheme.onSurface,
                               fontWeight: FontWeight.bold),
                         ),
-                        backgroundColor: const Color(0xFFEF4444),
+                        
                         behavior: SnackBarBehavior.floating,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
@@ -795,20 +795,20 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
                   await _lookupFlightDetails(showSuccessSnack: true);
                 },
           child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 13),
+            padding: EdgeInsets.symmetric(horizontal: 14, vertical: 13),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.04),
+              color: Theme.of(context).colorScheme.outline,
               borderRadius: BorderRadius.circular(14),
               border: Border.all(
                 color: _flightLookup != null
-                    ? const Color(0xFF10B981).withOpacity(0.45)
-                    : Colors.white.withOpacity(0.08),
+                    ? Color(0xFF10B981).withOpacity(0.45)
+                    : Theme.of(context).colorScheme.outline,
               ),
             ),
             child: Row(
               children: [
                 _isLookingUpFlight
-                    ? const SizedBox(
+                    ? SizedBox(
                         width: 18,
                         height: 18,
                         child: CircularProgressIndicator(
@@ -826,7 +826,7 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
                             : const Color(0xFFFFC229),
                         size: 18,
                       ),
-                const SizedBox(width: 10),
+                SizedBox(width: 10),
                 Expanded(
                   child: Text(
                     _isLookingUpFlight
@@ -835,7 +835,7 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
                     style: TextStyle(
                       color: _flightLookup != null
                           ? const Color(0xFF10B981)
-                          : Colors.white70,
+                          : Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
                       fontSize: 12,
                       fontWeight: FontWeight.w700,
                       height: 1.35,
@@ -847,61 +847,61 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
           ),
         ),
 
-        const SizedBox(height: 20),
+        SizedBox(height: 20),
 
         // Booking Reference (Optional)
-        const Text(
+        Text(
           'Booking Reference (Optional)',
           style: TextStyle(
-            color: Colors.white70,
+            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
             fontSize: 13,
             fontWeight: FontWeight.w500,
           ),
         ),
-        const SizedBox(height: 8),
+        SizedBox(height: 8),
         TextField(
           controller: _bookingRefController,
-          style: const TextStyle(color: Colors.white, fontSize: 14),
+          style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 14),
           decoration: InputDecoration(
             hintText: 'e.g., ABC123',
-            hintStyle: const TextStyle(color: Colors.white30, fontSize: 14),
-            fillColor: const Color(0xFF0C162A),
+            hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3), fontSize: 14),
+            fillColor: Theme.of(context).colorScheme.surface,
             filled: true,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(14),
               borderSide: BorderSide.none,
             ),
             contentPadding:
-                const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+                EdgeInsets.symmetric(horizontal: 18, vertical: 16),
           ),
         ),
 
-        const SizedBox(height: 18),
+        SizedBox(height: 18),
 
         // Tip Info card
         Container(
-          padding: const EdgeInsets.all(16),
+          padding: EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: const Color(0xFF0C162A),
+            color: Theme.of(context).colorScheme.surface,
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
-              color: Colors.white.withOpacity(0.04),
+              color: Theme.of(context).colorScheme.outline,
             ),
           ),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Icon(
+              Icon(
                 Icons.lightbulb_outline,
                 color: Color(0xFFFFC229),
                 size: 16,
               ),
-              const SizedBox(width: 10),
+              SizedBox(width: 10),
               Expanded(
                 child: Text(
                   'Tip: Flight number and date let us find route details automatically. Add origin and destination if the provider cannot resolve the flight.',
                   style: TextStyle(
-                    color: Colors.white.withOpacity(0.4),
+                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
                     fontSize: 11,
                     height: 1.4,
                   ),
@@ -918,21 +918,21 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
     return GestureDetector(
       onTap: _isUploading ? null : _simulateUpload,
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 36, horizontal: 24),
+        padding: EdgeInsets.symmetric(vertical: 36, horizontal: 24),
         decoration: BoxDecoration(
-          color: const Color(0xFF0C162A),
+          color: Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.circular(24),
           border: Border.all(
             color: _uploadedFileName != null
                 ? const Color(0xFF10B981)
-                : Colors.white.withOpacity(0.08),
+                : Theme.of(context).colorScheme.outline,
             style: BorderStyle.solid,
           ),
         ),
         child: Column(
           children: [
             if (_isUploading) ...[
-              const SizedBox(
+              SizedBox(
                 width: 36,
                 height: 36,
                 child: CircularProgressIndicator(
@@ -940,73 +940,73 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
                   strokeWidth: 3,
                 ),
               ),
-              const SizedBox(height: 16),
+              SizedBox(height: 16),
               Text(
                 'Uploading... ${(_uploadProgress * 100).toInt()}%',
-                style: const TextStyle(
-                  color: Colors.white70,
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
                   fontSize: 14,
                   fontWeight: FontWeight.bold,
                 ),
               ),
             ] else if (_uploadedFileName != null) ...[
               Container(
-                padding: const EdgeInsets.all(12),
-                decoration: const BoxDecoration(
-                  color: Color(0xFF0F2D24),
+                padding: EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.surface,
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.check,
                   color: Color(0xFF10B981),
                   size: 24,
                 ),
               ),
-              const SizedBox(height: 14),
+              SizedBox(height: 14),
               Text(
                 _uploadedFileName!,
-                style: const TextStyle(
-                  color: Colors.white,
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurface,
                   fontSize: 14,
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              const SizedBox(height: 6),
-              const Text(
+              SizedBox(height: 6),
+              Text(
                 'Tap to upload a different file',
                 style: TextStyle(
-                  color: Colors.white38,
+                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.38),
                   fontSize: 11,
                 ),
               ),
             ] else ...[
               Container(
-                padding: const EdgeInsets.all(14),
+                padding: EdgeInsets.all(14),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.04),
+                  color: Theme.of(context).colorScheme.outline,
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.cloud_upload_outlined,
-                  color: Colors.white60,
+                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                   size: 28,
                 ),
               ),
-              const SizedBox(height: 16),
-              const Text(
+              SizedBox(height: 16),
+              Text(
                 'Upload your booking confirmation',
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  color: Colors.white,
+                  color: Theme.of(context).colorScheme.onSurface,
                   fontSize: 14,
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              const SizedBox(height: 6),
-              const Text(
+              SizedBox(height: 6),
+              Text(
                 'PDF, email, or screenshot',
                 style: TextStyle(
-                  color: Colors.white38,
+                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.38),
                   fontSize: 12,
                 ),
               ),
@@ -1021,22 +1021,22 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
     return Row(
       children: [
         Container(
-          padding: const EdgeInsets.all(2),
-          decoration: const BoxDecoration(
+          padding: EdgeInsets.all(2),
+          decoration: BoxDecoration(
             color: Color(0xFF10B981), // Green
             shape: BoxShape.circle,
           ),
-          child: const Icon(
+          child: Icon(
             Icons.check,
             color: Colors.black,
             size: 10,
           ),
         ),
-        const SizedBox(width: 8),
+        SizedBox(width: 8),
         Text(
           label,
-          style: const TextStyle(
-            color: Colors.white70,
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
             fontSize: 12,
           ),
         ),
@@ -1049,50 +1049,50 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
       context: context,
       builder: (BuildContext context) {
         return Dialog(
-          backgroundColor: const Color(0xFF0C162A),
+          backgroundColor: Theme.of(context).colorScheme.surface,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(28),
             side: BorderSide(
-              color: Colors.white.withOpacity(0.08),
+              color: Theme.of(context).colorScheme.outline,
             ),
           ),
           child: Padding(
-            padding: const EdgeInsets.all(28),
+            padding: EdgeInsets.all(28),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: const BoxDecoration(
-                    color: Color(0xFF0F2D24),
+                  padding: EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.surface,
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.check_circle_outline,
                     color: Color(0xFF10B981),
                     size: 48,
                   ),
                 ),
-                const SizedBox(height: 24),
-                const Text(
+                SizedBox(height: 24),
+                Text(
                   'Sentinel™ Active',
                   style: TextStyle(
-                    color: Colors.white,
+                    color: Theme.of(context).colorScheme.onSurface,
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                const SizedBox(height: 10),
+                SizedBox(height: 10),
                 Text(
                   'We are now actively monitoring your flight for delays, cancellations, and disruptions 24/7.',
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    color: Colors.white.withOpacity(0.5),
+                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
                     fontSize: 13,
                     height: 1.45,
                   ),
                 ),
-                const SizedBox(height: 28),
+                SizedBox(height: 28),
                 GestureDetector(
                   onTap: () {
                     Navigator.pop(context); // Pop dialog
@@ -1107,13 +1107,13 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
                   },
                   child: Container(
                     width: double.infinity,
-                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    padding: EdgeInsets.symmetric(vertical: 14),
                     decoration: BoxDecoration(
                       color: const Color(0xFFFFC229),
                       borderRadius: BorderRadius.circular(14),
                     ),
                     alignment: Alignment.center,
-                    child: const Text(
+                    child: Text(
                       'Done',
                       style: TextStyle(
                         color: Colors.black,

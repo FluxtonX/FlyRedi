@@ -64,11 +64,11 @@ class _PlanUsageScreenState extends State<PlanUsageScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      
       bottomNavigationBar: const TravellerBottomNav(activeIndex: 0),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(24, 20, 24, 28),
+          padding: EdgeInsets.fromLTRB(24, 20, 24, 28),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
@@ -76,34 +76,34 @@ class _PlanUsageScreenState extends State<PlanUsageScreen> {
                 children: [
                   IconButton(
                     onPressed: () => Navigator.pop(context),
-                    icon: const Icon(
+                    icon: Icon(
                       Icons.arrow_back,
                       color: Color(0xFF9AA8BD),
                       size: 28,
                     ),
                   ),
-                  const SizedBox(width: 8),
-                  const Text(
+                  SizedBox(width: 8),
+                  Text(
                     'Plan Usage',
                     style: TextStyle(
-                      color: Colors.white,
+                      color: Theme.of(context).colorScheme.onSurface,
                       fontSize: 26,
                       fontWeight: FontWeight.w800,
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 26),
+              SizedBox(height: 26),
               Container(
-                padding: const EdgeInsets.all(24),
+                padding: EdgeInsets.all(24),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF111F45),
+                  color: Theme.of(context).colorScheme.surface,
                   borderRadius: BorderRadius.circular(24),
-                  border: Border.all(color: const Color(0xFF2B3B68)),
+                  border: Border.all(color: Theme.of(context).colorScheme.surface),
                 ),
                 child: Row(
                   children: [
-                    const Expanded(
+                    Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -118,7 +118,7 @@ class _PlanUsageScreenState extends State<PlanUsageScreen> {
                           Text(
                             'Traveler Basic',
                             style: TextStyle(
-                              color: Colors.white,
+                              color: Theme.of(context).colorScheme.onSurface,
                               fontSize: 25,
                               fontWeight: FontWeight.w500,
                             ),
@@ -127,15 +127,15 @@ class _PlanUsageScreenState extends State<PlanUsageScreen> {
                       ),
                     ),
                     Container(
-                      padding: const EdgeInsets.symmetric(
+                      padding: EdgeInsets.symmetric(
                         horizontal: 18,
                         vertical: 10,
                       ),
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(22),
-                        border: Border.all(color: const Color(0xFF34466F)),
+                        border: Border.all(color: Theme.of(context).colorScheme.surface),
                       ),
-                      child: const Row(
+                      child: Row(
                         children: [
                           Icon(
                             Icons.bolt_outlined,
@@ -156,16 +156,16 @@ class _PlanUsageScreenState extends State<PlanUsageScreen> {
                   ],
                 ),
               ),
-              const SizedBox(height: 30),
-              const Text(
+              SizedBox(height: 30),
+              Text(
                 'Monthly Usage',
                 style: TextStyle(
-                  color: Colors.white,
+                  color: Theme.of(context).colorScheme.onSurface,
                   fontSize: 20,
                   fontWeight: FontWeight.w800,
                 ),
               ),
-              const SizedBox(height: 18),
+              SizedBox(height: 18),
               _PlanUsageRow(
                 icon: Icons.flight_takeoff,
                 label: 'Flights Monitored',
@@ -174,7 +174,12 @@ class _PlanUsageScreenState extends State<PlanUsageScreen> {
                     ? (_stats!.flightsMonitored / _stats!.flightsMonitoredMax).clamp(0.0, 1.0)
                     : _flightProgress,
                 warning: (_stats?.flightsMonitored ?? _usedFlights) >= (_stats?.flightsMonitoredMax ?? freeFlightLimit),
-                onTap: () => showUpgradeToProDialog(context),
+                onTap: () async {
+                  final upgraded = await showUpgradeToProDialog(context);
+                  if (upgraded == true && mounted) {
+                    _loadData();
+                  }
+                },
               ),
               _PlanUsageRow(
                 icon: Icons.fact_check_outlined,
@@ -184,7 +189,12 @@ class _PlanUsageScreenState extends State<PlanUsageScreen> {
                     ? (_stats!.claimsFiled / _stats!.claimsFiledMax).clamp(0.0, 1.0)
                     : 0,
                 warning: (_stats?.claimsFiled ?? 0) >= (_stats?.claimsFiledMax ?? 1),
-                onTap: () => showUpgradeToProDialog(context),
+                onTap: () async {
+                  final upgraded = await showUpgradeToProDialog(context);
+                  if (upgraded == true && mounted) {
+                    _loadData();
+                  }
+                },
               ),
               _PlanUsageRow(
                 icon: Icons.auto_awesome,
@@ -194,7 +204,12 @@ class _PlanUsageScreenState extends State<PlanUsageScreen> {
                     ? (_stats!.aiComplaintLetters / _stats!.aiComplaintLettersMax).clamp(0.0, 1.0)
                     : 0,
                 warning: (_stats?.aiComplaintLetters ?? 0) >= (_stats?.aiComplaintLettersMax ?? 1),
-                onTap: () => showUpgradeToProDialog(context),
+                onTap: () async {
+                  final upgraded = await showUpgradeToProDialog(context);
+                  if (upgraded == true && mounted) {
+                    _loadData();
+                  }
+                },
               ),
               _PlanUsageRow(
                 icon: Icons.chat_bubble_outline,
@@ -204,7 +219,12 @@ class _PlanUsageScreenState extends State<PlanUsageScreen> {
                     ? (_stats!.aiAssistantQuestions / _stats!.aiAssistantQuestionsMax).clamp(0.0, 1.0)
                     : 0,
                 warning: (_stats?.aiAssistantQuestions ?? 0) >= (_stats?.aiAssistantQuestionsMax ?? 5),
-                onTap: () => showUpgradeToProDialog(context),
+                onTap: () async {
+                  final upgraded = await showUpgradeToProDialog(context);
+                  if (upgraded == true && mounted) {
+                    _loadData();
+                  }
+                },
               ),
               _PlanUsageRow(
                 icon: Icons.upload_outlined,
@@ -216,7 +236,7 @@ class _PlanUsageScreenState extends State<PlanUsageScreen> {
                 warning: false,
                 onTap: () {},
               ),
-              const SizedBox(height: 14),
+              SizedBox(height: 14),
               GestureDetector(
                 onTap: () {
                   Navigator.push(
@@ -227,16 +247,16 @@ class _PlanUsageScreenState extends State<PlanUsageScreen> {
                   );
                 },
                 child: Container(
-                  padding: const EdgeInsets.all(22),
+                  padding: EdgeInsets.all(22),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF101B30),
+                    color: Theme.of(context).colorScheme.surface,
                     borderRadius: BorderRadius.circular(22),
                     border: Border.all(color: const Color(0xFFFFC229)),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      const Row(
+                      Row(
                         children: [
                           Icon(
                             Icons.workspace_premium_outlined,
@@ -251,7 +271,7 @@ class _PlanUsageScreenState extends State<PlanUsageScreen> {
                                 Text(
                                   'Upgrade to Pro',
                                   style: TextStyle(
-                                    color: Colors.white,
+                                    color: Theme.of(context).colorScheme.onSurface,
                                     fontSize: 19,
                                     fontWeight: FontWeight.w600,
                                   ),
@@ -260,7 +280,7 @@ class _PlanUsageScreenState extends State<PlanUsageScreen> {
                                 Text(
                                   'Unlimited everything for \$9/month',
                                   style: TextStyle(
-                                    color: Color(0xFF8D99AD),
+                                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.54),
                                     fontSize: 14,
                                   ),
                                 ),
@@ -269,7 +289,7 @@ class _PlanUsageScreenState extends State<PlanUsageScreen> {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 20),
+                      SizedBox(height: 20),
                       Container(
                         height: 60,
                         alignment: Alignment.center,
@@ -277,7 +297,7 @@ class _PlanUsageScreenState extends State<PlanUsageScreen> {
                           color: const Color(0xFFFFC943),
                           borderRadius: BorderRadius.circular(15),
                         ),
-                        child: const Row(
+                        child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Icon(
@@ -330,28 +350,28 @@ class _PlanUsageRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final color = warning ? const Color(0xFFFF4D5E) : const Color(0xFF23C78A);
     return Padding(
-      padding: const EdgeInsets.only(bottom: 16),
+      padding: EdgeInsets.only(bottom: 16),
       child: GestureDetector(
         onTap: onTap,
         child: Container(
-          padding: const EdgeInsets.all(20),
+          padding: EdgeInsets.all(20),
           decoration: BoxDecoration(
-            color: const Color(0xFF111F45),
+            color: Theme.of(context).colorScheme.surface,
             borderRadius: BorderRadius.circular(22),
-            border: Border.all(color: const Color(0xFF2B3B68)),
+            border: Border.all(color: Theme.of(context).colorScheme.surface),
           ),
           child: Row(
             children: [
               Container(
                 width: 44,
                 height: 44,
-                decoration: const BoxDecoration(
-                  color: Color(0xFF273044),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.surface,
                   shape: BoxShape.circle,
                 ),
                 child: Icon(icon, color: const Color(0xFFFFC229), size: 22),
               ),
-              const SizedBox(width: 16),
+              SizedBox(width: 16),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -361,7 +381,7 @@ class _PlanUsageRow extends StatelessWidget {
                         Expanded(
                           child: Text(
                             label,
-                            style: const TextStyle(
+                            style: TextStyle(
                               color: Color(0xFF9AA5B8),
                               fontSize: 16,
                             ),
@@ -376,8 +396,8 @@ class _PlanUsageRow extends StatelessWidget {
                           ),
                         ),
                         if (warning) ...[
-                          const SizedBox(width: 8),
-                          const Icon(
+                          SizedBox(width: 8),
+                          Icon(
                             Icons.error_outline,
                             color: Color(0xFFFF4D5E),
                             size: 17,
@@ -385,13 +405,13 @@ class _PlanUsageRow extends StatelessWidget {
                         ],
                       ],
                     ),
-                    const SizedBox(height: 12),
+                    SizedBox(height: 12),
                     ClipRRect(
                       borderRadius: BorderRadius.circular(999),
                       child: LinearProgressIndicator(
                         value: progress,
                         minHeight: 7,
-                        backgroundColor: const Color(0xFF475269),
+                        
                         valueColor: AlwaysStoppedAnimation<Color>(color),
                       ),
                     ),

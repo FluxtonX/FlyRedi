@@ -6,12 +6,12 @@ class DisruptionDetailsCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(24),
+      padding: EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: const Color(0xFF0C162A), // Dark blue card bg
+        color: Theme.of(context).colorScheme.surface, // Dark blue card bg
         borderRadius: BorderRadius.circular(26),
         border: Border.all(
-          color: Colors.white.withOpacity(0.05),
+          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.05),
         ),
       ),
       child: Column(
@@ -22,43 +22,43 @@ class DisruptionDetailsCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
-                padding: const EdgeInsets.all(12),
+                padding: EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFE11D48).withOpacity(0.12), // Red tinted bg
+                  color: Color(0xFFE11D48).withOpacity(0.12), // Red tinted bg
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.warning_amber_rounded,
                   color: Color(0xFFE11D48),
                   size: 20,
                 ),
               ),
-              const SizedBox(width: 16),
+              SizedBox(width: 16),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
                       children: [
-                        const Text(
+                        Text(
                           'Flight W3 205',
                           style: TextStyle(
-                            color: Colors.white,
+                            color: Theme.of(context).colorScheme.onSurface,
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        const SizedBox(width: 10),
+                        SizedBox(width: 10),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                           decoration: BoxDecoration(
-                            color: const Color(0xFFE11D48).withOpacity(0.15),
+                            color: Color(0xFFE11D48).withOpacity(0.15),
                             borderRadius: BorderRadius.circular(6),
                             border: Border.all(
-                              color: const Color(0xFFE11D48).withOpacity(0.3),
+                              color: Color(0xFFE11D48).withOpacity(0.3),
                             ),
                           ),
-                          child: const Text(
+                          child: Text(
                             'CANCELLED',
                             style: TextStyle(
                               color: Color(0xFFE11D48),
@@ -70,11 +70,11 @@ class DisruptionDetailsCard extends StatelessWidget {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 4),
+                    SizedBox(height: 4),
                     Text(
                       'Air Peace',
                       style: TextStyle(
-                        color: Colors.white.withOpacity(0.5),
+                        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
                         fontSize: 14,
                       ),
                     ),
@@ -84,28 +84,28 @@ class DisruptionDetailsCard extends StatelessWidget {
             ],
           ),
           
-          const SizedBox(height: 24),
-          Divider(color: Colors.white.withOpacity(0.05), height: 1),
-          const SizedBox(height: 24),
+          SizedBox(height: 24),
+          Divider(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.05), height: 1),
+          SizedBox(height: 24),
 
           // Row 2: Route details
-          _buildDetailRow(
+          _buildDetailRow(context, 
             icon: Icons.flight_takeoff,
             label: 'Route',
             value: 'Lagos (LOS) → Abuja (ABV)',
           ),
-          const SizedBox(height: 20),
+          SizedBox(height: 20),
 
           // Row 3: Date
-          _buildDetailRow(
+          _buildDetailRow(context, 
             icon: Icons.calendar_today_outlined,
             label: 'Date',
             value: 'April 27, 2026',
           ),
-          const SizedBox(height: 20),
+          SizedBox(height: 20),
 
           // Row 4: Scheduled time
-          _buildDetailRow(
+          _buildDetailRow(context, 
             icon: Icons.access_time,
             label: 'Scheduled Time',
             value: '14:00 WAT',
@@ -115,7 +115,7 @@ class DisruptionDetailsCard extends StatelessWidget {
     );
   }
 
-  Widget _buildDetailRow({
+  Widget _buildDetailRow(BuildContext context, {
     required IconData icon,
     required String label,
     required String value,
@@ -124,18 +124,18 @@ class DisruptionDetailsCard extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Container(
-          padding: const EdgeInsets.all(10),
+          padding: EdgeInsets.all(10),
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.06),
+            color: Theme.of(context).colorScheme.outline.withOpacity(0.5),
             shape: BoxShape.circle,
           ),
           child: Icon(
             icon,
-            color: Colors.white70,
+            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
             size: 16,
           ),
         ),
-        const SizedBox(width: 16),
+        SizedBox(width: 16),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -143,15 +143,15 @@ class DisruptionDetailsCard extends StatelessWidget {
               Text(
                 label,
                 style: TextStyle(
-                  color: Colors.white.withOpacity(0.4),
+                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
                   fontSize: 12,
                 ),
               ),
-              const SizedBox(height: 4),
+              SizedBox(height: 4),
               Text(
                 value,
-                style: const TextStyle(
-                  color: Colors.white,
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurface,
                   fontSize: 15,
                   fontWeight: FontWeight.w500,
                 ),

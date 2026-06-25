@@ -9,14 +9,14 @@ class ResolveHeaderGradient extends StatelessWidget {
       children: [
         Container(
           width: double.infinity,
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
-          decoration: const BoxDecoration(
+          padding: EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+          decoration: BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: [
                 Color(0xFFB47C1C), // Warm orange/bronze
-                Color(0xFF0C2B5C), // Dark blue/indigo
+                Theme.of(context).colorScheme.surface, // Dark blue/indigo
               ],
             ),
             borderRadius: BorderRadius.only(
@@ -27,33 +27,33 @@ class ResolveHeaderGradient extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(height: 16),
+              SizedBox(height: 16),
               Row(
                 children: [
                   Container(
-                    padding: const EdgeInsets.all(12),
+                    padding: EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.12),
+                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.12),
                       shape: BoxShape.circle,
                       border: Border.all(
-                        color: Colors.white.withOpacity(0.15),
+                        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.15),
                         width: 1,
                       ),
                     ),
-                    child: const Icon(
+                    child: Icon(
                       Icons.auto_awesome,
-                      color: Colors.white,
+                      color: Theme.of(context).colorScheme.onSurface,
                       size: 24,
                     ),
                   ),
-                  const SizedBox(width: 16),
-                  const Column(
+                  SizedBox(width: 16),
+                  Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
                         'Resolve',
                         style: TextStyle(
-                          color: Colors.white,
+                          color: Theme.of(context).colorScheme.onSurface,
                           fontSize: 26,
                           fontWeight: FontWeight.bold,
                         ),
@@ -62,7 +62,7 @@ class ResolveHeaderGradient extends StatelessWidget {
                       Text(
                         'Guided resolution workflow',
                         style: TextStyle(
-                          color: Colors.white70,
+                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
                           fontSize: 14,
                         ),
                       ),
@@ -70,29 +70,29 @@ class ResolveHeaderGradient extends StatelessWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: 32),
+              SizedBox(height: 32),
               Container(
                 width: double.infinity,
-                padding: const EdgeInsets.all(20),
+                padding: EdgeInsets.all(20),
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [
-                      Colors.white.withOpacity(0.12),
-                      Colors.white.withOpacity(0.04),
+                      Theme.of(context).colorScheme.onSurface.withOpacity(0.12),
+                      Theme.of(context).colorScheme.outline,
                     ],
                   ),
                   borderRadius: BorderRadius.circular(24),
                   border: Border.all(
-                    color: Colors.white.withOpacity(0.15),
+                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.15),
                   ),
                 ),
-                child: const Column(
+                child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       "We'll guide you step-by-step",
                       style: TextStyle(
-                        color: Colors.white,
+                        color: Theme.of(context).colorScheme.onSurface,
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
                       ),
@@ -101,7 +101,7 @@ class ResolveHeaderGradient extends StatelessWidget {
                     Text(
                       'From confirming the disruption to receiving your compensation',
                       style: TextStyle(
-                        color: Colors.white70,
+                        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
                         fontSize: 13,
                         height: 1.4,
                       ),

@@ -80,8 +80,8 @@ class _SearchableBottomSheetState extends State<SearchableBottomSheet> {
   Widget build(BuildContext context) {
     return Container(
       height: MediaQuery.of(context).size.height * 0.85,
-      decoration: const BoxDecoration(
-        color: Color(0xFF0C162A), // Match app card color
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface, // Match app card color
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(24),
           topRight: Radius.circular(24),
@@ -93,7 +93,7 @@ class _SearchableBottomSheetState extends State<SearchableBottomSheet> {
           // Drag Handle
           Center(
             child: Container(
-              margin: const EdgeInsets.only(top: 12, bottom: 16),
+              margin: EdgeInsets.only(top: 12, bottom: 16),
               width: 40,
               height: 4,
               decoration: BoxDecoration(
@@ -105,13 +105,13 @@ class _SearchableBottomSheetState extends State<SearchableBottomSheet> {
 
           // Header
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24),
+            padding: EdgeInsets.symmetric(horizontal: 24),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
                   widget.title,
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: Colors.white,
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
@@ -133,35 +133,35 @@ class _SearchableBottomSheetState extends State<SearchableBottomSheet> {
                   )
                 else
                   IconButton(
-                    icon: const Icon(Icons.close, color: Colors.white54),
+                    icon: Icon(Icons.close, color: Colors.white54),
                     onPressed: () => Navigator.pop(context),
                   ),
               ],
             ),
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: 16),
 
           // Search Field
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24),
+            padding: EdgeInsets.symmetric(horizontal: 24),
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
+              padding: EdgeInsets.symmetric(horizontal: 16),
               decoration: BoxDecoration(
-                color: const Color(0xFF162544), // Slightly lighter for contrast
+                color: Theme.of(context).colorScheme.surface, // Slightly lighter for contrast
                 borderRadius: BorderRadius.circular(16),
               ),
               child: TextField(
                 controller: _searchController,
                 onChanged: _filterItems,
-                style: const TextStyle(color: Colors.white),
+                style: TextStyle(color: Colors.white),
                 decoration: InputDecoration(
-                  icon: const Icon(Icons.search, color: Colors.white54),
+                  icon: Icon(Icons.search, color: Colors.white54),
                   hintText: widget.hintText,
                   hintStyle: TextStyle(color: Colors.white.withOpacity(0.4)),
                   border: InputBorder.none,
                   suffixIcon: _searchController.text.isNotEmpty
                       ? IconButton(
-                          icon: const Icon(Icons.clear, color: Colors.white54),
+                          icon: Icon(Icons.clear, color: Colors.white54),
                           onPressed: () {
                             _searchController.clear();
                             _filterItems('');
@@ -172,7 +172,7 @@ class _SearchableBottomSheetState extends State<SearchableBottomSheet> {
               ),
             ),
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: 16),
 
           // Divider
           Divider(color: Colors.white.withOpacity(0.1), height: 1),
@@ -190,7 +190,7 @@ class _SearchableBottomSheetState extends State<SearchableBottomSheet> {
                     ),
                   )
                 : ListView.builder(
-                    padding: const EdgeInsets.symmetric(vertical: 8),
+                    padding: EdgeInsets.symmetric(vertical: 8),
                     itemCount: _filteredItems.length,
                     itemBuilder: (context, index) {
                       final item = _filteredItems[index];
@@ -199,7 +199,7 @@ class _SearchableBottomSheetState extends State<SearchableBottomSheet> {
                           : false;
 
                       return ListTile(
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 24),
+                        contentPadding: EdgeInsets.symmetric(horizontal: 24),
                         title: Text(
                           item['name'] ?? '',
                           style: TextStyle(

@@ -88,7 +88,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF071B3A),
+      
       body: SafeArea(
         child: SingleChildScrollView(
           keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
@@ -102,14 +102,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const SizedBox(height: 40),
+                SizedBox(height: 40),
                 Center(
                   child: Image.asset(
                     'assets/images/flyredilogo.png',
                     height: 100,
                   ),
                 ),
-                const SizedBox(height: 24),
+                SizedBox(height: 24),
                 const Text(
                   'Create Account',
                   textAlign: TextAlign.center,
@@ -119,7 +119,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                const SizedBox(height: 8),
+                SizedBox(height: 8),
                 const Text(
                   'Get started with FlyRedi',
                   textAlign: TextAlign.center,
@@ -128,7 +128,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     fontSize: 16,
                   ),
                 ),
-                const SizedBox(height: 35),
+                SizedBox(height: 35),
 
                 // Full Name field
                 AuthTextField(
@@ -145,12 +145,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 Obx(() => _nameError.value != null
                     ? Column(
                         children: [
-                          const SizedBox(height: 6),
+                          SizedBox(height: 6),
                           _buildFieldError(_nameError.value!),
                         ],
                       )
-                    : const SizedBox.shrink()),
-                const SizedBox(height: 18),
+                    : SizedBox.shrink()),
+                SizedBox(height: 18),
 
                 // Email field
                 AuthTextField(
@@ -168,12 +168,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 Obx(() => _emailError.value != null
                     ? Column(
                         children: [
-                          const SizedBox(height: 6),
+                          SizedBox(height: 6),
                           _buildFieldError(_emailError.value!),
                         ],
                       )
-                    : const SizedBox.shrink()),
-                const SizedBox(height: 18),
+                    : SizedBox.shrink()),
+                SizedBox(height: 18),
 
                 // Password field
                 AuthTextField(
@@ -189,8 +189,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   enableSuggestions: false,
                   onSubmitted: (_) => _handleRegister(),
                 ),
-                const SizedBox(height: 6),
-                const Padding(
+                SizedBox(height: 6),
+                Padding(
                   padding: EdgeInsets.only(left: 4),
                   child: Text(
                     'Use at least 8 characters with letters and numbers.',
@@ -204,12 +204,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 Obx(() => _passwordError.value != null
                     ? Column(
                         children: [
-                          const SizedBox(height: 6),
+                          SizedBox(height: 6),
                           _buildFieldError(_passwordError.value!),
                         ],
                       )
-                    : const SizedBox.shrink()),
-                const SizedBox(height: 28),
+                    : SizedBox.shrink()),
+                SizedBox(height: 28),
 
                 // Create Account button
                 Obx(() => CustomButton(
@@ -217,7 +217,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       onTap: _authController.isLoading.value ? () {} : _handleRegister,
                       isLoading: _authController.isLoading.value,
                     )),
-                const SizedBox(height: 24),
+                SizedBox(height: 24),
 
                 // Already have account
                 Row(
@@ -239,7 +239,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     ),
                   ],
                 ),
-                const SizedBox(height: 24),
+                SizedBox(height: 24),
               ],
             ),
           ),
@@ -250,19 +250,19 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   Widget _buildFieldError(String message) {
     return Padding(
-      padding: const EdgeInsets.only(left: 4),
+      padding: EdgeInsets.only(left: 4),
       child: Row(
         children: [
-          const Icon(
+          Icon(
             Icons.info_outline_rounded,
             size: 14,
             color: Color(0xFFE11D48),
           ),
-          const SizedBox(width: 6),
+          SizedBox(width: 6),
           Expanded(
             child: Text(
               message,
-              style: const TextStyle(
+              style: TextStyle(
                 color: Color(0xFFE11D48),
                 fontSize: 12,
                 fontWeight: FontWeight.w500,

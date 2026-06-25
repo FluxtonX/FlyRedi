@@ -14,12 +14,12 @@ class FlightMonitorCard extends StatelessWidget {
         );
       },
       child: Container(
-        padding: const EdgeInsets.all(22),
+        padding: EdgeInsets.all(22),
         decoration: BoxDecoration(
-          color: const Color(0xFF10284F),
+          color: Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.circular(30),
           border: Border.all(
-            color: const Color(0xFFFFC229).withOpacity(0.2),
+            color: Theme.of(context).colorScheme.outline,
           ),
         ),
         child: Column(
@@ -29,7 +29,7 @@ class FlightMonitorCard extends StatelessWidget {
             Row(
               // mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Expanded(
+                Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -38,7 +38,7 @@ class FlightMonitorCard extends StatelessWidget {
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
-                          color: Colors.white38,
+                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.38),
                           fontSize: 16,
                         ),
                       ),
@@ -46,7 +46,7 @@ class FlightMonitorCard extends StatelessWidget {
                       Text(
                         'UA 2847',
                         style: TextStyle(
-                          color: Colors.white,
+                          color: Theme.of(context).colorScheme.onSurface,
                           fontSize: 22,
                         ),
                       ),
@@ -54,7 +54,7 @@ class FlightMonitorCard extends StatelessWidget {
                   ),
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(
+                  padding: EdgeInsets.symmetric(
                     horizontal: 18,
                     vertical: 10,
                   ),
@@ -62,7 +62,7 @@ class FlightMonitorCard extends StatelessWidget {
                     color: Colors.black26,
                     borderRadius: BorderRadius.circular(30),
                   ),
-                  child: const Row(
+                  child: Row(
                     children: [
                       Icon(
                         Icons.access_time,
@@ -83,26 +83,26 @@ class FlightMonitorCard extends StatelessWidget {
               ],
             ),
 
-            const SizedBox(height: 26),
+            SizedBox(height: 26),
 
             /// FLIGHT ROUTE
             Container(
-              padding: const EdgeInsets.symmetric(
+              padding: EdgeInsets.symmetric(
                 vertical: 24,
               ),
               decoration: BoxDecoration(
-                color: const Color(0xFF071B3A),
+                color: Theme.of(context).scaffoldBackgroundColor,
                 borderRadius: BorderRadius.circular(24),
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  const Column(
+                  Column(
                     children: [
                       Text(
                         'SFO',
                         style: TextStyle(
-                          color: Colors.white,
+                          color: Theme.of(context).colorScheme.onSurface,
                           fontSize: 28,
                         ),
                       ),
@@ -110,7 +110,7 @@ class FlightMonitorCard extends StatelessWidget {
                       Text(
                         '10:45 AM',
                         style: TextStyle(
-                          color: Colors.white54,
+                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.54),
                           fontSize: 16,
                         ),
                       ),
@@ -118,18 +118,18 @@ class FlightMonitorCard extends StatelessWidget {
                   ),
                   Transform.rotate(
                     angle: -0.8,
-                    child: const Icon(
+                    child: Icon(
                       Icons.flight,
                       color: Color(0xFFFFC229),
                       size: 34,
                     ),
                   ),
-                  const Column(
+                  Column(
                     children: [
                       Text(
                         'JFK',
                         style: TextStyle(
-                          color: Colors.white,
+                          color: Theme.of(context).colorScheme.onSurface,
                           fontSize: 28,
                         ),
                       ),
@@ -137,7 +137,7 @@ class FlightMonitorCard extends StatelessWidget {
                       Text(
                         'Monitoring',
                         style: TextStyle(
-                          color: Colors.white54,
+                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.54),
                           fontSize: 16,
                         ),
                       ),
@@ -147,7 +147,7 @@ class FlightMonitorCard extends StatelessWidget {
               ),
             ),
 
-            const SizedBox(height: 28),
+            SizedBox(height: 28),
 
             /// STATS
             Row(
@@ -156,21 +156,21 @@ class FlightMonitorCard extends StatelessWidget {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
+                    Text(
                       'Delay Probability',
                       style: TextStyle(
-                        color: Colors.white54,
+                        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.54),
                         fontSize: 16,
                       ),
                     ),
-                    const SizedBox(height: 14),
+                    SizedBox(height: 14),
                     Row(
                       children: [
                         Container(
                           width: 120,
                           height: 8,
                           decoration: BoxDecoration(
-                            color: Colors.blueGrey,
+                            color: Colors.blueGrey.withOpacity(0.3),
                             borderRadius: BorderRadius.circular(
                               20,
                             ),
@@ -190,11 +190,11 @@ class FlightMonitorCard extends StatelessWidget {
                             ),
                           ),
                         ),
-                        const SizedBox(width: 14),
-                        const Text(
+                        SizedBox(width: 14),
+                        Text(
                           '68%',
                           style: TextStyle(
-                            color: Colors.white,
+                            color: Theme.of(context).colorScheme.onSurface,
                             fontSize: 18,
                           ),
                         ),
@@ -202,12 +202,12 @@ class FlightMonitorCard extends StatelessWidget {
                     ),
                   ],
                 ),
-                const Column(
+                Column(
                   children: [
                     Text(
                       'Active Alerts',
                       style: TextStyle(
-                        color: Colors.white54,
+                        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.54),
                         fontSize: 16,
                       ),
                     ),
@@ -215,7 +215,7 @@ class FlightMonitorCard extends StatelessWidget {
                     Text(
                       '2',
                       style: TextStyle(
-                        color: Colors.white,
+                        color: Theme.of(context).colorScheme.onSurface,
                         fontSize: 34,
                       ),
                     ),
@@ -224,12 +224,12 @@ class FlightMonitorCard extends StatelessWidget {
               ],
             ),
 
-            const SizedBox(height: 28),
+            SizedBox(height: 28),
 
-            const Text(
+            Text(
               'May 15, 2026',
               style: TextStyle(
-                color: Colors.white54,
+                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.54),
                 fontSize: 16,
               ),
             ),

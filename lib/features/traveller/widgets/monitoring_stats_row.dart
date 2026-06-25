@@ -19,26 +19,26 @@ class MonitoringStatsRow extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Expanded(
-            child: _buildStatCard(
+            child: _buildStatCard(context, 
               alertsCount.toString(),
               'Active\nAlerts',
               const Color(0xFFFFC229),
             ),
           ),
-          const SizedBox(width: 18),
+          SizedBox(width: 18),
           Expanded(
-            child: _buildStatCard(
+            child: _buildStatCard(context, 
               totalSavings,
               'Total\nSavings',
               const Color(0xFF2DD4BF),
             ),
           ),
-          const SizedBox(width: 18),
+          SizedBox(width: 18),
           Expanded(
-            child: _buildStatCard(
+            child: _buildStatCard(context, 
               casesCount.toString(),
               'Active\nClaims',
-              Colors.white,
+              Theme.of(context).colorScheme.onSurface,
             ),
           ),
         ],
@@ -46,20 +46,20 @@ class MonitoringStatsRow extends StatelessWidget {
     );
   }
 
-  Widget _buildStatCard(
+  Widget _buildStatCard(BuildContext context, 
     String number,
     String title,
     Color numberColor,
   ) {
     return Container(
-      padding: const EdgeInsets.symmetric(
+      padding: EdgeInsets.symmetric(
         vertical: 26,
       ),
       decoration: BoxDecoration(
-        color: const Color(0xFF10284F),
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(28),
         border: Border.all(
-          color: Colors.white.withOpacity(0.08),
+          color: Theme.of(context).colorScheme.outline,
         ),
       ),
       child: Column(
@@ -73,12 +73,12 @@ class MonitoringStatsRow extends StatelessWidget {
               fontWeight: FontWeight.bold,
             ),
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: 16),
           Text(
             title,
             textAlign: TextAlign.center,
-            style: const TextStyle(
-              color: Colors.white54,
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.54),
               fontSize: 18,
               height: 1.5,
             ),

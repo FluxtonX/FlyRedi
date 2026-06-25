@@ -6,7 +6,7 @@ import '../../../../core/widgets/searchable_bottom_sheet.dart';
 import '../widgets/traveller_bottom_nav.dart';
 
 class BorderReadyScreen extends StatefulWidget {
-  const BorderReadyScreen({super.key});
+  BorderReadyScreen({super.key});
 
   @override
   State<BorderReadyScreen> createState() => _BorderReadyScreenState();
@@ -109,11 +109,11 @@ class _BorderReadyScreenState extends State<BorderReadyScreen> {
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
-            colorScheme: const ColorScheme.dark(
+            colorScheme: ColorScheme.dark(
               primary: AppColors.primary,
               onPrimary: Colors.black,
-              surface: Color(0xFF0C162A),
-              onSurface: Colors.white,
+              surface: Theme.of(context).colorScheme.surface,
+              onSurface: Theme.of(context).colorScheme.onSurface,
             ),
           ),
           child: child!,
@@ -130,30 +130,30 @@ class _BorderReadyScreenState extends State<BorderReadyScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          icon: Icon(Icons.arrow_back, color: Theme.of(context).colorScheme.onSurface),
           onPressed: () => Navigator.pop(context),
         ),
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
+            Text(
               'BorderReady™',
               style: TextStyle(
-                color: Colors.white,
+                color: Theme.of(context).colorScheme.onSurface,
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
               ),
             ),
-            const SizedBox(height: 6),
+            SizedBox(height: 6),
             Text(
               'IATA Timatic-grade AI — visa, transit, health &\npassport compliance.',
               style: TextStyle(
-                color: Colors.white.withOpacity(0.5),
+                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
                 fontSize: 12,
                 height: 1.4,
               ),
@@ -164,15 +164,15 @@ class _BorderReadyScreenState extends State<BorderReadyScreen> {
         titleSpacing: 0,
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+        padding: EdgeInsets.symmetric(horizontal: 24, vertical: 16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             // Top Grid
             Container(
-              padding: const EdgeInsets.all(20),
+              padding: EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: const Color(0xFF0C162A),
+                color: Theme.of(context).colorScheme.surface,
                 borderRadius: BorderRadius.circular(24),
               ),
               child: Column(
@@ -187,7 +187,7 @@ class _BorderReadyScreenState extends State<BorderReadyScreen> {
                           subtitle: 'Real-time eligibility',
                         ),
                       ),
-                      const SizedBox(width: 16),
+                      SizedBox(width: 16),
                       Expanded(
                         child: _buildGridItem(
                           icon: Icons.flight_takeoff,
@@ -197,7 +197,7 @@ class _BorderReadyScreenState extends State<BorderReadyScreen> {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 24),
+                  SizedBox(height: 24),
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -208,7 +208,7 @@ class _BorderReadyScreenState extends State<BorderReadyScreen> {
                           subtitle: 'COVID & vaccination',
                         ),
                       ),
-                      const SizedBox(width: 16),
+                      SizedBox(width: 16),
                       Expanded(
                         child: _buildGridItem(
                           icon: Icons.description_outlined,
@@ -222,7 +222,7 @@ class _BorderReadyScreenState extends State<BorderReadyScreen> {
               ),
             ),
 
-            const SizedBox(height: 24),
+            SizedBox(height: 24),
 
             // Action Cards
             _buildActionCard(
@@ -231,7 +231,7 @@ class _BorderReadyScreenState extends State<BorderReadyScreen> {
               subtitle: 'Send booking to ai@borderready.app',
               onTap: () => _showEmailDialog(context),
             ),
-            const SizedBox(height: 12),
+            SizedBox(height: 12),
             _buildActionCard(
               icon: Icons.document_scanner_outlined,
               title: 'Scan passport or visa',
@@ -239,11 +239,11 @@ class _BorderReadyScreenState extends State<BorderReadyScreen> {
               onTap: () => _showScanDialog(context),
             ),
 
-            const SizedBox(height: 32),
+            SizedBox(height: 32),
 
             // TRIP DETAILS SECTION
             _buildSectionTitle('TRIP DETAILS'),
-            const SizedBox(height: 16),
+            SizedBox(height: 16),
             _buildDropdownField(
               label: 'NATIONALITY',
               hint: 'Select country',
@@ -251,7 +251,7 @@ class _BorderReadyScreenState extends State<BorderReadyScreen> {
               value: _nationality?['name'],
               onTap: () => _showCountrySelection('Select Nationality', (val) => setState(() => _nationality = val)),
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: 16),
             _buildDropdownField(
               label: 'COUNTRY OF RESIDENCE',
               hint: 'Where you live',
@@ -259,7 +259,7 @@ class _BorderReadyScreenState extends State<BorderReadyScreen> {
               value: _residence?['name'],
               onTap: () => _showCountrySelection('Select Residence', (val) => setState(() => _residence = val)),
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: 16),
             _buildDropdownField(
               label: 'DESTINATION',
               hint: 'Final destination',
@@ -267,7 +267,7 @@ class _BorderReadyScreenState extends State<BorderReadyScreen> {
               value: _destination?['name'],
               onTap: () => _showCountrySelection('Select Destination', (val) => setState(() => _destination = val)),
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: 16),
             _buildMultiSelectDropdownField(
               label: 'TRANSIT COUNTRIES',
               hint: 'Add layover countries',
@@ -280,7 +280,7 @@ class _BorderReadyScreenState extends State<BorderReadyScreen> {
                 });
               },
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: 16),
             _buildDropdownField(
               label: 'AIRLINE / CARRIER',
               hint: 'e.g., Emirates, Lufthansa',
@@ -288,7 +288,7 @@ class _BorderReadyScreenState extends State<BorderReadyScreen> {
               value: _airline?['name'],
               onTap: _showAirlineSelection,
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: 16),
             _buildDropdownField(
               label: 'PASSPORT EXPIRY',
               hint: 'MM/YYYY',
@@ -298,7 +298,7 @@ class _BorderReadyScreenState extends State<BorderReadyScreen> {
                   : null,
               onTap: () => _selectDate(context),
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: 16),
             _buildTextField(
               label: 'STAY DURATION',
               hint: 'Number of days',
@@ -307,24 +307,24 @@ class _BorderReadyScreenState extends State<BorderReadyScreen> {
               keyboardType: TextInputType.number,
             ),
 
-            const SizedBox(height: 32),
+            SizedBox(height: 32),
 
             // EXISTING DOCUMENTS SECTION
             _buildSectionTitle('EXISTING DOCUMENTS'),
-            const SizedBox(height: 16),
+            SizedBox(height: 16),
             _buildSwitchRow('Has return ticket', _hasReturnTicket, (val) => setState(() => _hasReturnTicket = val)),
-            const SizedBox(height: 12),
+            SizedBox(height: 12),
             _buildSwitchRow('Has proof of funds', _hasProofOfFunds, (val) => setState(() => _hasProofOfFunds = val)),
-            const SizedBox(height: 12),
+            SizedBox(height: 12),
             _buildSwitchRow('Travelling with a minor', _travellingWithMinor, (val) => setState(() => _travellingWithMinor = val)),
-            const SizedBox(height: 12),
+            SizedBox(height: 12),
             _buildSwitchRow('Already has visa', _alreadyHasVisa, (val) => setState(() => _alreadyHasVisa = val)),
 
-            const SizedBox(height: 32),
+            SizedBox(height: 32),
 
             // PET TRAVEL SECTION
             _buildSectionTitle('PET TRAVEL'),
-            const SizedBox(height: 16),
+            SizedBox(height: 16),
             _buildSwitchRow(
               'Travelling with pet',
               _travellingWithPet,
@@ -332,21 +332,21 @@ class _BorderReadyScreenState extends State<BorderReadyScreen> {
               activeTrackColor: const Color(0xFF10B981), // Green track
             ),
             if (_travellingWithPet) ...[
-              const SizedBox(height: 16),
+              SizedBox(height: 16),
               _buildTextField(
                 label: 'PET TYPE',
                 hint: 'Dog, Cat, etc.',
                 icon: Icons.favorite_border,
                 controller: _petTypeController,
               ),
-              const SizedBox(height: 16),
+              SizedBox(height: 16),
               _buildTextField(
                 label: 'BREED',
                 hint: 'Breed name',
                 icon: Icons.favorite_border,
                 controller: _breedController,
               ),
-              const SizedBox(height: 16),
+              SizedBox(height: 16),
               _buildTextField(
                 label: 'PET AGE',
                 hint: 'Age in years',
@@ -354,13 +354,13 @@ class _BorderReadyScreenState extends State<BorderReadyScreen> {
                 controller: _petAgeController,
                 keyboardType: TextInputType.number,
               ),
-              const SizedBox(height: 16),
+              SizedBox(height: 16),
               _buildSwitchRow('Has required vaccinations', _hasRequiredVaccinations, (val) => setState(() => _hasRequiredVaccinations = val)),
-              const SizedBox(height: 12),
+              SizedBox(height: 12),
               _buildSwitchRow('Has microchip', _hasMicrochip, (val) => setState(() => _hasMicrochip = val)),
             ],
 
-            const SizedBox(height: 40),
+            SizedBox(height: 40),
 
             // Run Check Button
             GestureDetector(
@@ -369,19 +369,19 @@ class _BorderReadyScreenState extends State<BorderReadyScreen> {
               },
               child: Container(
                 width: double.infinity,
-                padding: const EdgeInsets.symmetric(vertical: 18),
+                padding: EdgeInsets.symmetric(vertical: 18),
                 decoration: BoxDecoration(
                   color: const Color(0xFFFFC229),
                   borderRadius: BorderRadius.circular(16),
                   boxShadow: [
                     BoxShadow(
-                      color: const Color(0xFFFFC229).withOpacity(0.2),
+                      color: Color(0xFFFFC229).withOpacity(0.2),
                       blurRadius: 20,
                       offset: const Offset(0, 4),
                     ),
                   ],
                 ),
-                child: const Row(
+                child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Icon(
@@ -402,7 +402,7 @@ class _BorderReadyScreenState extends State<BorderReadyScreen> {
                 ),
               ),
             ),
-            const SizedBox(height: 32),
+            SizedBox(height: 32),
           ],
         ),
       ),
@@ -415,20 +415,20 @@ class _BorderReadyScreenState extends State<BorderReadyScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Icon(icon, color: const Color(0xFF3B82F6), size: 22), 
-        const SizedBox(height: 12),
+        SizedBox(height: 12),
         Text(
           title,
-          style: const TextStyle(
-            color: Colors.white,
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.onSurface,
             fontSize: 13,
             fontWeight: FontWeight.bold,
           ),
         ),
-        const SizedBox(height: 4),
+        SizedBox(height: 4),
         Text(
           subtitle,
           style: TextStyle(
-            color: Colors.white54,
+            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.54),
             fontSize: 11,
           ),
         ),
@@ -440,50 +440,50 @@ class _BorderReadyScreenState extends State<BorderReadyScreen> {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.all(16),
+        padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFF0C162A),
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: const Color(0xFFFFC229).withOpacity(0.15),
+          color: Color(0xFFFFC229).withOpacity(0.15),
         ),
       ),
       child: Row(
         children: [
           Container(
-            padding: const EdgeInsets.all(10),
+            padding: EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.05),
+              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.05),
               shape: BoxShape.circle,
             ),
             child: Icon(icon, color: const Color(0xFFFFC229), size: 20),
           ),
-          const SizedBox(width: 16),
+          SizedBox(width: 16),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   title,
-                  style: const TextStyle(
-                    color: Colors.white,
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurface,
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                const SizedBox(height: 4),
+                SizedBox(height: 4),
                 Text(
                   subtitle,
                   style: TextStyle(
-                    color: Colors.white.withOpacity(0.5),
+                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
                     fontSize: 12,
                   ),
                 ),
               ],
             ),
           ),
-          const SizedBox(width: 8),
-          const Icon(Icons.auto_awesome, color: Color(0xFFFFC229), size: 16),
+          SizedBox(width: 8),
+          Icon(Icons.auto_awesome, color: Color(0xFFFFC229), size: 16),
         ],
       ),
     ),
@@ -493,8 +493,8 @@ class _BorderReadyScreenState extends State<BorderReadyScreen> {
   Widget _buildSectionTitle(String title) {
     return Text(
       title,
-      style: const TextStyle(
-        color: Colors.white54,
+      style: TextStyle(
+        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.54),
         fontSize: 12,
         fontWeight: FontWeight.bold,
         letterSpacing: 1.2,
@@ -514,37 +514,37 @@ class _BorderReadyScreenState extends State<BorderReadyScreen> {
       children: [
         Text(
           label,
-          style: const TextStyle(
-            color: Colors.white54,
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.54),
             fontSize: 11,
             fontWeight: FontWeight.bold,
             letterSpacing: 0.5,
           ),
         ),
-        const SizedBox(height: 8),
+        SizedBox(height: 8),
         GestureDetector(
           onTap: onTap,
           child: Container(
             width: double.infinity,
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
             decoration: BoxDecoration(
-              color: const Color(0xFF0C162A),
+              color: Theme.of(context).colorScheme.surface,
               borderRadius: BorderRadius.circular(16),
             ),
             child: Row(
               children: [
-                Icon(icon, color: Colors.white54, size: 20),
-                const SizedBox(width: 16),
+                Icon(icon, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.54), size: 20),
+                SizedBox(width: 16),
                 Expanded(
                   child: Text(
                     value ?? hint,
                     style: TextStyle(
-                      color: value != null ? Colors.white : Colors.white.withOpacity(0.3),
+                      color: value != null ? Colors.white : Theme.of(context).colorScheme.onSurface.withOpacity(0.3),
                       fontSize: 14,
                     ),
                   ),
                 ),
-                const Icon(Icons.arrow_drop_down, color: Colors.white54),
+                Icon(Icons.arrow_drop_down, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.54)),
               ],
             ),
           ),
@@ -566,33 +566,33 @@ class _BorderReadyScreenState extends State<BorderReadyScreen> {
       children: [
         Text(
           label,
-          style: const TextStyle(
-            color: Colors.white54,
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.54),
             fontSize: 11,
             fontWeight: FontWeight.bold,
             letterSpacing: 0.5,
           ),
         ),
-        const SizedBox(height: 8),
+        SizedBox(height: 8),
         GestureDetector(
           onTap: onTap,
           child: Container(
             width: double.infinity,
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             decoration: BoxDecoration(
-              color: const Color(0xFF0C162A),
+              color: Theme.of(context).colorScheme.surface,
               borderRadius: BorderRadius.circular(16),
             ),
             child: Row(
               children: [
-                Icon(icon, color: Colors.white54, size: 20),
-                const SizedBox(width: 16),
+                Icon(icon, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.54), size: 20),
+                SizedBox(width: 16),
                 Expanded(
                   child: selectedItems.isEmpty
                       ? Text(
                           hint,
                           style: TextStyle(
-                            color: Colors.white.withOpacity(0.3),
+                            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3),
                             fontSize: 14,
                           ),
                         )
@@ -603,17 +603,17 @@ class _BorderReadyScreenState extends State<BorderReadyScreen> {
                             return Chip(
                               label: Text(
                                 item['name'] ?? '',
-                                style: const TextStyle(color: Colors.white, fontSize: 12),
+                                style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 12),
                               ),
-                              backgroundColor: const Color(0xFF162544),
-                              deleteIconColor: Colors.white54,
+                              backgroundColor: Theme.of(context).colorScheme.surface,
+                              deleteIconColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.54),
                               onDeleted: () => onRemove(item),
                               materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                             );
                           }).toList(),
                         ),
                 ),
-                const Icon(Icons.arrow_drop_down, color: Colors.white54),
+                Icon(Icons.arrow_drop_down, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.54)),
               ],
             ),
           ),
@@ -634,28 +634,28 @@ class _BorderReadyScreenState extends State<BorderReadyScreen> {
       children: [
         Text(
           label,
-          style: const TextStyle(
-            color: Colors.white54,
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.54),
             fontSize: 11,
             fontWeight: FontWeight.bold,
             letterSpacing: 0.5,
           ),
         ),
-        const SizedBox(height: 8),
+        SizedBox(height: 8),
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+          padding: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
           decoration: BoxDecoration(
-            color: const Color(0xFF0C162A),
+            color: Theme.of(context).colorScheme.surface,
             borderRadius: BorderRadius.circular(16),
           ),
           child: TextFormField(
             controller: controller,
             keyboardType: keyboardType,
-            style: const TextStyle(color: Colors.white, fontSize: 14),
+            style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 14),
             decoration: InputDecoration(
-              icon: Icon(icon, color: Colors.white54, size: 20),
+              icon: Icon(icon, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.54), size: 20),
               hintText: hint,
-              hintStyle: TextStyle(color: Colors.white.withOpacity(0.3), fontSize: 14),
+              hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3), fontSize: 14),
               border: InputBorder.none,
             ),
           ),
@@ -666,9 +666,9 @@ class _BorderReadyScreenState extends State<BorderReadyScreen> {
 
   Widget _buildSwitchRow(String label, bool value, ValueChanged<bool> onChanged, {Color? activeColor, Color? activeTrackColor}) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 8),
       decoration: BoxDecoration(
-        color: const Color(0xFF0C162A),
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
       ),
       child: Row(
@@ -676,18 +676,18 @@ class _BorderReadyScreenState extends State<BorderReadyScreen> {
         children: [
           Text(
             label,
-            style: const TextStyle(
-              color: Colors.white,
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.onSurface,
               fontSize: 14,
             ),
           ),
           Switch(
             value: value,
             onChanged: onChanged,
-            activeColor: activeColor ?? Colors.white,
-            activeTrackColor: activeTrackColor ?? Colors.white,
-            inactiveThumbColor: Colors.white,
-            inactiveTrackColor: Colors.white.withOpacity(0.2),
+            activeColor: activeColor ?? Theme.of(context).colorScheme.onSurface,
+            activeTrackColor: activeTrackColor ?? Theme.of(context).colorScheme.onSurface,
+            inactiveThumbColor: Theme.of(context).colorScheme.onSurface,
+            inactiveTrackColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.2),
           ),
         ],
       ),
@@ -699,14 +699,14 @@ class _BorderReadyScreenState extends State<BorderReadyScreen> {
       context: context,
       builder: (context) {
         return Dialog(
-          backgroundColor: const Color(0xFF0C162A),
+          backgroundColor: Theme.of(context).colorScheme.surface,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(24),
-            side: BorderSide(color: Colors.white.withOpacity(0.08)),
+            side: BorderSide(color: Theme.of(context).colorScheme.outline),
           ),
-          insetPadding: const EdgeInsets.symmetric(horizontal: 24),
+          insetPadding: EdgeInsets.symmetric(horizontal: 24),
           child: Padding(
-            padding: const EdgeInsets.all(24),
+            padding: EdgeInsets.all(24),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -714,62 +714,62 @@ class _BorderReadyScreenState extends State<BorderReadyScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text(
+                    Text(
                       'Paste flight confirmation email',
                       style: TextStyle(
-                        color: Colors.white,
+                        color: Theme.of(context).colorScheme.onSurface,
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                     GestureDetector(
                       onTap: () => Navigator.pop(context),
-                      child: const Icon(Icons.close, color: Colors.white54, size: 20),
+                      child: Icon(Icons.close, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.54), size: 20),
                     ),
                   ],
                 ),
-                const SizedBox(height: 20),
+                SizedBox(height: 20),
                 Container(
                   height: 160,
-                  padding: const EdgeInsets.all(16),
+                  padding: EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF071120),
+                    color: Theme.of(context).colorScheme.surface,
                     borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: Colors.white.withOpacity(0.08)),
+                    border: Border.all(color: Theme.of(context).colorScheme.outline),
                   ),
                   child: TextFormField(
                     maxLines: null,
-                    style: const TextStyle(color: Colors.white, fontSize: 14),
+                    style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 14),
                     decoration: InputDecoration(
                       hintText: 'Copy and paste your airline confirmation\nemail here (subject line + full body)...',
-                      hintStyle: TextStyle(color: Colors.white.withOpacity(0.3), fontSize: 14, height: 1.4),
+                      hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3), fontSize: 14, height: 1.4),
                       border: InputBorder.none,
                       isDense: true,
                     ),
                   ),
                 ),
-                const SizedBox(height: 24),
+                SizedBox(height: 24),
                 Row(
                   children: [
                     Expanded(
                       child: GestureDetector(
                         onTap: () => Navigator.pop(context),
                         child: Container(
-                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          padding: EdgeInsets.symmetric(vertical: 14),
                           decoration: BoxDecoration(
                             color: Colors.transparent,
                             borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: Colors.white.withOpacity(0.2)),
+                            border: Border.all(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.2)),
                           ),
                           alignment: Alignment.center,
-                          child: const Text(
+                          child: Text(
                             'Cancel',
-                            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                            style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.bold),
                           ),
                         ),
                       ),
                     ),
-                    const SizedBox(width: 12),
+                    SizedBox(width: 12),
                     Expanded(
                       flex: 2,
                       child: GestureDetector(
@@ -777,19 +777,19 @@ class _BorderReadyScreenState extends State<BorderReadyScreen> {
                           Navigator.pop(context);
                         },
                         child: Container(
-                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          padding: EdgeInsets.symmetric(vertical: 14),
                           decoration: BoxDecoration(
                             color: const Color(0xFFFFC229),
                             borderRadius: BorderRadius.circular(12),
                             boxShadow: [
                               BoxShadow(
-                                color: const Color(0xFFFFC229).withOpacity(0.2),
+                                color: Color(0xFFFFC229).withOpacity(0.2),
                                 blurRadius: 12,
                                 offset: const Offset(0, 4),
                               ),
                             ],
                           ),
-                          child: const Row(
+                          child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Icon(Icons.auto_awesome, color: Colors.black, size: 16),
@@ -818,14 +818,14 @@ class _BorderReadyScreenState extends State<BorderReadyScreen> {
       context: context,
       builder: (context) {
         return Dialog(
-          backgroundColor: const Color(0xFF0C162A),
+          backgroundColor: Theme.of(context).colorScheme.surface,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(24),
-            side: BorderSide(color: Colors.white.withOpacity(0.08)),
+            side: BorderSide(color: Theme.of(context).colorScheme.outline),
           ),
-          insetPadding: const EdgeInsets.symmetric(horizontal: 24),
+          insetPadding: EdgeInsets.symmetric(horizontal: 24),
           child: Padding(
-            padding: const EdgeInsets.all(24),
+            padding: EdgeInsets.all(24),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -833,10 +833,10 @@ class _BorderReadyScreenState extends State<BorderReadyScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text(
+                    Text(
                       'SCAN TRAVEL DOCUMENT',
                       style: TextStyle(
-                        color: Colors.white54,
+                        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.54),
                         fontSize: 12,
                         fontWeight: FontWeight.bold,
                         letterSpacing: 1.2,
@@ -844,74 +844,74 @@ class _BorderReadyScreenState extends State<BorderReadyScreen> {
                     ),
                     GestureDetector(
                       onTap: () => Navigator.pop(context),
-                      child: const Icon(Icons.close, color: Colors.white54, size: 20),
+                      child: Icon(Icons.close, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.54), size: 20),
                     ),
                   ],
                 ),
-                const SizedBox(height: 20),
+                SizedBox(height: 20),
                 Container(
-                  padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 16),
+                  padding: EdgeInsets.symmetric(vertical: 32, horizontal: 16),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF071120),
+                    color: Theme.of(context).colorScheme.surface,
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(
-                      color: const Color(0xFFFFC229).withOpacity(0.3),
+                      color: Color(0xFFFFC229).withOpacity(0.3),
                     ),
                   ),
                   child: Column(
                     children: [
                       Container(
-                        padding: const EdgeInsets.all(12),
+                        padding: EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.05),
+                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.05),
                           shape: BoxShape.circle,
                         ),
-                        child: const Icon(Icons.upload_file, color: Colors.white54, size: 24),
+                        child: Icon(Icons.upload_file, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.54), size: 24),
                       ),
-                      const SizedBox(height: 16),
-                      const Text(
+                      SizedBox(height: 16),
+                      Text(
                         'Tap or drag passport/visa image',
-                        style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold),
+                        style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 14, fontWeight: FontWeight.bold),
                       ),
-                      const SizedBox(height: 8),
+                      SizedBox(height: 8),
                       Text(
                         'JPG, PNG, or PDF — max 10MB',
-                        style: TextStyle(color: Colors.white.withOpacity(0.4), fontSize: 11),
+                        style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4), fontSize: 11),
                       ),
                     ],
                   ),
                 ),
-                const SizedBox(height: 24),
+                SizedBox(height: 24),
                 GestureDetector(
                   onTap: () {
                     Navigator.pop(context);
                   },
                   child: Container(
-                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    padding: EdgeInsets.symmetric(vertical: 16),
                     decoration: BoxDecoration(
                       color: const Color(0xFFFFC229),
                       borderRadius: BorderRadius.circular(12),
                       boxShadow: [
                         BoxShadow(
-                          color: const Color(0xFFFFC229).withOpacity(0.2),
+                          color: Color(0xFFFFC229).withOpacity(0.2),
                           blurRadius: 12,
                           offset: const Offset(0, 4),
                         ),
                       ],
                     ),
                     alignment: Alignment.center,
-                    child: const Text(
+                    child: Text(
                       'Scan & Auto-Fill',
                       style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 15),
                     ),
                   ),
                 ),
-                const SizedBox(height: 16),
+                SizedBox(height: 16),
                 Text(
                   'Uses AI to extract name, dates, and passport info — data is not stored',
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    color: Colors.white.withOpacity(0.4),
+                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
                     fontSize: 10,
                   ),
                 ),

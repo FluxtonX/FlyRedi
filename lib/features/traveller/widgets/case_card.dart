@@ -34,32 +34,32 @@ class CaseCard extends StatelessWidget {
     switch (status) {
       case CaseStatus.inProgress:
         badgeColor = const Color(0xFFFFC229);
-        badgeBgColor = const Color(0xFF2A2016);
+        badgeBgColor = Theme.of(context).colorScheme.surface;
         badgeText = 'IN PROGRESS';
         trailingIcon = Icons.access_time;
         break;
       case CaseStatus.pending:
         badgeColor = const Color(0xFFF97316); // Orange
-        badgeBgColor = const Color(0xFF2D1F17);
+        badgeBgColor = Theme.of(context).colorScheme.surface;
         badgeText = 'PENDING';
         trailingIcon = Icons.description_outlined;
         break;
       case CaseStatus.completed:
         badgeColor = const Color(0xFF10B981); // Green
-        badgeBgColor = const Color(0xFF0F2D24);
+        badgeBgColor = Theme.of(context).colorScheme.surface;
         badgeText = 'COMPLETED';
         trailingIcon = Icons.check_circle_outline;
         break;
     }
 
     return Container(
-      padding: const EdgeInsets.all(22),
-      margin: const EdgeInsets.only(bottom: 18),
+      padding: EdgeInsets.all(22),
+      margin: EdgeInsets.only(bottom: 18),
       decoration: BoxDecoration(
-        color: const Color(0xFF0C162A), // Dark blue card background
+        color: Theme.of(context).colorScheme.surface, // Dark blue card background
         borderRadius: BorderRadius.circular(26),
         border: Border.all(
-          color: Colors.white.withOpacity(0.05),
+          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.05),
         ),
       ),
       child: Column(
@@ -72,15 +72,15 @@ class CaseCard extends StatelessWidget {
                 children: [
                   Text(
                     flightCode,
-                    style: const TextStyle(
-                      color: Colors.white,
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurface,
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  const SizedBox(width: 12),
+                  SizedBox(width: 12),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                     decoration: BoxDecoration(
                       color: badgeBgColor,
                       borderRadius: BorderRadius.circular(8),
@@ -108,15 +108,15 @@ class CaseCard extends StatelessWidget {
                 ),
             ],
           ),
-          const SizedBox(height: 8),
+          SizedBox(height: 8),
           Text(
             '$airline • $disruptionType',
             style: TextStyle(
-              color: Colors.white.withOpacity(0.5),
+              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
               fontSize: 14,
             ),
           ),
-          const SizedBox(height: 20),
+          SizedBox(height: 20),
           
           if (status == CaseStatus.inProgress) ...[
             Row(
@@ -125,31 +125,31 @@ class CaseCard extends StatelessWidget {
                 Text(
                   stepText ?? '',
                   style: TextStyle(
-                    color: Colors.white.withOpacity(0.4),
+                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
                     fontSize: 13,
                   ),
                 ),
                 Text(
                   '${(progress * 100).toInt()}%',
-                  style: const TextStyle(
-                    color: Colors.white,
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurface,
                     fontSize: 13,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 10),
+            SizedBox(height: 10),
             ClipRRect(
               borderRadius: BorderRadius.circular(10),
               child: LinearProgressIndicator(
                 value: progress,
-                backgroundColor: const Color(0xFF08101E),
+                backgroundColor: Theme.of(context).colorScheme.surface,
                 valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFFFFC229)),
                 minHeight: 6,
               ),
             ),
-            const SizedBox(height: 20),
+            SizedBox(height: 20),
             _buildButton(
               context,
               'Continue',
@@ -178,12 +178,12 @@ class CaseCard extends StatelessWidget {
             ),
           ] else if (status == CaseStatus.completed) ...[
             Container(
-              padding: const EdgeInsets.all(18),
+              padding: EdgeInsets.all(18),
               decoration: BoxDecoration(
-                color: const Color(0xFF08101E),
+                color: Theme.of(context).colorScheme.surface,
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(
-                  color: Colors.white.withOpacity(0.04),
+                  color: Theme.of(context).colorScheme.outline,
                 ),
               ),
               child: Row(
@@ -195,15 +195,15 @@ class CaseCard extends StatelessWidget {
                       Text(
                         'Resolution',
                         style: TextStyle(
-                          color: Colors.white.withOpacity(0.4),
+                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
                           fontSize: 12,
                         ),
                       ),
-                      const SizedBox(height: 4),
-                      const Text(
+                      SizedBox(height: 4),
+                      Text(
                         'Compensation Received',
                         style: TextStyle(
-                          color: Colors.white,
+                          color: Theme.of(context).colorScheme.onSurface,
                           fontSize: 14,
                           fontWeight: FontWeight.w500,
                         ),
@@ -212,7 +212,7 @@ class CaseCard extends StatelessWidget {
                   ),
                   Text(
                     compensationAmount ?? '',
-                    style: const TextStyle(
+                    style: TextStyle(
                       color: Color(0xFF10B981),
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -232,7 +232,7 @@ class CaseCard extends StatelessWidget {
       onTap: onPressed,
       child: Container(
         width: double.infinity,
-        padding: const EdgeInsets.symmetric(vertical: 14),
+        padding: EdgeInsets.symmetric(vertical: 14),
         decoration: BoxDecoration(
           color: const Color(0xFFFFC229), // Brand yellow
           borderRadius: BorderRadius.circular(16),
@@ -243,14 +243,14 @@ class CaseCard extends StatelessWidget {
           children: [
             Text(
               text,
-              style: const TextStyle(
+              style: TextStyle(
                 color: Colors.black,
                 fontSize: 15,
                 fontWeight: FontWeight.bold,
               ),
             ),
-            const SizedBox(width: 8),
-            const Icon(
+            SizedBox(width: 8),
+            Icon(
               Icons.chevron_right,
               color: Colors.black,
               size: 18,

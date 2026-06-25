@@ -14,43 +14,43 @@ class RecommendedActionsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (isEmpty) return const SizedBox.shrink();
+    if (isEmpty) return SizedBox.shrink();
 
     return Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            _buildHeader(),
-            const SizedBox(height: 24),
+            _buildHeader(context),
+            SizedBox(height: 24),
             _buildMainCard(context),
           ],
         );
   }
 
-  Widget _buildHeader() {
+  Widget _buildHeader(BuildContext context) {
     return Row(
       children: [
         Container(
           width: 54,
           height: 54,
           decoration: BoxDecoration(
-            color: const Color(0xFF1E1E2C),
+            color: Theme.of(context).colorScheme.surface,
             borderRadius: BorderRadius.circular(18),
           ),
-          child: const Icon(
+          child: Icon(
             Icons.auto_awesome,
             color: Color(0xFFFFC229),
             size: 28,
           ),
         ),
-        const SizedBox(width: 16),
-        const Expanded(
+        SizedBox(width: 16),
+        Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
                 'Recommended Actions',
                 style: TextStyle(
-                  color: Colors.white,
+                  color: Theme.of(context).colorScheme.onSurface,
                   fontSize: 21,
                   fontWeight: FontWeight.bold,
                 ),
@@ -59,7 +59,7 @@ class RecommendedActionsCard extends StatelessWidget {
               Text(
                 'AI-powered guidance',
                 style: TextStyle(
-                  color: Colors.white54,
+                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.54),
                   fontSize: 15,
                 ),
               ),
@@ -72,12 +72,12 @@ class RecommendedActionsCard extends StatelessWidget {
 
   Widget _buildMainCard(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(24),
+      padding: EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: const Color(0xFF101B30),
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(30),
         border: Border.all(
-          color: const Color(0xFFE11D48).withOpacity(0.3),
+          color: Color(0xFFE11D48).withOpacity(0.3),
           width: 1,
         ),
       ),
@@ -87,19 +87,19 @@ class RecommendedActionsCard extends StatelessWidget {
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.all(12),
+                padding: EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF1F1B24),
+                  color: Theme.of(context).colorScheme.surface,
                   borderRadius: BorderRadius.circular(16),
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.auto_awesome,
                   color: Color(0xFFFFC229),
                   size: 20,
                 ),
               ),
-              const SizedBox(width: 16),
-              const Expanded(
+              SizedBox(width: 16),
+              Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -108,7 +108,7 @@ class RecommendedActionsCard extends StatelessWidget {
                         Text(
                           'Resolution Assistant™',
                           style: TextStyle(
-                            color: Colors.white,
+                            color: Theme.of(context).colorScheme.onSurface,
                             fontSize: 18,
                             fontWeight: FontWeight.w600,
                           ),
@@ -116,7 +116,7 @@ class RecommendedActionsCard extends StatelessWidget {
                         SizedBox(width: 8),
                         CircleAvatar(
                           radius: 4,
-                          backgroundColor: Color(0xFFE11D48),
+                          
                         ),
                       ],
                     ),
@@ -124,7 +124,7 @@ class RecommendedActionsCard extends StatelessWidget {
                     Text(
                       'Flight UA 2847 delayed by 2h 30m',
                       style: TextStyle(
-                        color: Colors.white54,
+                        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.54),
                         fontSize: 14,
                       ),
                     ),
@@ -133,26 +133,26 @@ class RecommendedActionsCard extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 24),
-          const Text(
+          SizedBox(height: 24),
+          Text(
             'Your flight delay qualifies for compensation under EU261. We recommend contacting the airline desk for immediate rebooking options and filing a compensation claim.',
             style: TextStyle(
-              color: Colors.white,
+              color: Theme.of(context).colorScheme.onSurface,
               fontSize: 15,
               height: 1.5,
             ),
           ),
-          const SizedBox(height: 20),
+          SizedBox(height: 20),
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
             decoration: BoxDecoration(
-              color: const Color(0xFF2A2016),
+              color: Theme.of(context).colorScheme.surface,
               borderRadius: BorderRadius.circular(20),
               border: Border.all(
-                color: const Color(0xFFFFC229).withOpacity(0.2),
+                color: Color(0xFFFFC229).withOpacity(0.2),
               ),
             ),
-            child: const Row(
+            child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Row(
@@ -166,7 +166,7 @@ class RecommendedActionsCard extends StatelessWidget {
                     Text(
                       'Compensation Eligible',
                       style: TextStyle(
-                        color: Colors.white,
+                        color: Theme.of(context).colorScheme.onSurface,
                         fontSize: 16,
                       ),
                     ),
@@ -183,37 +183,37 @@ class RecommendedActionsCard extends StatelessWidget {
               ],
             ),
           ),
-          const SizedBox(height: 24),
-          const Text(
+          SizedBox(height: 24),
+          Text(
             'Recommended Next Steps:',
             style: TextStyle(
-              color: Colors.white60,
+              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
               fontSize: 16,
             ),
           ),
-          const SizedBox(height: 16),
-          _buildStepItem('1', 'Contact airline customer service desk'),
-          const SizedBox(height: 16),
-          _buildStepItem('2', 'Request meal vouchers if delay exceeds 3 hours'),
-          const SizedBox(height: 16),
-          _buildStepItem('3', 'File compensation claim within 6 months'),
-          const SizedBox(height: 24),
+          SizedBox(height: 16),
+          _buildStepItem(context, '1', 'Contact airline customer service desk'),
+          SizedBox(height: 16),
+          _buildStepItem(context, '2', 'Request meal vouchers if delay exceeds 3 hours'),
+          SizedBox(height: 16),
+          _buildStepItem(context, '3', 'File compensation claim within 6 months'),
+          SizedBox(height: 24),
           Container(
-            padding: const EdgeInsets.all(20),
+            padding: EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: const Color(0xFF2A2016),
+              color: Theme.of(context).colorScheme.surface,
               borderRadius: BorderRadius.circular(20),
               border: Border.all(
-                color: const Color(0xFFFFC229).withOpacity(0.3),
+                color: Color(0xFFFFC229).withOpacity(0.3),
               ),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 RichText(
-                  text: const TextSpan(
+                  text: TextSpan(
                     style: TextStyle(
-                      color: Colors.white,
+                      color: Theme.of(context).colorScheme.onSurface,
                       fontSize: 15,
                       height: 1.5,
                     ),
@@ -227,17 +227,17 @@ class RecommendedActionsCard extends StatelessWidget {
                     ],
                   ),
                 ),
-                const SizedBox(height: 16),
+                SizedBox(height: 16),
                 GestureDetector(
                   onTap: onUpgrade,
                   child: Container(
-                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    padding: EdgeInsets.symmetric(vertical: 14),
                     decoration: BoxDecoration(
                       color: const Color(0xFFFFC229),
                       borderRadius: BorderRadius.circular(20),
                     ),
                     alignment: Alignment.center,
-                    child: const Row(
+                    child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Icon(Icons.arrow_forward, color: Colors.black, size: 18),
@@ -257,7 +257,7 @@ class RecommendedActionsCard extends StatelessWidget {
               ],
             ),
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: 16),
           GestureDetector(
             onTap: () {
               Navigator.push(
@@ -266,23 +266,23 @@ class RecommendedActionsCard extends StatelessWidget {
               );
             },
             child: Container(
-              padding: const EdgeInsets.symmetric(vertical: 18),
+              padding: EdgeInsets.symmetric(vertical: 18),
               decoration: BoxDecoration(
-                color: const Color(0xFF101B30),
+                color: Theme.of(context).colorScheme.surface,
                 borderRadius: BorderRadius.circular(20),
                 border: Border.all(
-                  color: const Color(0xFF2E426B),
+                  color: Theme.of(context).colorScheme.surface,
                 ),
               ),
-              child: const Row(
+              child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.arrow_forward, color: Colors.white, size: 20),
+                  Icon(Icons.arrow_forward, color: Theme.of(context).colorScheme.onSurface, size: 20),
                   SizedBox(width: 12),
                   Text(
                     'Get AI Assistance',
                     style: TextStyle(
-                      color: Colors.white,
+                      color: Theme.of(context).colorScheme.onSurface,
                       fontSize: 18,
                       fontWeight: FontWeight.w600,
                     ),
@@ -296,33 +296,33 @@ class RecommendedActionsCard extends StatelessWidget {
     );
   }
 
-  Widget _buildStepItem(String number, String text) {
+  Widget _buildStepItem(BuildContext context, String number, String text) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Container(
           width: 28,
           height: 28,
-          decoration: const BoxDecoration(
-            color: Color(0xFF2A2016),
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.surface,
             shape: BoxShape.circle,
           ),
           alignment: Alignment.center,
           child: Text(
             number,
-            style: const TextStyle(
+            style: TextStyle(
               color: Color(0xFFFFC229),
               fontSize: 14,
               fontWeight: FontWeight.bold,
             ),
           ),
         ),
-        const SizedBox(width: 16),
+        SizedBox(width: 16),
         Expanded(
           child: Text(
             text,
-            style: const TextStyle(
-              color: Colors.white,
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.onSurface,
               fontSize: 16,
               height: 1.4,
             ),

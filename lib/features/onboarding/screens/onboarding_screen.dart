@@ -135,7 +135,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           if (_isCompleting)
             Container(
               color: Colors.black.withOpacity(0.5),
-              child: const Center(
+              child: Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -166,7 +166,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
     return Padding(
       key: const ValueKey('onboarding_content'),
-      padding: const EdgeInsets.all(24),
+      padding: EdgeInsets.all(24),
       child: Column(
         children: [
           const Spacer(),
@@ -185,21 +185,21 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   size: 76,
                   color: const Color(0xFFFFC229),
                 ),
-                const SizedBox(height: 40),
+                SizedBox(height: 40),
                 Text(
                   item['title'] as String,
                   textAlign: TextAlign.center,
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: Colors.white,
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                const SizedBox(height: 20),
+                SizedBox(height: 20),
                 Text(
                   item['description'] as String,
                   textAlign: TextAlign.center,
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: Colors.white60,
                     fontSize: 15,
                     height: 1.5,
@@ -209,7 +209,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             ),
           ),
 
-          const SizedBox(height: 40),
+          SizedBox(height: 40),
 
           // Dots — stay in place, just animate width/color smoothly
           Row(
@@ -220,7 +220,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               return AnimatedContainer(
                 duration: const Duration(milliseconds: 300),
                 curve: Curves.easeInOut,
-                margin: const EdgeInsets.symmetric(horizontal: 4),
+                margin: EdgeInsets.symmetric(horizontal: 4),
                 width: isActive ? 28 : 8,
                 height: 8,
                 decoration: BoxDecoration(
@@ -238,7 +238,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             title: isLastContentPage ? 'Get Started' : 'Next',
             onTap: nextPage,
           ),
-          const SizedBox(height: 18),
+          SizedBox(height: 18),
 
           // Skip link — stays in place, hidden on last page
           if (!isLastContentPage)
@@ -252,7 +252,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 ),
               ),
             ),
-          const SizedBox(height: 20),
+          SizedBox(height: 20),
         ],
       ),
     );

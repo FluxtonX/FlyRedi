@@ -10,18 +10,18 @@ class ExpenseTrackerScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     bool isEmpty = true;
     return Scaffold(
-      backgroundColor: AppColors.background,
+      
           appBar: AppBar(
             backgroundColor: Colors.transparent,
             elevation: 0,
             leading: IconButton(
-              icon: const Icon(Icons.arrow_back, color: Colors.white),
+              icon: Icon(Icons.arrow_back, color: Theme.of(context).colorScheme.onSurface),
               onPressed: () => Navigator.pop(context),
             ),
-            title: const Text(
+            title: Text(
               'Expenses',
               style: TextStyle(
-                color: Colors.white,
+                color: Theme.of(context).colorScheme.onSurface,
                 fontSize: 22,
                 fontWeight: FontWeight.bold,
               ),
@@ -29,7 +29,7 @@ class ExpenseTrackerScreen extends StatelessWidget {
             titleSpacing: 0,
             actions: [
               IconButton(
-                icon: const Icon(Icons.add, color: Colors.white),
+                icon: Icon(Icons.add, color: Theme.of(context).colorScheme.onSurface),
                 onPressed: () {
                   Navigator.push(
                     context,
@@ -39,48 +39,48 @@ class ExpenseTrackerScreen extends StatelessWidget {
                   );
                 },
               ),
-              const SizedBox(width: 12),
+              SizedBox(width: 12),
             ],
           ),
           body: SingleChildScrollView(
-            padding: const EdgeInsets.all(24),
+            padding: EdgeInsets.all(24),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 // Total Expenses Card
                 Container(
-                  padding: const EdgeInsets.all(24),
+                  padding: EdgeInsets.all(24),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF0C162A),
+                    color: Theme.of(context).colorScheme.surface,
                     borderRadius: BorderRadius.circular(22),
                     border: Border.all(
-                      color: Colors.white.withOpacity(0.04),
+                      color: Theme.of(context).colorScheme.outline,
                     ),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
+                      Text(
                         'Total Expenses',
                         style: TextStyle(
-                          color: Colors.white54,
+                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.54),
                           fontSize: 14,
                         ),
                       ),
-                      const SizedBox(height: 8),
+                      SizedBox(height: 8),
                       Text(
                         isEmpty ? '\$00.00' : '\$290.00',
-                        style: const TextStyle(
-                          color: Colors.white,
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.onSurface,
                           fontSize: 36,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      const SizedBox(height: 6),
-                      const Text(
+                      SizedBox(height: 6),
+                      Text(
                         'Current trip',
                         style: TextStyle(
-                          color: Colors.white38,
+                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.38),
                           fontSize: 12,
                         ),
                       ),
@@ -88,55 +88,55 @@ class ExpenseTrackerScreen extends StatelessWidget {
                   ),
                 ),
 
-                const SizedBox(height: 32),
+                SizedBox(height: 32),
 
                 // Recent Expenses Section Header
-                const Text(
+                Text(
                   'Recent Expenses',
                   style: TextStyle(
-                    color: Colors.white,
+                    color: Theme.of(context).colorScheme.onSurface,
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                const SizedBox(height: 16),
+                SizedBox(height: 16),
 
                 if (isEmpty)
                   Container(
-                    padding: const EdgeInsets.symmetric(vertical: 36),
+                    padding: EdgeInsets.symmetric(vertical: 36),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF0C162A),
+                      color: Theme.of(context).colorScheme.surface,
                       borderRadius: BorderRadius.circular(20),
                       border: Border.all(
-                        color: Colors.white.withOpacity(0.04),
+                        color: Theme.of(context).colorScheme.outline,
                       ),
                     ),
                     alignment: Alignment.center,
                     child: Text(
                       'No expenses recorded yet',
                       style: TextStyle(
-                        color: Colors.white.withOpacity(0.4),
+                        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
                         fontSize: 12,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                   )
                 else ...[
-                  _buildExpenseItem(
+                  _buildExpenseItem(context, 
                     title: 'Airport meal',
                     category: 'Food',
                     amount: '\$45.00',
                     date: 'May 15, 2026',
                     icon: Icons.local_cafe_outlined,
                   ),
-                  _buildExpenseItem(
+                  _buildExpenseItem(context, 
                     title: 'Taxi to hotel',
                     category: 'Transport',
                     amount: '\$65.00',
                     date: 'May 15, 2026',
                     icon: Icons.local_taxi_outlined,
                   ),
-                  _buildExpenseItem(
+                  _buildExpenseItem(context, 
                     title: 'Hotel overnight',
                     category: 'Accommodation',
                     amount: '\$180.00',
@@ -145,7 +145,7 @@ class ExpenseTrackerScreen extends StatelessWidget {
                   ),
                 ],
 
-                const SizedBox(height: 32),
+                SizedBox(height: 32),
 
                 // Add Expense Button
                 GestureDetector(
@@ -159,13 +159,13 @@ class ExpenseTrackerScreen extends StatelessWidget {
                   },
                   child: Container(
                     width: double.infinity,
-                    padding: const EdgeInsets.symmetric(vertical: 18),
+                    padding: EdgeInsets.symmetric(vertical: 18),
                     decoration: BoxDecoration(
                       color: const Color(0xFFFFC229),
                       borderRadius: BorderRadius.circular(16),
                     ),
                     alignment: Alignment.center,
-                    child: const Row(
+                    child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Icon(Icons.add, color: Colors.black, size: 20),
@@ -182,14 +182,14 @@ class ExpenseTrackerScreen extends StatelessWidget {
                     ),
                   ),
                 ),
-                const SizedBox(height: 24),
+                SizedBox(height: 24),
               ],
             ),
           ),
         );
   }
 
-  Widget _buildExpenseItem({
+  Widget _buildExpenseItem(BuildContext context, {
     required String title,
     required String category,
     required String amount,
@@ -197,21 +197,21 @@ class ExpenseTrackerScreen extends StatelessWidget {
     required IconData icon,
   }) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(18),
+      margin: EdgeInsets.only(bottom: 12),
+      padding: EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: const Color(0xFF0C162A),
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: Colors.white.withOpacity(0.04),
+          color: Theme.of(context).colorScheme.outline,
         ),
       ),
       child: Row(
         children: [
           Container(
-            padding: const EdgeInsets.all(12),
+            padding: EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: const Color(0xFF2C2210), // Golden tint dark background
+              color: Theme.of(context).colorScheme.surface, // Golden tint dark background
               borderRadius: BorderRadius.circular(14),
             ),
             child: Icon(
@@ -220,24 +220,24 @@ class ExpenseTrackerScreen extends StatelessWidget {
               size: 22,
             ),
           ),
-          const SizedBox(width: 16),
+          SizedBox(width: 16),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   title,
-                  style: const TextStyle(
-                    color: Colors.white,
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurface,
                     fontSize: 15,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                const SizedBox(height: 4),
+                SizedBox(height: 4),
                 Text(
                   category,
                   style: TextStyle(
-                    color: Colors.white.withOpacity(0.4),
+                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
                     fontSize: 12,
                   ),
                 ),
@@ -249,17 +249,17 @@ class ExpenseTrackerScreen extends StatelessWidget {
             children: [
               Text(
                 amount,
-                style: const TextStyle(
-                  color: Colors.white,
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurface,
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              const SizedBox(height: 4),
+              SizedBox(height: 4),
               Text(
                 date,
                 style: TextStyle(
-                  color: Colors.white.withOpacity(0.3),
+                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3),
                   fontSize: 10,
                 ),
               ),

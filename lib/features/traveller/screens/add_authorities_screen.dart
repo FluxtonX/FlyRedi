@@ -17,21 +17,21 @@ class _AddAuthoritiesScreenState extends State<AddAuthoritiesScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          icon: Icon(Icons.arrow_back, color: Theme.of(context).colorScheme.onSurface),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Column(
+        title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               'Add Authorities',
               style: TextStyle(
-                color: Colors.white,
+                color: Theme.of(context).colorScheme.onSurface,
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
               ),
@@ -40,7 +40,7 @@ class _AddAuthoritiesScreenState extends State<AddAuthoritiesScreen> {
             Text(
               'Include regulatory bodies for better response likelihood',
               style: TextStyle(
-                color: Colors.white54,
+                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.54),
                 fontSize: 12,
                 fontWeight: FontWeight.normal,
               ),
@@ -50,53 +50,53 @@ class _AddAuthoritiesScreenState extends State<AddAuthoritiesScreen> {
         titleSpacing: 0,
       ),
       body: Padding(
-        padding: const EdgeInsets.all(24),
+        padding: EdgeInsets.all(24),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             // Switch Card (Include Regulatory Authorities)
             Container(
-              padding: const EdgeInsets.all(20),
+              padding: EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: const Color(0xFF0C162A),
+                color: Theme.of(context).colorScheme.surface,
                 borderRadius: BorderRadius.circular(24),
                 border: Border.all(
-                  color: Colors.white.withOpacity(0.04),
+                  color: Theme.of(context).colorScheme.outline,
                 ),
               ),
               child: Row(
                 children: [
                   // Shield Icon inside circular box
                   Container(
-                    padding: const EdgeInsets.all(12),
+                    padding: EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFFFC229).withOpacity(0.1),
+                      color: Color(0xFFFFC229).withOpacity(0.1),
                       shape: BoxShape.circle,
                     ),
-                    child: const Icon(
+                    child: Icon(
                       Icons.shield_outlined,
                       color: Color(0xFFFFC229),
                       size: 20,
                     ),
                   ),
-                  const SizedBox(width: 16),
+                  SizedBox(width: 16),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
+                        Text(
                           'Include Regulatory Authorities',
                           style: TextStyle(
-                            color: Colors.white,
+                            color: Theme.of(context).colorScheme.onSurface,
                             fontSize: 15,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        const SizedBox(height: 4),
+                        SizedBox(height: 4),
                         Text(
                           'CC authorities on your complaint email',
                           style: TextStyle(
-                            color: Colors.white.withOpacity(0.4),
+                            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
                             fontSize: 12,
                           ),
                         ),
@@ -107,9 +107,9 @@ class _AddAuthoritiesScreenState extends State<AddAuthoritiesScreen> {
                   Switch(
                     value: _includeAuthorities,
                     activeColor: const Color(0xFFFFC229),
-                    activeTrackColor: const Color(0xFFFFC229).withOpacity(0.3),
-                    inactiveThumbColor: Colors.white54,
-                    inactiveTrackColor: Colors.white12,
+                    activeTrackColor: Color(0xFFFFC229).withOpacity(0.3),
+                    inactiveThumbColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.54),
+                    inactiveTrackColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.12),
                     onChanged: (bool value) {
                       setState(() {
                         _includeAuthorities = value;
@@ -120,32 +120,32 @@ class _AddAuthoritiesScreenState extends State<AddAuthoritiesScreen> {
               ),
             ),
 
-            const SizedBox(height: 20),
+            SizedBox(height: 20),
 
             // Info Card
             Container(
-              padding: const EdgeInsets.all(20),
+              padding: EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: const Color(0xFF0C162A),
+                color: Theme.of(context).colorScheme.surface,
                 borderRadius: BorderRadius.circular(20),
                 border: Border.all(
-                  color: const Color(0xFF3B82F6).withOpacity(0.15), // Blue outline tint
+                  color: Color(0xFF3B82F6).withOpacity(0.15), // Blue outline tint
                 ),
               ),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Icon(
+                  Icon(
                     Icons.info_outline,
                     color: Color(0xFF3B82F6),
                     size: 20,
                   ),
-                  const SizedBox(width: 14),
+                  SizedBox(width: 14),
                   Expanded(
                     child: Text(
                       'Adding authorities may improve response likelihood. They will be CC\'d on your email, making the airline aware of regulatory oversight.',
                       style: TextStyle(
-                        color: Colors.white.withOpacity(0.7),
+                        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
                         fontSize: 13,
                         height: 1.45,
                       ),
@@ -169,12 +169,12 @@ class _AddAuthoritiesScreenState extends State<AddAuthoritiesScreen> {
               },
               child: Container(
                 width: double.infinity,
-                padding: const EdgeInsets.symmetric(vertical: 18),
+                padding: EdgeInsets.symmetric(vertical: 18),
                 decoration: BoxDecoration(
                   color: const Color(0xFFFFC229), // Yellow
                   borderRadius: BorderRadius.circular(16),
                 ),
-                child: const Row(
+                child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(

@@ -46,13 +46,13 @@ class _AuthTextFieldState extends State<AuthTextField> {
       children: [
         Text(
           widget.label,
-          style: const TextStyle(
+          style: TextStyle(
             color: Colors.white54,
             fontSize: 16,
             fontWeight: FontWeight.w600,
           ),
         ),
-        const SizedBox(height: 8),
+        SizedBox(height: 8),
         TextField(
           controller: widget.controller,
           focusNode: widget.focusNode,
@@ -64,13 +64,13 @@ class _AuthTextFieldState extends State<AuthTextField> {
           enableSuggestions: widget.enableSuggestions,
           textCapitalization: widget.textCapitalization,
           obscureText: isPassword ? _isHidden : false,
-          style: const TextStyle(color: Colors.white),
-          scrollPadding: const EdgeInsets.only(bottom: 120),
+          style: TextStyle(color: Colors.white),
+          scrollPadding: EdgeInsets.only(bottom: 120),
           decoration: InputDecoration(
             hintText: widget.hint,
-            hintStyle: const TextStyle(color: Colors.white54),
+            hintStyle: TextStyle(color: Colors.white54),
             filled: true,
-            fillColor: const Color(0xFF10284F),
+            fillColor: Theme.of(context).colorScheme.surface,
             suffixIcon: isPassword
                 ? IconButton(
                     icon: Icon(

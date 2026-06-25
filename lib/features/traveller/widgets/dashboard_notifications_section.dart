@@ -27,38 +27,38 @@ class DashboardNotificationsSection extends StatelessWidget {
             Row(
               children: [
                 Container(
-                  padding: const EdgeInsets.all(8),
+                  padding: EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.08),
+                    color: Theme.of(context).colorScheme.outline,
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.notifications_active_outlined,
-                    color: Colors.white54,
+                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.54),
                     size: 20,
                   ),
                 ),
-                const SizedBox(width: 12),
-                const Text(
+                SizedBox(width: 12),
+                Text(
                   'Disruption Alerts',
                   style: TextStyle(
-                    color: Colors.white,
+                    color: Theme.of(context).colorScheme.onSurface,
                     fontSize: 21,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                const SizedBox(width: 10),
+                SizedBox(width: 10),
                 if (criticalCount > 0)
                   Container(
                     padding:
-                        const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                        EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFE11D48).withOpacity(0.15),
+                      color: Color(0xFFE11D48).withOpacity(0.15),
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: Text(
                       '$criticalCount',
-                      style: const TextStyle(
+                      style: TextStyle(
                         color: Color(0xFFE11D48),
                         fontSize: 11,
                         fontWeight: FontWeight.bold,
@@ -75,7 +75,7 @@ class DashboardNotificationsSection extends StatelessWidget {
                       builder: (context) => const NotificationsScreen()),
                 );
               },
-              child: const Text(
+              child: Text(
                 'View all',
                 style: TextStyle(
                   color: Color(0xFFFFC229),
@@ -86,21 +86,21 @@ class DashboardNotificationsSection extends StatelessWidget {
             ),
           ],
         ),
-        const SizedBox(height: 16),
+        SizedBox(height: 16),
 
         if (isEmpty)
           Container(
-            padding: const EdgeInsets.symmetric(vertical: 36),
+            padding: EdgeInsets.symmetric(vertical: 36),
             decoration: BoxDecoration(
-              color: const Color(0xFF0C162A),
+              color: Theme.of(context).colorScheme.surface,
               borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: Colors.white.withOpacity(0.04)),
+              border: Border.all(color: Theme.of(context).colorScheme.outline),
             ),
             alignment: Alignment.center,
             child: Text(
               'No disruption alerts',
               style: TextStyle(
-                color: Colors.white.withOpacity(0.4),
+                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
                 fontSize: 12,
                 fontWeight: FontWeight.bold,
               ),
@@ -112,7 +112,7 @@ class DashboardNotificationsSection extends StatelessWidget {
             final icon = _getIcon(alert.priority);
             final color = _getColor(alert.priority);
             return Padding(
-              padding: const EdgeInsets.only(bottom: 16),
+              padding: EdgeInsets.only(bottom: 16),
               child: NotificationCard(
                 mainIcon: icon,
                 mainIconColor: color,

@@ -4,6 +4,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'firebase_options.dart';
 import 'core/theme/app_theme.dart';
+import 'core/theme/theme_controller.dart';
 import 'core/storage/storage_service.dart';
 import 'features/auth/presentation/bindings/auth_binding.dart';
 import 'features/auth/presentation/screens/sign_in_screen.dart';
@@ -23,6 +24,9 @@ void main() async {
 
   // Initialize SharedPreferences wrapper service before runApp starts
   await Get.putAsync(() => StorageService().init());
+  
+  // Initialize ThemeController
+  Get.put(ThemeController());
 
   // Listen for FCM messages in the foreground and show a top banner
   FirebaseMessaging.onMessage.listen((RemoteMessage message) {
@@ -31,12 +35,12 @@ void main() async {
         message.notification!.title ?? 'New Alert',
         message.notification!.body ?? '',
         snackPosition: SnackPosition.TOP,
-        backgroundColor: const Color(0xFF0F2D24).withOpacity(0.95),
-        colorText: Colors.white,
-        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        backgroundColor: Get.theme.colorScheme.surface.withOpacity(0.95),
+        colorText: Get.theme.colorScheme.onSurface,
+        margin: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         borderRadius: 12,
         duration: const Duration(seconds: 5),
-        icon: const Icon(Icons.flight_takeoff, color: Color(0xFFFFC229)),
+        icon: Icon(Icons.flight_takeoff, color: Color(0xFFFFC229)),
         isDismissible: true,
       );
     }
@@ -50,9 +54,13 @@ class SkyRightz360App extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GetMaterialApp(
+    final themeController = Get.find<ThemeController>();
+    
+    return Obx(() => GetMaterialApp(
       title: 'SkyRightz360',
-      theme: AppTheme.darkTheme,
+      theme: AppTheme.lightTheme,
+      darkTheme: AppTheme.darkTheme,
+      themeMode: themeController.themeMode,
       debugShowCheckedModeBanner: false,
       initialBinding: AuthBinding(),
       initialRoute: '/home',
@@ -82,6 +90,6 @@ class SkyRightz360App extends StatelessWidget {
           page: () => const TravellerTabsScreen(),
         ),
       ],
-    );
+    ));
   }
 }

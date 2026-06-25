@@ -54,7 +54,7 @@ class _TravellerTabsScreenState extends State<TravellerTabsScreen> {
         index: _activeIndex,
         children: List.generate(
           _tabs.length,
-          (index) => _tabs[index] ?? const SizedBox.shrink(),
+          (index) => _tabs[index] ?? SizedBox.shrink(),
         ),
       ),
       bottomNavigationBar: TravellerBottomNav(

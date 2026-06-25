@@ -27,7 +27,7 @@ class DashboardActivityList extends StatelessWidget {
     }
   }
 
-  Color _getColor(String type) {
+  Color _getColor(BuildContext context, String type) {
     switch (type) {
       case 'alert':
         return const Color(0xFFE11D48); // Rose
@@ -38,7 +38,7 @@ class DashboardActivityList extends StatelessWidget {
       case 'trip':
         return const Color(0xFF3B82F6); // Blue
       default:
-        return Colors.white54;
+        return Theme.of(context).colorScheme.onSurface.withOpacity(0.54);
     }
   }
 
@@ -109,10 +109,10 @@ class DashboardActivityList extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text(
+            Text(
               'Recent Activity',
               style: TextStyle(
-                color: Colors.white,
+                color: Theme.of(context).colorScheme.onSurface,
                 fontSize: 21,
                 fontWeight: FontWeight.bold,
               ),
@@ -125,7 +125,7 @@ class DashboardActivityList extends StatelessWidget {
                     MaterialPageRoute(builder: (context) => const NotificationsScreen()),
                   );
                 },
-                child: const Text(
+                child: Text(
                   'View all',
                   style: TextStyle(
                     color: Color(0xFFFFC229),
@@ -135,28 +135,28 @@ class DashboardActivityList extends StatelessWidget {
               ),
           ],
         ),
-        const SizedBox(height: 14),
+        SizedBox(height: 14),
         if (activities.isEmpty)
           Container(
-            padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 16),
+            padding: EdgeInsets.symmetric(vertical: 32, horizontal: 16),
             decoration: BoxDecoration(
-              color: const Color(0xFF10284F),
+              color: Theme.of(context).colorScheme.surface,
               borderRadius: BorderRadius.circular(24),
-              border: Border.all(color: Colors.white.withOpacity(0.08)),
+              border: Border.all(color: Theme.of(context).colorScheme.outline),
             ),
-            child: const Center(
+            child: Center(
               child: Column(
                 children: [
                   Icon(
                     Icons.history_outlined,
-                    color: Colors.white30,
+                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3),
                     size: 40,
                   ),
                   SizedBox(height: 12),
                   Text(
                     'No recent activity found.',
                     style: TextStyle(
-                      color: Colors.white54,
+                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.54),
                       fontSize: 16,
                     ),
                   ),
@@ -167,10 +167,10 @@ class DashboardActivityList extends StatelessWidget {
         else
           Container(
             decoration: BoxDecoration(
-              color: const Color(0xFF10284F),
+              color: Theme.of(context).colorScheme.surface,
               borderRadius: BorderRadius.circular(28),
               border: Border.all(
-                color: Colors.white.withOpacity(0.08),
+                color: Theme.of(context).colorScheme.outline,
               ),
             ),
             child: ListView.separated(
@@ -178,20 +178,20 @@ class DashboardActivityList extends StatelessWidget {
               physics: const NeverScrollableScrollPhysics(),
               itemCount: activities.length,
               separatorBuilder: (context, index) => Divider(
-                color: Colors.white.withOpacity(0.06),
+                color: Theme.of(context).colorScheme.outline.withOpacity(0.5),
                 height: 1,
                 indent: 64,
               ),
               itemBuilder: (context, index) {
                 final activity = activities[index];
                 final icon = _getIcon(activity.type);
-                final color = _getColor(activity.type);
+                final color = _getColor(context, activity.type);
                 final subtitle = _activitySubtitle(activity);
 
                 return ListTile(
                   onTap: () => _onTapActivity(context, activity),
                   leading: Container(
-                    padding: const EdgeInsets.all(8),
+                    padding: EdgeInsets.all(8),
                     decoration: BoxDecoration(
                       color: color.withOpacity(0.12),
                       shape: BoxShape.circle,
@@ -204,8 +204,8 @@ class DashboardActivityList extends StatelessWidget {
                   ),
                   title: Text(
                     _activityTitle(activity),
-                    style: const TextStyle(
-                      color: Colors.white,
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurface,
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
                     ),
@@ -214,15 +214,15 @@ class DashboardActivityList extends StatelessWidget {
                       ? null
                       : Text(
                           subtitle,
-                          style: const TextStyle(
-                            color: Colors.white54,
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.54),
                             fontSize: 14,
                           ),
                     ),
                   trailing: Text(
                     _formatTime(activity.createdAt),
-                    style: const TextStyle(
-                      color: Colors.white30,
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3),
                       fontSize: 12,
                     ),
                   ),

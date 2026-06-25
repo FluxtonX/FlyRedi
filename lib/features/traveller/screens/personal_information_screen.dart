@@ -44,7 +44,7 @@ class _PersonalInformationScreenState extends State<PersonalInformationScreen> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: const Color(0xFF0C162A),
+      backgroundColor: Theme.of(context).colorScheme.surface,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
       ),
@@ -65,30 +65,30 @@ class _PersonalInformationScreenState extends State<PersonalInformationScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text(
+                      Text(
                         'Edit Personal Information',
                         style: TextStyle(
-                          color: Colors.white,
+                          color: Theme.of(context).colorScheme.onSurface,
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                       IconButton(
                         onPressed: () => Navigator.pop(ctx),
-                        icon: const Icon(Icons.close, color: Colors.white54),
+                        icon: Icon(Icons.close, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.54)),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 18),
+                  SizedBox(height: 18),
                   _sheetField(nameCtrl, 'Full Name', Icons.person_outline),
-                  const SizedBox(height: 14),
+                  SizedBox(height: 14),
                   _sheetField(
                     phoneCtrl,
                     'Phone Number',
                     Icons.phone_outlined,
                     keyboardType: TextInputType.phone,
                   ),
-                  const SizedBox(height: 24),
+                  SizedBox(height: 24),
                   ElevatedButton(
                     onPressed: isSaving
                         ? null
@@ -117,17 +117,17 @@ class _PersonalInformationScreenState extends State<PersonalInformationScreen> {
                             }
                           },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFFFFC229),
+                      
                       foregroundColor: Colors.black,
                       disabledBackgroundColor:
-                          const Color(0xFFFFC229).withOpacity(0.55),
-                      padding: const EdgeInsets.symmetric(vertical: 16),
+                          Color(0xFFFFC229).withOpacity(0.55),
+                      padding: EdgeInsets.symmetric(vertical: 16),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16),
                       ),
                     ),
                     child: isSaving
-                        ? const SizedBox(
+                        ? SizedBox(
                             width: 20,
                             height: 20,
                             child: CircularProgressIndicator(
@@ -136,7 +136,7 @@ class _PersonalInformationScreenState extends State<PersonalInformationScreen> {
                                   AlwaysStoppedAnimation<Color>(Colors.black),
                             ),
                           )
-                        : const Text(
+                        : Text(
                             'Save Changes',
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
@@ -162,20 +162,20 @@ class _PersonalInformationScreenState extends State<PersonalInformationScreen> {
     return TextField(
       controller: ctrl,
       keyboardType: keyboardType,
-      style: const TextStyle(color: Colors.white),
+      style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
       decoration: InputDecoration(
         labelText: label,
-        labelStyle: const TextStyle(color: Colors.white54),
-        prefixIcon: Icon(icon, color: Colors.white38, size: 20),
+        labelStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.54)),
+        prefixIcon: Icon(icon, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.38), size: 20),
         filled: true,
-        fillColor: const Color(0xFF10284F),
+        fillColor: Theme.of(context).colorScheme.surface,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
           borderSide: BorderSide.none,
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: Color(0xFFFFC229), width: 1.5),
+          borderSide: BorderSide(color: Color(0xFFFFC229), width: 1.5),
         ),
       ),
     );
@@ -184,18 +184,18 @@ class _PersonalInformationScreenState extends State<PersonalInformationScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
           onPressed: () => Navigator.pop(context),
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          icon: Icon(Icons.arrow_back, color: Theme.of(context).colorScheme.onSurface),
         ),
-        title: const Text(
+        title: Text(
           'Personal Information',
           style: TextStyle(
-            color: Colors.white,
+            color: Theme.of(context).colorScheme.onSurface,
             fontSize: 20,
             fontWeight: FontWeight.bold,
           ),
@@ -203,7 +203,7 @@ class _PersonalInformationScreenState extends State<PersonalInformationScreen> {
         actions: [
           IconButton(
             onPressed: _showEditSheet,
-            icon: const Icon(Icons.edit_outlined, color: Colors.white),
+            icon: Icon(Icons.edit_outlined, color: Theme.of(context).colorScheme.onSurface),
             tooltip: 'Edit',
           ),
         ],
@@ -211,7 +211,7 @@ class _PersonalInformationScreenState extends State<PersonalInformationScreen> {
       body: Obx(() {
         final profile = _profile;
         if (profile == null) {
-          return const Center(
+          return Center(
             child: CircularProgressIndicator(
               valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFFFC229)),
             ),
@@ -219,28 +219,28 @@ class _PersonalInformationScreenState extends State<PersonalInformationScreen> {
         }
 
         return SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(24, 12, 24, 28),
+          padding: EdgeInsets.fromLTRB(24, 12, 24, 28),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Container(
-                padding: const EdgeInsets.all(20),
+                padding: EdgeInsets.all(20),
                 decoration: _cardDecoration(),
                 child: Row(
                   children: [
                     CircleAvatar(
                       radius: 30,
-                      backgroundColor: const Color(0xFFFFC229),
+                      
                       child: Text(
                         profile.initials,
-                        style: const TextStyle(
+                        style: TextStyle(
                           color: Colors.black,
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                     ),
-                    const SizedBox(width: 16),
+                    SizedBox(width: 16),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -249,17 +249,17 @@ class _PersonalInformationScreenState extends State<PersonalInformationScreen> {
                             profile.displayName.isNotEmpty
                                 ? profile.displayName
                                 : 'Traveller',
-                            style: const TextStyle(
-                              color: Colors.white,
+                            style: TextStyle(
+                              color: Theme.of(context).colorScheme.onSurface,
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          const SizedBox(height: 6),
+                          SizedBox(height: 6),
                           Text(
                             profile.email,
                             style: TextStyle(
-                              color: Colors.white.withOpacity(0.45),
+                              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.45),
                               fontSize: 12,
                             ),
                           ),
@@ -269,39 +269,39 @@ class _PersonalInformationScreenState extends State<PersonalInformationScreen> {
                   ],
                 ),
               ),
-              const SizedBox(height: 22),
+              SizedBox(height: 22),
               _sectionLabel('Account Details'),
-              const SizedBox(height: 14),
+              SizedBox(height: 14),
               _infoRow(
                   Icons.person_outline,
                   'Full Name',
                   profile.displayName.isEmpty
                       ? 'Not added'
                       : profile.displayName),
-              const SizedBox(height: 10),
+              SizedBox(height: 10),
               _infoRow(Icons.email_outlined, 'Email', profile.email),
-              const SizedBox(height: 10),
+              SizedBox(height: 10),
               _infoRow(
                 Icons.phone_outlined,
                 'Phone Number',
                 profile.phoneNumber.isEmpty ? 'Not added' : profile.phoneNumber,
               ),
-              const SizedBox(height: 10),
+              SizedBox(height: 10),
               _infoRow(Icons.workspace_premium_outlined, 'Plan',
                   '${profile.plan} Plan'),
-              const SizedBox(height: 24),
+              SizedBox(height: 24),
               ElevatedButton.icon(
                 onPressed: _showEditSheet,
-                icon: const Icon(Icons.edit_outlined, size: 18),
-                label: const Text('Edit Information'),
+                icon: Icon(Icons.edit_outlined, size: 18),
+                label: Text('Edit Information'),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFFFC229),
+                  
                   foregroundColor: Colors.black,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  padding: EdgeInsets.symmetric(vertical: 16),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16),
                   ),
-                  textStyle: const TextStyle(fontWeight: FontWeight.bold),
+                  textStyle: TextStyle(fontWeight: FontWeight.bold),
                 ),
               ),
             ],
@@ -315,7 +315,7 @@ class _PersonalInformationScreenState extends State<PersonalInformationScreen> {
     return Text(
       text.toUpperCase(),
       style: TextStyle(
-        color: Colors.white.withOpacity(0.38),
+        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.38),
         fontSize: 12,
         fontWeight: FontWeight.bold,
         letterSpacing: 0.8,
@@ -325,12 +325,12 @@ class _PersonalInformationScreenState extends State<PersonalInformationScreen> {
 
   Widget _infoRow(IconData icon, String label, String value) {
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 18),
+      padding: EdgeInsets.symmetric(vertical: 16, horizontal: 18),
       decoration: _cardDecoration(),
       child: Row(
         children: [
-          Icon(icon, color: Colors.white54, size: 20),
-          const SizedBox(width: 14),
+          Icon(icon, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.54), size: 20),
+          SizedBox(width: 14),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -338,15 +338,15 @@ class _PersonalInformationScreenState extends State<PersonalInformationScreen> {
                 Text(
                   label,
                   style: TextStyle(
-                    color: Colors.white.withOpacity(0.42),
+                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.42),
                     fontSize: 11,
                   ),
                 ),
-                const SizedBox(height: 5),
+                SizedBox(height: 5),
                 Text(
                   value,
-                  style: const TextStyle(
-                    color: Colors.white,
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurface,
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
                   ),
@@ -361,9 +361,9 @@ class _PersonalInformationScreenState extends State<PersonalInformationScreen> {
 
   BoxDecoration _cardDecoration() {
     return BoxDecoration(
-      color: const Color(0xFF0C162A),
+      color: Theme.of(context).colorScheme.surface,
       borderRadius: BorderRadius.circular(16),
-      border: Border.all(color: Colors.white.withOpacity(0.05)),
+      border: Border.all(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.05)),
     );
   }
 }

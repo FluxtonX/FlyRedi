@@ -55,13 +55,14 @@ class _LiveFlightTrackerScreenState extends State<LiveFlightTrackerScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      
       body: Stack(
         children: [
           // 1. Dynamic Map Placeholder
           Positioned.fill(
             child: CustomPaint(
               painter: _DarkMapPainter(
+                context: context,
                 pulseAnimation: _pulseAnimation,
                 planeAnimation: _planeAnimation,
               ),
@@ -96,11 +97,11 @@ class _LiveFlightTrackerScreenState extends State<LiveFlightTrackerScreen>
             child: GestureDetector(
               onTap: () => Navigator.pop(context),
               child: Container(
-                padding: const EdgeInsets.all(10),
+                padding: EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF0C162A).withOpacity(0.8),
+                  color: Theme.of(context).colorScheme.surface.withOpacity(0.8),
                   shape: BoxShape.circle,
-                  border: Border.all(color: Colors.white.withOpacity(0.1)),
+                  border: Border.all(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.1)),
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black.withOpacity(0.3),
@@ -109,7 +110,7 @@ class _LiveFlightTrackerScreenState extends State<LiveFlightTrackerScreen>
                     ),
                   ],
                 ),
-                child: const Icon(Icons.arrow_back, color: Colors.white, size: 20),
+                child: Icon(Icons.arrow_back, color: Theme.of(context).colorScheme.onSurface, size: 20),
               ),
             ),
           ),
@@ -119,21 +120,21 @@ class _LiveFlightTrackerScreenState extends State<LiveFlightTrackerScreen>
             top: MediaQuery.of(context).padding.top + 20,
             right: 20,
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+              padding: EdgeInsets.symmetric(horizontal: 14, vertical: 8),
               decoration: BoxDecoration(
-                color: const Color(0xFF0C162A).withOpacity(0.85),
+                color: Theme.of(context).colorScheme.surface.withOpacity(0.85),
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.white.withOpacity(0.08)),
+                border: Border.all(color: Theme.of(context).colorScheme.outline),
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Icon(Icons.flight, color: Color(0xFFFFC229), size: 16),
-                  const SizedBox(width: 6),
+                  Icon(Icons.flight, color: Color(0xFFFFC229), size: 16),
+                  SizedBox(width: 6),
                   Text(
                     'LHR → JFK',
                     style: TextStyle(
-                      color: Colors.white.withOpacity(0.8),
+                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.8),
                       fontSize: 13,
                       fontWeight: FontWeight.w600,
                       letterSpacing: 0.5,
@@ -150,12 +151,12 @@ class _LiveFlightTrackerScreenState extends State<LiveFlightTrackerScreen>
             left: 24,
             right: 24,
             child: Container(
-              padding: const EdgeInsets.all(20),
+              padding: EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: const Color(0xFF0C162A).withOpacity(0.95),
+                color: Theme.of(context).colorScheme.surface.withOpacity(0.95),
                 borderRadius: BorderRadius.circular(24),
                 border: Border.all(
-                  color: Colors.white.withOpacity(0.08),
+                  color: Theme.of(context).colorScheme.outline,
                 ),
                 boxShadow: [
                   BoxShadow(
@@ -176,30 +177,30 @@ class _LiveFlightTrackerScreenState extends State<LiveFlightTrackerScreen>
                         children: [
                           Text(
                             widget.flightCode,
-                            style: const TextStyle(
-                              color: Colors.white,
+                            style: TextStyle(
+                              color: Theme.of(context).colorScheme.onSurface,
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          const SizedBox(height: 4),
+                          SizedBox(height: 4),
                           Text(
                             widget.airline,
                             style: TextStyle(
-                              color: Colors.white.withOpacity(0.5),
+                              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
                               fontSize: 12,
                             ),
                           ),
                         ],
                       ),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                        padding: EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF10B981).withOpacity(0.1),
+                          color: Color(0xFF10B981).withOpacity(0.1),
                           borderRadius: BorderRadius.circular(8),
-                          border: Border.all(color: const Color(0xFF10B981).withOpacity(0.3)),
+                          border: Border.all(color: Color(0xFF10B981).withOpacity(0.3)),
                         ),
-                        child: const Row(
+                        child: Row(
                           children: [
                             Icon(Icons.sensors, color: Color(0xFF10B981), size: 14),
                             SizedBox(width: 4),
@@ -217,9 +218,9 @@ class _LiveFlightTrackerScreenState extends State<LiveFlightTrackerScreen>
                       ),
                     ],
                   ),
-                  const SizedBox(height: 20),
-                  const Divider(color: Colors.white10, height: 1),
-                  const SizedBox(height: 20),
+                  SizedBox(height: 20),
+                  Divider(color: Colors.white10, height: 1),
+                  SizedBox(height: 20),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
@@ -241,33 +242,33 @@ class _LiveFlightTrackerScreenState extends State<LiveFlightTrackerScreen>
     return Column(
       children: [
         Icon(icon, color: const Color(0xFFFFC229), size: 20),
-        const SizedBox(height: 8),
+        SizedBox(height: 8),
         Text(
           label,
           style: TextStyle(
-            color: Colors.white.withOpacity(0.5),
+            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
             fontSize: 11,
           ),
         ),
-        const SizedBox(height: 4),
+        SizedBox(height: 4),
         Row(
           crossAxisAlignment: CrossAxisAlignment.baseline,
           textBaseline: TextBaseline.alphabetic,
           children: [
             Text(
               value,
-              style: const TextStyle(
-                color: Colors.white,
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onSurface,
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
               ),
             ),
             if (unit.isNotEmpty) ...[
-              const SizedBox(width: 2),
+              SizedBox(width: 2),
               Text(
                 unit,
                 style: TextStyle(
-                  color: Colors.white.withOpacity(0.5),
+                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
                   fontSize: 10,
                 ),
               ),
@@ -283,10 +284,12 @@ class _LiveFlightTrackerScreenState extends State<LiveFlightTrackerScreen>
 // Custom Painter: Dynamic Dark-Theme Map Placeholder
 // =============================================================================
 class _DarkMapPainter extends CustomPainter {
+  final BuildContext context;
   final Animation<double> pulseAnimation;
   final Animation<double> planeAnimation;
 
   _DarkMapPainter({
+    required this.context,
     required this.pulseAnimation,
     required this.planeAnimation,
   }) : super(repaint: Listenable.merge([pulseAnimation, planeAnimation]));
@@ -297,13 +300,13 @@ class _DarkMapPainter extends CustomPainter {
 
     // 1. Background gradient (deep ocean blue)
     final bgPaint = Paint()
-      ..shader = const LinearGradient(
+      ..shader = LinearGradient(
         begin: Alignment.topCenter,
         end: Alignment.bottomCenter,
         colors: [
-          Color(0xFF071B3A),
-          Color(0xFF051329),
-          Color(0xFF040E1F),
+          Theme.of(context).colorScheme.surface,
+          Theme.of(context).colorScheme.surface,
+          Theme.of(context).colorScheme.surface,
         ],
       ).createShader(rect);
     canvas.drawRect(rect, bgPaint);
@@ -329,7 +332,7 @@ class _DarkMapPainter extends CustomPainter {
 
   void _drawGrid(Canvas canvas, Size size) {
     final gridPaint = Paint()
-      ..color = const Color(0xFF0E2447).withOpacity(0.5)
+      ..color = Theme.of(context).colorScheme.surface.withOpacity(0.5)
       ..strokeWidth = 0.5
       ..style = PaintingStyle.stroke;
 
@@ -345,7 +348,7 @@ class _DarkMapPainter extends CustomPainter {
 
     // Draw slightly brighter "equator" and "prime meridian"
     final majorGridPaint = Paint()
-      ..color = const Color(0xFF153060).withOpacity(0.6)
+      ..color = Theme.of(context).colorScheme.surface.withOpacity(0.6)
       ..strokeWidth = 1.0
       ..style = PaintingStyle.stroke;
 
@@ -363,11 +366,11 @@ class _DarkMapPainter extends CustomPainter {
 
   void _drawContinents(Canvas canvas, Size size) {
     final landPaint = Paint()
-      ..color = const Color(0xFF102B5C).withOpacity(0.6)
+      ..color = Theme.of(context).colorScheme.surface.withOpacity(0.6)
       ..style = PaintingStyle.fill;
 
     final landStroke = Paint()
-      ..color = const Color(0xFF1A3D6E).withOpacity(0.5)
+      ..color = Theme.of(context).colorScheme.surface.withOpacity(0.5)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1.0;
 
@@ -493,7 +496,7 @@ class _DarkMapPainter extends CustomPainter {
 
     // Dashed flight path
     final pathPaint = Paint()
-      ..color = const Color(0xFFFFC229).withOpacity(0.4)
+      ..color = Color(0xFFFFC229).withOpacity(0.4)
       ..strokeWidth = 2.0
       ..style = PaintingStyle.stroke;
 
@@ -506,7 +509,7 @@ class _DarkMapPainter extends CustomPainter {
 
     // Glow effect on path
     final glowPaint = Paint()
-      ..color = const Color(0xFFFFC229).withOpacity(0.08)
+      ..color = Color(0xFFFFC229).withOpacity(0.08)
       ..strokeWidth = 8.0
       ..style = PaintingStyle.stroke
       ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 6);
@@ -545,7 +548,7 @@ class _DarkMapPainter extends CustomPainter {
     // Pulsing glow around the plane position
     final pulseRadius = 12.0 + (pulseAnimation.value * 8.0);
     final glowPaint = Paint()
-      ..color = const Color(0xFFFFC229).withOpacity(0.15 * pulseAnimation.value)
+      ..color = Color(0xFFFFC229).withOpacity(0.15 * pulseAnimation.value)
       ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 12);
     canvas.drawCircle(Offset(planeX, planeY), pulseRadius, glowPaint);
 
@@ -610,14 +613,14 @@ class _DarkMapPainter extends CustomPainter {
   void _drawMarker(Canvas canvas, double x, double y, String label) {
     // Outer ring
     final outerRing = Paint()
-      ..color = const Color(0xFFFFC229).withOpacity(0.3)
+      ..color = Color(0xFFFFC229).withOpacity(0.3)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1.5;
     canvas.drawCircle(Offset(x, y), 10, outerRing);
 
     // Inner dot
     final innerDot = Paint()
-      ..color = const Color(0xFFFFC229).withOpacity(0.8)
+      ..color = Color(0xFFFFC229).withOpacity(0.8)
       ..style = PaintingStyle.fill;
     canvas.drawCircle(Offset(x, y), 4, innerDot);
 
@@ -626,7 +629,7 @@ class _DarkMapPainter extends CustomPainter {
       text: TextSpan(
         text: label,
         style: TextStyle(
-          color: Colors.white.withOpacity(0.7),
+          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
           fontSize: 10,
           fontWeight: FontWeight.w600,
           letterSpacing: 1.0,
@@ -646,7 +649,7 @@ class _DarkMapPainter extends CustomPainter {
         radius: 1.2,
         colors: [
           Colors.transparent,
-          const Color(0xFF040E1F).withOpacity(0.7),
+          Theme.of(context).colorScheme.surface.withOpacity(0.7),
         ],
         stops: const [0.5, 1.0],
       ).createShader(vignetteRect);

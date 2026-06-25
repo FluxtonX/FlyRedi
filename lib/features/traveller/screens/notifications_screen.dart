@@ -91,31 +91,31 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      
       body: SafeArea(
         child: _isLoading
-            ? const Center(
+            ? Center(
                 child: CircularProgressIndicator(color: Color(0xFFFFC229)))
             : _errorMessage != null
                 ? _buildErrorState()
                 : SingleChildScrollView(
-                    padding: const EdgeInsets.symmetric(
+                    padding: EdgeInsets.symmetric(
                         horizontal: 24, vertical: 24),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         _buildHeader(),
-                        const SizedBox(height: 28),
+                        SizedBox(height: 28),
                         _buildStatCards(),
-                        const SizedBox(height: 28),
+                        SizedBox(height: 28),
                         _buildTabSelector(),
-                        const SizedBox(height: 24),
+                        SizedBox(height: 24),
                         if (_selectedTab == 0) ...[
                           _buildFilterBar(),
-                          const SizedBox(height: 24),
+                          SizedBox(height: 24),
                         ],
                         _buildPublishButton(),
-                        const SizedBox(height: 8),
+                        SizedBox(height: 8),
                         _buildBody(),
                       ],
                     ),
@@ -128,21 +128,21 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   Widget _buildErrorState() {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(32),
+        padding: EdgeInsets.all(32),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.error_outline, color: Colors.red, size: 48),
-            const SizedBox(height: 16),
+            Icon(Icons.error_outline, color: Colors.red, size: 48),
+            SizedBox(height: 16),
             Text(
               'Failed to load alerts:\n$_errorMessage',
               textAlign: TextAlign.center,
-              style: const TextStyle(color: Colors.white),
+              style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
             ),
-            const SizedBox(height: 24),
+            SizedBox(height: 24),
             ElevatedButton(
               onPressed: _loadAlerts,
-              child: const Text('Retry'),
+              child: Text('Retry'),
             ),
           ],
         ),
@@ -156,19 +156,19 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       children: [
         IconButton(
           onPressed: () => Navigator.pop(context),
-          icon: const Icon(Icons.arrow_back, color: Colors.white70, size: 24),
+          icon: Icon(Icons.arrow_back, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7), size: 24),
           padding: EdgeInsets.zero,
           constraints: const BoxConstraints(),
         ),
-        const SizedBox(width: 16),
-        const Expanded(
+        SizedBox(width: 16),
+        Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
                 'Notifications',
                 style: TextStyle(
-                  color: Colors.white,
+                  color: Theme.of(context).colorScheme.onSurface,
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
                 ),
@@ -177,7 +177,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
               Text(
                 'Real-time disruption detection and\nmonitoring',
                 style: TextStyle(
-                  color: Colors.white54,
+                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.54),
                   fontSize: 14,
                   height: 1.4,
                 ),
@@ -188,7 +188,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         if (_unreadCount > 0)
           TextButton(
             onPressed: _markAllRead,
-            child: const Text(
+            child: Text(
               'Mark all read',
               style: TextStyle(color: Color(0xFFFFC229), fontSize: 12),
             ),
@@ -205,25 +205,25 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
             value: '${_countBySeverity('CRITICAL')}',
             label: 'Critical',
             borderColor: const Color(0xFFE11D48),
-            backgroundColor: const Color(0xFF2B161E),
+            
           ),
         ),
-        const SizedBox(width: 12),
+        SizedBox(width: 12),
         Expanded(
           child: _buildStatCard(
             value: '${_countBySeverity('HIGH')}',
             label: 'High',
-            borderColor: const Color(0xFFFFC229).withOpacity(0.8),
-            backgroundColor: const Color(0xFF2A2416),
+            borderColor: Color(0xFFFFC229).withOpacity(0.8),
+            
           ),
         ),
-        const SizedBox(width: 12),
+        SizedBox(width: 12),
         Expanded(
           child: _buildStatCard(
             value: '$_unreadCount',
             label: 'Unread',
             borderColor: const Color(0xFF2563EB),
-            backgroundColor: const Color(0xFF16203A),
+            
           ),
         ),
       ],
@@ -234,12 +234,12 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     required String value,
     required String label,
     required Color borderColor,
-    required Color backgroundColor,
+    Color? backgroundColor,
   }) {
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 20),
+      padding: EdgeInsets.symmetric(vertical: 20),
       decoration: BoxDecoration(
-        color: backgroundColor,
+        color: backgroundColor ?? Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: borderColor.withOpacity(0.6), width: 1.5),
       ),
@@ -247,16 +247,16 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         children: [
           Text(
             value,
-            style: const TextStyle(
-              color: Colors.white,
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.onSurface,
               fontSize: 24,
               fontWeight: FontWeight.bold,
             ),
           ),
-          const SizedBox(height: 6),
+          SizedBox(height: 6),
           Text(
             label,
-            style: const TextStyle(color: Colors.white54, fontSize: 12),
+            style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.54), fontSize: 12),
           ),
         ],
       ),
@@ -265,11 +265,11 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
 
   Widget _buildTabSelector() {
     return Container(
-      padding: const EdgeInsets.all(4),
+      padding: EdgeInsets.all(4),
       decoration: BoxDecoration(
-        color: const Color(0xFF101B30),
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(28),
-        border: Border.all(color: Colors.white.withOpacity(0.05)),
+        border: Border.all(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.05)),
       ),
       child: Row(
         children: [
@@ -278,7 +278,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
             child: GestureDetector(
               onTap: () => setState(() => _selectedTab = 0),
               child: Container(
-                padding: const EdgeInsets.symmetric(vertical: 12),
+                padding: EdgeInsets.symmetric(vertical: 12),
                 decoration: BoxDecoration(
                   color: _selectedTab == 0
                       ? const Color(0xFF1D4ED8)
@@ -291,33 +291,33 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                     Icon(
                       Icons.notifications_none,
                       color:
-                          _selectedTab == 0 ? Colors.white : Colors.white54,
+                          _selectedTab == 0 ? Colors.white : Theme.of(context).colorScheme.onSurface.withOpacity(0.54),
                       size: 16,
                     ),
-                    const SizedBox(width: 6),
+                    SizedBox(width: 6),
                     Text(
                       'Alerts',
                       style: TextStyle(
                         color: _selectedTab == 0
                             ? Colors.white
-                            : Colors.white54,
+                            : Theme.of(context).colorScheme.onSurface.withOpacity(0.54),
                         fontSize: 14,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    const SizedBox(width: 6),
+                    SizedBox(width: 6),
                     if (_unreadCount > 0)
                       Container(
                         width: 16,
                         height: 16,
-                        decoration: const BoxDecoration(
+                        decoration: BoxDecoration(
                           color: Color(0xFFFFC229),
                           shape: BoxShape.circle,
                         ),
                         alignment: Alignment.center,
                         child: Text(
                           _unreadCount > 9 ? '9+' : '$_unreadCount',
-                          style: const TextStyle(
+                          style: TextStyle(
                             color: Colors.black,
                             fontSize: 9,
                             fontWeight: FontWeight.bold,
@@ -334,7 +334,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
             child: GestureDetector(
               onTap: () => setState(() => _selectedTab = 1),
               child: Container(
-                padding: const EdgeInsets.symmetric(vertical: 12),
+                padding: EdgeInsets.symmetric(vertical: 12),
                 decoration: BoxDecoration(
                   color: _selectedTab == 1
                       ? const Color(0xFF1D4ED8)
@@ -346,7 +346,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                   'New & Updates',
                   style: TextStyle(
                     color:
-                        _selectedTab == 1 ? Colors.white : Colors.white54,
+                        _selectedTab == 1 ? Colors.white : Theme.of(context).colorScheme.onSurface.withOpacity(0.54),
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
                   ),
@@ -361,11 +361,11 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
 
   Widget _buildFilterBar() {
     return Container(
-      padding: const EdgeInsets.all(4),
+      padding: EdgeInsets.all(4),
       decoration: BoxDecoration(
-        color: const Color(0xFF101B30),
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: Colors.white.withOpacity(0.04)),
+        border: Border.all(color: Theme.of(context).colorScheme.outline),
       ),
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
@@ -376,8 +376,8 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
               onTap: () => setState(() => _selectedFilterIndex = index),
               child: Container(
                 padding:
-                    const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
-                margin: const EdgeInsets.symmetric(horizontal: 2),
+                    EdgeInsets.symmetric(horizontal: 18, vertical: 8),
+                margin: EdgeInsets.symmetric(horizontal: 2),
                 decoration: BoxDecoration(
                   color: isSelected
                       ? const Color(0xFF1D4ED8)
@@ -387,7 +387,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                 child: Text(
                   _filters[index],
                   style: TextStyle(
-                    color: isSelected ? Colors.white : Colors.white54,
+                    color: isSelected ? Colors.white : Theme.of(context).colorScheme.onSurface.withOpacity(0.54),
                     fontSize: 13,
                     fontWeight:
                         isSelected ? FontWeight.bold : FontWeight.normal,
@@ -404,28 +404,28 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   Widget _buildPublishButton() {
     return Container(
       width: double.infinity,
-      margin: const EdgeInsets.only(bottom: 28),
+      margin: EdgeInsets.only(bottom: 28),
       child: OutlinedButton.icon(
         onPressed: () {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: const Text(
+              content: Text(
                 'Updates publishing form initiated.',
                 style:
-                    TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                    TextStyle(color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.bold),
               ),
-              backgroundColor: const Color(0xFF0C162A),
+              backgroundColor: Theme.of(context).colorScheme.surface,
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
-                side: BorderSide(color: Colors.white.withOpacity(0.08)),
+                side: BorderSide(color: Theme.of(context).colorScheme.outline),
               ),
             ),
           );
         },
-        icon: const Icon(Icons.campaign_outlined,
+        icon: Icon(Icons.campaign_outlined,
             color: Color(0xFFFFC229), size: 18),
-        label: const Text(
+        label: Text(
           'Publish New Update',
           style: TextStyle(
             color: Color(0xFFFFC229),
@@ -434,8 +434,8 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
           ),
         ),
         style: OutlinedButton.styleFrom(
-          padding: const EdgeInsets.symmetric(vertical: 16),
-          side: const BorderSide(color: Color(0xFFFFC229), width: 1.2),
+          padding: EdgeInsets.symmetric(vertical: 16),
+          side: BorderSide(color: Color(0xFFFFC229), width: 1.2),
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
         ),
@@ -456,7 +456,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     return Column(
       children: filtered.map((alert) {
         return Padding(
-          padding: const EdgeInsets.only(bottom: 16.0),
+          padding: EdgeInsets.only(bottom: 16.0),
           child: _buildAlertCard(alert),
         );
       }).toList(),
@@ -466,18 +466,18 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   Widget _buildEmptyState(String message) {
     return Column(
       children: [
-        const SizedBox(height: 48),
+        SizedBox(height: 48),
         Center(
           child: Text(
             message,
-            style: const TextStyle(
-              color: Colors.white38,
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.38),
               fontSize: 18,
               fontWeight: FontWeight.bold,
             ),
           ),
         ),
-        const SizedBox(height: 100),
+        SizedBox(height: 100),
       ],
     );
   }

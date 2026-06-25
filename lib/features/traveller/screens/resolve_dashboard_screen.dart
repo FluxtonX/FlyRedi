@@ -78,9 +78,9 @@ class _ResolveDashboardScreenState extends State<ResolveDashboardScreen> {
             bottom: MediaQuery.of(context).viewInsets.bottom,
           ),
           child: Container(
-            padding: const EdgeInsets.all(24),
-            decoration: const BoxDecoration(
-              color: Color(0xFF0C162A), // Dark premium theme match
+            padding: EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.surface, // Dark premium theme match
               borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
             ),
             child: Column(
@@ -90,85 +90,85 @@ class _ResolveDashboardScreenState extends State<ResolveDashboardScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text(
+                    Text(
                       'Report Disruption',
                       style: TextStyle(
-                        color: Colors.white,
+                        color: Theme.of(context).colorScheme.onSurface,
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                     IconButton(
-                      icon: const Icon(Icons.close, color: Colors.white54),
+                      icon: Icon(Icons.close, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.54)),
                       onPressed: () => Navigator.pop(context),
                     ),
                   ],
                 ),
-                const SizedBox(height: 20),
+                SizedBox(height: 20),
                 // Flight Number Field
-                const Text(
+                Text(
                   'FLIGHT NUMBER',
                   style: TextStyle(
-                    color: Colors.white54,
+                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.54),
                     fontSize: 11,
                     fontWeight: FontWeight.bold,
                     letterSpacing: 0.5,
                   ),
                 ),
-                const SizedBox(height: 8),
+                SizedBox(height: 8),
                 Container(
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                      EdgeInsets.symmetric(horizontal: 16, vertical: 4),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF162544),
+                    color: Theme.of(context).colorScheme.surface,
                     borderRadius: BorderRadius.circular(16),
                   ),
                   child: TextField(
                     controller: _flightController,
-                    style: const TextStyle(color: Colors.white),
+                    style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
                     decoration: InputDecoration(
-                      icon: const Icon(Icons.flight_takeoff,
-                          color: Colors.white54, size: 20),
+                      icon: Icon(Icons.flight_takeoff,
+                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.54), size: 20),
                       hintText: 'e.g., BA 123',
                       hintStyle:
-                          TextStyle(color: Colors.white.withOpacity(0.3)),
+                          TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3)),
                       border: InputBorder.none,
                     ),
                   ),
                 ),
-                const SizedBox(height: 16),
+                SizedBox(height: 16),
                 // Baggage Tag Field
-                const Text(
+                Text(
                   'BAGGAGE TAG NUMBER (OPTIONAL)',
                   style: TextStyle(
-                    color: Colors.white54,
+                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.54),
                     fontSize: 11,
                     fontWeight: FontWeight.bold,
                     letterSpacing: 0.5,
                   ),
                 ),
-                const SizedBox(height: 8),
+                SizedBox(height: 8),
                 Container(
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                      EdgeInsets.symmetric(horizontal: 16, vertical: 4),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF162544),
+                    color: Theme.of(context).colorScheme.surface,
                     borderRadius: BorderRadius.circular(16),
                   ),
                   child: TextField(
                     controller: _baggageController,
-                    style: const TextStyle(color: Colors.white),
+                    style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
                     decoration: InputDecoration(
-                      icon: const Icon(Icons.luggage,
-                          color: Colors.white54, size: 20),
+                      icon: Icon(Icons.luggage,
+                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.54), size: 20),
                       hintText: 'e.g., 1234567890',
                       hintStyle:
-                          TextStyle(color: Colors.white.withOpacity(0.3)),
+                          TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3)),
                       border: InputBorder.none,
                     ),
                   ),
                 ),
-                const SizedBox(height: 32),
+                SizedBox(height: 32),
                 // Submit Button
                 GestureDetector(
                   onTap: _isSubmitting ? null : () async {
@@ -203,13 +203,13 @@ class _ResolveDashboardScreenState extends State<ResolveDashboardScreen> {
                   },
                   child: Container(
                     width: double.infinity,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    padding: EdgeInsets.symmetric(vertical: 16),
                     decoration: BoxDecoration(
                       color: _isSubmitting ? Colors.grey : const Color(0xFFFFC229),
                       borderRadius: BorderRadius.circular(16),
                       boxShadow: _isSubmitting ? null : [
                         BoxShadow(
-                          color: const Color(0xFFFFC229).withOpacity(0.2),
+                          color: Color(0xFFFFC229).withOpacity(0.2),
                           blurRadius: 12,
                           offset: const Offset(0, 4),
                         ),
@@ -217,13 +217,13 @@ class _ResolveDashboardScreenState extends State<ResolveDashboardScreen> {
                     ),
                     alignment: Alignment.center,
                     child: _isSubmitting
-                        ? const SizedBox(
+                        ? SizedBox(
                             width: 20,
                             height: 20,
                             child: CircularProgressIndicator(
                                 strokeWidth: 2, valueColor: AlwaysStoppedAnimation<Color>(Colors.black)),
                           )
-                        : const Text(
+                        : Text(
                             'Submit Complaint',
                             style: TextStyle(
                               color: Colors.black,
@@ -233,7 +233,7 @@ class _ResolveDashboardScreenState extends State<ResolveDashboardScreen> {
                           ),
                   ),
                 ),
-                const SizedBox(height: 16),
+                SizedBox(height: 16),
               ],
             ),
           ),
@@ -256,12 +256,12 @@ class _ResolveDashboardScreenState extends State<ResolveDashboardScreen> {
     bool isEmptyCompleted = completedCases.isEmpty;
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _showReportDisruptionSheet,
-        backgroundColor: const Color(0xFFFFC229),
-        icon: const Icon(Icons.add, color: Colors.black),
-        label: const Text(
+        
+        icon: Icon(Icons.add, color: Colors.black),
+        label: Text(
           'Report Disruption',
           style: TextStyle(
             color: Colors.black,
@@ -279,7 +279,7 @@ class _ResolveDashboardScreenState extends State<ResolveDashboardScreen> {
               const ResolveHeaderGradient(),
 
               Padding(
-                padding: const EdgeInsets.all(24.0),
+                padding: EdgeInsets.all(24.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
@@ -287,10 +287,10 @@ class _ResolveDashboardScreenState extends State<ResolveDashboardScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text(
+                        Text(
                           'Active Cases',
                           style: TextStyle(
-                            color: Colors.white,
+                            color: Theme.of(context).colorScheme.onSurface,
                             fontSize: 21,
                             fontWeight: FontWeight.bold,
                           ),
@@ -299,32 +299,32 @@ class _ResolveDashboardScreenState extends State<ResolveDashboardScreen> {
                           isEmptyActive
                               ? '0 in progress'
                               : '${activeCases.length} in progress',
-                          style: const TextStyle(
-                            color: Colors.white38,
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.38),
                             fontSize: 14,
                           ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 10),
+                    SizedBox(height: 10),
 
                     if (_isLoading)
                       const SkeletonBox(height: 140, radius: 24)
                     else if (isEmptyActive)
                       Container(
-                        padding: const EdgeInsets.symmetric(vertical: 36),
+                        padding: EdgeInsets.symmetric(vertical: 36),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF0C162A),
+                          color: Theme.of(context).colorScheme.surface,
                           borderRadius: BorderRadius.circular(24),
                           border: Border.all(
-                            color: Colors.white.withOpacity(0.04),
+                            color: Theme.of(context).colorScheme.outline,
                           ),
                         ),
                         alignment: Alignment.center,
                         child: Text(
                           'No active cases',
                           style: TextStyle(
-                            color: Colors.white.withOpacity(0.4),
+                            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
                             fontSize: 13,
                             fontWeight: FontWeight.bold,
                           ),
@@ -340,36 +340,36 @@ class _ResolveDashboardScreenState extends State<ResolveDashboardScreen> {
                             stepText: 'Processing claim',
                           )),
 
-                    const SizedBox(height: 1),
+                    SizedBox(height: 1),
 
                     // Completed Cases Section Header
-                    const Text(
+                    Text(
                       'Completed Cases',
                       style: TextStyle(
-                        color: Colors.white,
+                        color: Theme.of(context).colorScheme.onSurface,
                         fontSize: 21,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    const SizedBox(height: 18),
+                    SizedBox(height: 18),
 
                     if (_isLoading)
                       const SkeletonBox(height: 100, radius: 24)
                     else if (isEmptyCompleted)
                       Container(
-                        padding: const EdgeInsets.symmetric(vertical: 36),
+                        padding: EdgeInsets.symmetric(vertical: 36),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF0C162A),
+                          color: Theme.of(context).colorScheme.surface,
                           borderRadius: BorderRadius.circular(24),
                           border: Border.all(
-                            color: Colors.white.withOpacity(0.04),
+                            color: Theme.of(context).colorScheme.outline,
                           ),
                         ),
                         alignment: Alignment.center,
                         child: Text(
                           'No completed cases yet',
                           style: TextStyle(
-                            color: Colors.white.withOpacity(0.4),
+                            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
                             fontSize: 13,
                             fontWeight: FontWeight.bold,
                           ),
@@ -383,7 +383,7 @@ class _ResolveDashboardScreenState extends State<ResolveDashboardScreen> {
                             status: CaseStatus.completed,
                             compensationAmount: claim.compensationAmount ?? 'N/A',
                           )),
-                    const SizedBox(height: 16),
+                    SizedBox(height: 16),
                   ],
                 ),
               ),

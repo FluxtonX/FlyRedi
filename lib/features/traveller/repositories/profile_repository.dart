@@ -31,10 +31,12 @@ class ProfileRepository {
   Future<UserProfile> updateProfile({
     String? displayName,
     String? phoneNumber,
+    String? plan,
   }) async {
     final body = <String, dynamic>{};
     if (displayName != null) body['displayName'] = displayName;
     if (phoneNumber != null) body['phoneNumber'] = phoneNumber;
+    if (plan != null) body['plan'] = plan;
 
     final http.Response response =
         await ApiService.put('/api/auth/profile', body: body);

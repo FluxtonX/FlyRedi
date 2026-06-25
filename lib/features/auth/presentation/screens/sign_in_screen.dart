@@ -64,22 +64,22 @@ class _SignInScreenState extends State<SignInScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF071B3A),
+      
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24),
+            padding: EdgeInsets.symmetric(horizontal: 24),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const SizedBox(height: 60),
+                SizedBox(height: 60),
                 Center(
                   child: Image.asset(
                     'assets/images/flyredilogo.png',
                     height: 120,
                   ),
                 ),
-                const SizedBox(height: 30),
+                SizedBox(height: 30),
                 const Text(
                   'Welcome Back',
                   textAlign: TextAlign.center,
@@ -89,7 +89,7 @@ class _SignInScreenState extends State<SignInScreen> {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                const SizedBox(height: 10),
+                SizedBox(height: 10),
                 const Text(
                   'Sign in to your FlyRedi account',
                   textAlign: TextAlign.center,
@@ -98,7 +98,7 @@ class _SignInScreenState extends State<SignInScreen> {
                     fontSize: 16,
                   ),
                 ),
-                const SizedBox(height: 40),
+                SizedBox(height: 40),
 
                 // Email field
                 AuthTextField(
@@ -114,12 +114,12 @@ class _SignInScreenState extends State<SignInScreen> {
                 Obx(() => _emailError.value != null
                     ? Column(
                         children: [
-                          const SizedBox(height: 6),
+                          SizedBox(height: 6),
                           _buildFieldError(_emailError.value!),
                         ],
                       )
-                    : const SizedBox.shrink()),
-                const SizedBox(height: 20),
+                    : SizedBox.shrink()),
+                SizedBox(height: 20),
 
                 // Password field
                 AuthTextField(
@@ -137,12 +137,12 @@ class _SignInScreenState extends State<SignInScreen> {
                 Obx(() => _passwordError.value != null
                     ? Column(
                         children: [
-                          const SizedBox(height: 6),
+                          SizedBox(height: 6),
                           _buildFieldError(_passwordError.value!),
                         ],
                       )
-                    : const SizedBox.shrink()),
-                const SizedBox(height: 16),
+                    : SizedBox.shrink()),
+                SizedBox(height: 16),
 
                 // Forgot password
                 Align(
@@ -159,14 +159,14 @@ class _SignInScreenState extends State<SignInScreen> {
                     ),
                   ),
                 ),
-                const SizedBox(height: 30),
+                SizedBox(height: 30),
 
                 // Sign In button
                 Obx(() => CustomButton(
                       title: _authController.isLoading.value ? 'Signing In...' : 'Sign In',
                       onTap: _authController.isLoading.value ? () {} : _handleLogin,
                     )),
-                const SizedBox(height: 30),
+                SizedBox(height: 30),
 
                 // Sign Up link
                 Row(
@@ -188,7 +188,7 @@ class _SignInScreenState extends State<SignInScreen> {
                     ),
                   ],
                 ),
-                const SizedBox(height: 24),
+                SizedBox(height: 24),
               ],
             ),
           ),
@@ -199,15 +199,15 @@ class _SignInScreenState extends State<SignInScreen> {
 
   Widget _buildFieldError(String message) {
     return Padding(
-      padding: const EdgeInsets.only(left: 4),
+      padding: EdgeInsets.only(left: 4),
       child: Row(
         children: [
-          const Icon(Icons.info_outline_rounded, size: 14, color: Color(0xFFE11D48)),
-          const SizedBox(width: 6),
+          Icon(Icons.info_outline_rounded, size: 14, color: Color(0xFFE11D48)),
+          SizedBox(width: 6),
           Expanded(
             child: Text(
               message,
-              style: const TextStyle(
+              style: TextStyle(
                 color: Color(0xFFE11D48),
                 fontSize: 12,
                 fontWeight: FontWeight.w500,

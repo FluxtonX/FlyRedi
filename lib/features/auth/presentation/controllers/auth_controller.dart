@@ -190,12 +190,12 @@ class AuthController extends GetxController {
         'Session expired',
         'Please sign in again.',
         snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: const Color(0xFFE11D48),
+        
         colorText: Colors.white,
-        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         borderRadius: 12,
         duration: const Duration(seconds: 3),
-        icon: const Icon(Icons.error_outline_rounded, color: Colors.white),
+        icon: Icon(Icons.error_outline_rounded, color: Colors.white),
       );
     }
 
@@ -207,12 +207,12 @@ class AuthController extends GetxController {
       'Error',
       message,
       snackPosition: SnackPosition.BOTTOM,
-      backgroundColor: const Color(0xFFE11D48),
+      
       colorText: Colors.white,
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       borderRadius: 12,
       duration: const Duration(seconds: 3),
-      icon: const Icon(Icons.error_outline_rounded, color: Colors.white),
+      icon: Icon(Icons.error_outline_rounded, color: Colors.white),
     );
   }
 
@@ -221,12 +221,12 @@ class AuthController extends GetxController {
       'Success',
       message,
       snackPosition: SnackPosition.BOTTOM,
-      backgroundColor: const Color(0xFF10B981),
+      
       colorText: Colors.white,
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       borderRadius: 12,
       duration: const Duration(seconds: 3),
-      icon: const Icon(Icons.check_circle_outline_rounded, color: Colors.white),
+      icon: Icon(Icons.check_circle_outline_rounded, color: Colors.white),
     );
   }
 }

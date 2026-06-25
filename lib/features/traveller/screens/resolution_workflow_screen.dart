@@ -24,11 +24,11 @@ class _ResolutionWorkflowScreenState extends State<ResolutionWorkflowScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+            padding: EdgeInsets.symmetric(horizontal: 24, vertical: 24),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
@@ -46,32 +46,32 @@ class _ResolutionWorkflowScreenState extends State<ResolutionWorkflowScreen> {
                           Navigator.pop(context);
                         }
                       },
-                      icon: const Icon(
+                      icon: Icon(
                         Icons.arrow_back,
-                        color: Colors.white70,
+                        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
                         size: 24,
                       ),
                       padding: EdgeInsets.zero,
                       constraints: const BoxConstraints(),
                     ),
-                    const SizedBox(width: 16),
+                    SizedBox(width: 16),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
+                          Text(
                             'Resolution Workflow',
                             style: TextStyle(
-                              color: Colors.white,
+                              color: Theme.of(context).colorScheme.onSurface,
                               fontSize: 22,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          const SizedBox(height: 6),
+                          SizedBox(height: 6),
                           Text(
                             "We'll guide you step-by-step to resolve this disruption",
                             style: TextStyle(
-                              color: Colors.white.withOpacity(0.5),
+                              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
                               fontSize: 14,
                               height: 1.35,
                             ),
@@ -82,9 +82,9 @@ class _ResolutionWorkflowScreenState extends State<ResolutionWorkflowScreen> {
                   ],
                 ),
 
-                const SizedBox(height: 32),
+                SizedBox(height: 32),
                 WorkflowTimelineTracker(currentStep: _currentStep),
-                const SizedBox(height: 40),
+                SizedBox(height: 40),
 
                 // Dynamic step content
                 _buildStepContent(),
@@ -106,25 +106,25 @@ class _ResolutionWorkflowScreenState extends State<ResolutionWorkflowScreen> {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const Text(
+            Text(
               'Step 1: Confirm Disruption',
               style: TextStyle(
-                color: Colors.white,
+                color: Theme.of(context).colorScheme.onSurface,
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
               ),
             ),
-            const SizedBox(height: 6),
+            SizedBox(height: 6),
             Text(
               "Let's verify the details of your travel disruption",
               style: TextStyle(
-                color: Colors.white.withOpacity(0.5),
+                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
                 fontSize: 14,
               ),
             ),
-            const SizedBox(height: 24),
+            SizedBox(height: 24),
             const DisruptionDetailsCard(),
-            const SizedBox(height: 24),
+            SizedBox(height: 24),
             ConfirmationCard(
               onYesPressed: () {
                 setState(() {
@@ -132,21 +132,21 @@ class _ResolutionWorkflowScreenState extends State<ResolutionWorkflowScreen> {
                 });
               },
             ),
-            const SizedBox(height: 24),
+            SizedBox(height: 24),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8),
+              padding: EdgeInsets.symmetric(horizontal: 8),
               child: RichText(
                 text: TextSpan(
                   style: TextStyle(
-                    color: Colors.white.withOpacity(0.4),
+                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
                     fontSize: 13,
                     height: 1.4,
                   ),
-                  children: const [
+                  children: [
                     TextSpan(
                       text: 'Note: ',
                       style: TextStyle(
-                        color: Colors.white70,
+                        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -196,7 +196,7 @@ class _ResolutionWorkflowScreenState extends State<ResolutionWorkflowScreen> {
           },
         );
       default:
-        return const SizedBox();
+        return SizedBox();
     }
   }
 

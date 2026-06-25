@@ -64,21 +64,21 @@ class _EmailPreviewScreenState extends State<EmailPreviewScreen> {
     Clipboard.setData(ClipboardData(text: _emailBodyController.text));
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: const Row(
+        content: Row(
           children: [
             Icon(Icons.check_circle, color: Color(0xFF10B981)),
             SizedBox(width: 10),
             Text(
               'Email copied to clipboard!',
-              style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+              style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.bold),
             ),
           ],
         ),
-        backgroundColor: const Color(0xFF0C162A),
+        backgroundColor: Theme.of(context).colorScheme.surface,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
-          side: BorderSide(color: Colors.white.withOpacity(0.08)),
+          side: BorderSide(color: Theme.of(context).colorScheme.outline),
         ),
         duration: const Duration(seconds: 2),
       ),
@@ -88,21 +88,21 @@ class _EmailPreviewScreenState extends State<EmailPreviewScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          icon: Icon(Icons.arrow_back, color: Theme.of(context).colorScheme.onSurface),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Column(
+        title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               'Email Preview',
               style: TextStyle(
-                color: Colors.white,
+                color: Theme.of(context).colorScheme.onSurface,
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
               ),
@@ -111,7 +111,7 @@ class _EmailPreviewScreenState extends State<EmailPreviewScreen> {
             Text(
               'Review your complaint email before sending',
               style: TextStyle(
-                color: Colors.white54,
+                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.54),
                 fontSize: 12,
                 fontWeight: FontWeight.normal,
               ),
@@ -121,17 +121,17 @@ class _EmailPreviewScreenState extends State<EmailPreviewScreen> {
         titleSpacing: 0,
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+        padding: EdgeInsets.symmetric(horizontal: 24, vertical: 16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             // Master Container for Email Preview Card
             Container(
               decoration: BoxDecoration(
-                color: const Color(0xFF0C162A),
+                color: Theme.of(context).colorScheme.surface,
                 borderRadius: BorderRadius.circular(24),
                 border: Border.all(
-                  color: Colors.white.withOpacity(0.04),
+                  color: Theme.of(context).colorScheme.outline,
                 ),
               ),
               child: Column(
@@ -139,72 +139,72 @@ class _EmailPreviewScreenState extends State<EmailPreviewScreen> {
                 children: [
                   // Top Email Header Container
                   Container(
-                    padding: const EdgeInsets.all(20),
+                    padding: EdgeInsets.all(20),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF08101E).withOpacity(0.5),
-                      borderRadius: const BorderRadius.only(
+                      color: Theme.of(context).colorScheme.surface.withOpacity(0.5),
+                      borderRadius: BorderRadius.only(
                         topLeft: Radius.circular(24),
                         topRight: Radius.circular(24),
                       ),
                       border: Border(
                         bottom: BorderSide(
-                          color: Colors.white.withOpacity(0.04),
+                          color: Theme.of(context).colorScheme.outline,
                         ),
                       ),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
+                        Text(
                           'To',
                           style: TextStyle(
-                            color: Colors.white38,
+                            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.38),
                             fontSize: 11,
                           ),
                         ),
-                        const SizedBox(height: 4),
-                        const Text(
+                        SizedBox(height: 4),
+                        Text(
                           'complaints@airpeace.com',
                           style: TextStyle(
-                            color: Colors.white,
+                            color: Theme.of(context).colorScheme.onSurface,
                             fontSize: 13,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
-                        const SizedBox(height: 14),
-                        const Text(
+                        SizedBox(height: 14),
+                        Text(
                           'Subject',
                           style: TextStyle(
-                            color: Colors.white38,
+                            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.38),
                             fontSize: 11,
                           ),
                         ),
-                        const SizedBox(height: 4),
-                        const Text(
+                        SizedBox(height: 4),
+                        Text(
                           'Flight Cancellation Complaint - W3 205 (27 Apr 2026)',
                           style: TextStyle(
-                            color: Colors.white,
+                            color: Theme.of(context).colorScheme.onSurface,
                             fontSize: 13,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        const SizedBox(height: 14),
-                        const Text(
+                        SizedBox(height: 14),
+                        Text(
                           'Attachments',
                           style: TextStyle(
-                            color: Colors.white38,
+                            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.38),
                             fontSize: 11,
                           ),
                         ),
-                        const SizedBox(height: 8),
+                        SizedBox(height: 8),
                         SingleChildScrollView(
                           scrollDirection: Axis.horizontal,
                           child: Row(
                             children: [
                               _buildAttachmentChip('Ticket.pdf'),
-                              const SizedBox(width: 8),
+                              SizedBox(width: 8),
                               _buildAttachmentChip('Passport.pdf'),
-                              const SizedBox(width: 8),
+                              SizedBox(width: 8),
                               _buildAttachmentChip('Notice.pdf'),
                             ],
                           ),
@@ -215,25 +215,25 @@ class _EmailPreviewScreenState extends State<EmailPreviewScreen> {
 
                   // Email Body Text Container (Scrollable)
                   Padding(
-                    padding: const EdgeInsets.all(22),
+                    padding: EdgeInsets.all(22),
                     child: _isEditing
                         ? TextField(
                             controller: _emailBodyController,
                             maxLines: null,
-                            style: const TextStyle(
-                              color: Colors.white70,
+                            style: TextStyle(
+                              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
                               fontSize: 13,
                               height: 1.45,
                             ),
-                            decoration: const InputDecoration(
+                            decoration: InputDecoration(
                               border: InputBorder.none,
                               contentPadding: EdgeInsets.zero,
                             ),
                           )
                         : Text(
                             _emailBodyController.text,
-                            style: const TextStyle(
-                              color: Colors.white70,
+                            style: TextStyle(
+                              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
                               fontSize: 13,
                               height: 1.45,
                             ),
@@ -243,7 +243,7 @@ class _EmailPreviewScreenState extends State<EmailPreviewScreen> {
               ),
             ),
 
-            const SizedBox(height: 20),
+            SizedBox(height: 20),
 
             // Action Buttons: Copy & Edit
             Row(
@@ -252,12 +252,12 @@ class _EmailPreviewScreenState extends State<EmailPreviewScreen> {
                   child: GestureDetector(
                     onTap: _copyToClipboard,
                     child: Container(
-                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      padding: EdgeInsets.symmetric(vertical: 14),
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.04),
+                        color: Theme.of(context).colorScheme.outline,
                         borderRadius: BorderRadius.circular(14),
                         border: Border.all(
-                          color: Colors.white.withOpacity(0.08),
+                          color: Theme.of(context).colorScheme.outline,
                         ),
                       ),
                       child: Row(
@@ -265,14 +265,14 @@ class _EmailPreviewScreenState extends State<EmailPreviewScreen> {
                         children: [
                           Icon(
                             Icons.copy,
-                            color: Colors.white.withOpacity(0.8),
+                            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.8),
                             size: 16,
                           ),
-                          const SizedBox(width: 8),
-                          const Text(
+                          SizedBox(width: 8),
+                          Text(
                             'Copy',
                             style: TextStyle(
-                              color: Colors.white,
+                              color: Theme.of(context).colorScheme.onSurface,
                               fontSize: 13,
                               fontWeight: FontWeight.bold,
                             ),
@@ -282,7 +282,7 @@ class _EmailPreviewScreenState extends State<EmailPreviewScreen> {
                     ),
                   ),
                 ),
-                const SizedBox(width: 12),
+                SizedBox(width: 12),
                 Expanded(
                   child: GestureDetector(
                     onTap: () {
@@ -292,21 +292,21 @@ class _EmailPreviewScreenState extends State<EmailPreviewScreen> {
                       if (!_isEditing) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
-                            content: const Row(
+                            content: Row(
                               children: [
                                 Icon(Icons.check, color: Color(0xFF10B981)),
                                 SizedBox(width: 10),
                                 Text(
                                   'Changes saved successfully!',
-                                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                                  style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.bold),
                                 ),
                               ],
                             ),
-                            backgroundColor: const Color(0xFF0C162A),
+                            backgroundColor: Theme.of(context).colorScheme.surface,
                             behavior: SnackBarBehavior.floating,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
-                              side: BorderSide(color: Colors.white.withOpacity(0.08)),
+                              side: BorderSide(color: Theme.of(context).colorScheme.outline),
                             ),
                             duration: const Duration(seconds: 2),
                           ),
@@ -314,12 +314,12 @@ class _EmailPreviewScreenState extends State<EmailPreviewScreen> {
                       }
                     },
                     child: Container(
-                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      padding: EdgeInsets.symmetric(vertical: 14),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF08101E),
+                        color: Theme.of(context).colorScheme.surface,
                         borderRadius: BorderRadius.circular(14),
                         border: Border.all(
-                          color: Colors.white.withOpacity(0.08),
+                          color: Theme.of(context).colorScheme.outline,
                         ),
                       ),
                       child: Row(
@@ -327,14 +327,14 @@ class _EmailPreviewScreenState extends State<EmailPreviewScreen> {
                         children: [
                           Icon(
                             _isEditing ? Icons.save : Icons.edit,
-                            color: Colors.white.withOpacity(0.8),
+                            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.8),
                             size: 16,
                           ),
-                          const SizedBox(width: 8),
+                          SizedBox(width: 8),
                           Text(
                             _isEditing ? 'Save' : 'Edit',
-                            style: const TextStyle(
-                              color: Colors.white,
+                            style: TextStyle(
+                              color: Theme.of(context).colorScheme.onSurface,
                               fontSize: 13,
                               fontWeight: FontWeight.bold,
                             ),
@@ -347,16 +347,16 @@ class _EmailPreviewScreenState extends State<EmailPreviewScreen> {
               ],
             ),
 
-            const SizedBox(height: 24),
+            SizedBox(height: 24),
 
             // Tip Container
             Container(
-              padding: const EdgeInsets.all(18),
+              padding: EdgeInsets.all(18),
               decoration: BoxDecoration(
-                color: const Color(0xFF0C162A),
+                color: Theme.of(context).colorScheme.surface,
                 borderRadius: BorderRadius.circular(20),
                 border: Border.all(
-                  color: const Color(0xFFFFC229).withOpacity(0.12),
+                  color: Color(0xFFFFC229).withOpacity(0.12),
                 ),
               ),
               child: Column(
@@ -364,27 +364,27 @@ class _EmailPreviewScreenState extends State<EmailPreviewScreen> {
                 children: [
                   Row(
                     children: [
-                      const Icon(
+                      Icon(
                         Icons.lightbulb_outline,
                         color: Color(0xFFFFC229),
                         size: 16,
                       ),
-                      const SizedBox(width: 6),
+                      SizedBox(width: 6),
                       Text(
                         'Tip:',
                         style: TextStyle(
-                          color: Colors.white.withOpacity(0.9),
+                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.9),
                           fontSize: 13,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 6),
+                  SizedBox(height: 6),
                   Text(
                     'You can edit any part of this email. Dynamic fields like flight numbers and dates are highlighted for easy identification.',
                     style: TextStyle(
-                      color: Colors.white.withOpacity(0.55),
+                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.55),
                       fontSize: 12,
                       height: 1.45,
                     ),
@@ -393,7 +393,7 @@ class _EmailPreviewScreenState extends State<EmailPreviewScreen> {
               ),
             ),
 
-            const SizedBox(height: 32),
+            SizedBox(height: 32),
 
             // Bottom Continue to Send Options Button
             GestureDetector(
@@ -407,12 +407,12 @@ class _EmailPreviewScreenState extends State<EmailPreviewScreen> {
               },
               child: Container(
                 width: double.infinity,
-                padding: const EdgeInsets.symmetric(vertical: 18),
+                padding: EdgeInsets.symmetric(vertical: 18),
                 decoration: BoxDecoration(
                   color: const Color(0xFFFFC229), // Yellow
                   borderRadius: BorderRadius.circular(16),
                 ),
-                child: const Row(
+                child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
@@ -442,27 +442,27 @@ class _EmailPreviewScreenState extends State<EmailPreviewScreen> {
 
   Widget _buildAttachmentChip(String filename) {
     return Container(
-      margin: const EdgeInsets.only(right: 8),
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      margin: EdgeInsets.only(right: 8),
+      padding: EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
-        color: const Color(0xFF1E3A8A).withOpacity(0.4),
+        color: Theme.of(context).colorScheme.surface.withOpacity(0.4),
         borderRadius: BorderRadius.circular(8),
         border: Border.all(
-          color: const Color(0xFF3B82F6).withOpacity(0.2),
+          color: Color(0xFF3B82F6).withOpacity(0.2),
         ),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Icon(
+          Icon(
             Icons.link,
             color: Color(0xFF60A5FA),
             size: 13,
           ),
-          const SizedBox(width: 4),
+          SizedBox(width: 4),
           Text(
             filename,
-            style: const TextStyle(
+            style: TextStyle(
               color: Color(0xFF93C5FD),
               fontSize: 11,
               fontWeight: FontWeight.w500,

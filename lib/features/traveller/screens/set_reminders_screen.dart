@@ -17,21 +17,21 @@ class _SetRemindersScreenState extends State<SetRemindersScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          icon: Icon(Icons.arrow_back, color: Theme.of(context).colorScheme.onSurface),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Column(
+        title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               'Set Follow-Up Reminders',
               style: TextStyle(
-                color: Colors.white,
+                color: Theme.of(context).colorScheme.onSurface,
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
               ),
@@ -40,7 +40,7 @@ class _SetRemindersScreenState extends State<SetRemindersScreen> {
             Text(
               "We'll remind you if you don't receive a response",
               style: TextStyle(
-                color: Colors.white54,
+                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.54),
                 fontSize: 12,
                 fontWeight: FontWeight.normal,
               ),
@@ -50,52 +50,52 @@ class _SetRemindersScreenState extends State<SetRemindersScreen> {
         titleSpacing: 0,
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24),
+        padding: EdgeInsets.all(24),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             // Enable Reminders Card
             Container(
-              padding: const EdgeInsets.all(20),
+              padding: EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: const Color(0xFF0C162A),
+                color: Theme.of(context).colorScheme.surface,
                 borderRadius: BorderRadius.circular(24),
                 border: Border.all(
-                  color: Colors.white.withOpacity(0.04),
+                  color: Theme.of(context).colorScheme.outline,
                 ),
               ),
               child: Row(
                 children: [
                   Container(
-                    padding: const EdgeInsets.all(12),
+                    padding: EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFFFC229).withOpacity(0.1),
+                      color: Color(0xFFFFC229).withOpacity(0.1),
                       shape: BoxShape.circle,
                     ),
-                    child: const Icon(
+                    child: Icon(
                       Icons.notifications_active_outlined,
                       color: Color(0xFFFFC229),
                       size: 20,
                     ),
                   ),
-                  const SizedBox(width: 16),
+                  SizedBox(width: 16),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
+                        Text(
                           'Enable Follow-Up Reminders',
                           style: TextStyle(
-                            color: Colors.white,
+                            color: Theme.of(context).colorScheme.onSurface,
                             fontSize: 15,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        const SizedBox(height: 4),
+                        SizedBox(height: 4),
                         Text(
                           'Get notified if no response is received',
                           style: TextStyle(
-                            color: Colors.white.withOpacity(0.4),
+                            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
                             fontSize: 12,
                           ),
                         ),
@@ -105,9 +105,9 @@ class _SetRemindersScreenState extends State<SetRemindersScreen> {
                   Switch(
                     value: _enableReminders,
                     activeColor: const Color(0xFFFFC229),
-                    activeTrackColor: const Color(0xFFFFC229).withOpacity(0.3),
-                    inactiveThumbColor: Colors.white54,
-                    inactiveTrackColor: Colors.white12,
+                    activeTrackColor: Color(0xFFFFC229).withOpacity(0.3),
+                    inactiveThumbColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.54),
+                    inactiveTrackColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.12),
                     onChanged: (bool value) {
                       setState(() {
                         _enableReminders = value;
@@ -118,44 +118,44 @@ class _SetRemindersScreenState extends State<SetRemindersScreen> {
               ),
             ),
 
-            const SizedBox(height: 20),
+            SizedBox(height: 20),
 
             // Smart Suggestion Card
             Container(
-              padding: const EdgeInsets.all(20),
+              padding: EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: const Color(0xFF0C162A),
+                color: Theme.of(context).colorScheme.surface,
                 borderRadius: BorderRadius.circular(20),
                 border: Border.all(
-                  color: const Color(0xFF10B981).withOpacity(0.15), // Green border tint
+                  color: Color(0xFF10B981).withOpacity(0.15), // Green border tint
                 ),
               ),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Icon(
+                  Icon(
                     Icons.check_circle_outline,
                     color: Color(0xFF10B981),
                     size: 20,
                   ),
-                  const SizedBox(width: 14),
+                  SizedBox(width: 14),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
+                        Text(
                           'Smart Suggestion',
                           style: TextStyle(
-                            color: Colors.white,
+                            color: Theme.of(context).colorScheme.onSurface,
                             fontSize: 14,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        const SizedBox(height: 6),
+                        SizedBox(height: 6),
                         Text(
                           'Most cases are resolved within 7–14 days. We recommend setting a 7-day reminder for optimal follow-up timing.',
                           style: TextStyle(
-                            color: Colors.white.withOpacity(0.55),
+                            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.55),
                             fontSize: 12,
                             height: 1.45,
                           ),
@@ -167,17 +167,17 @@ class _SetRemindersScreenState extends State<SetRemindersScreen> {
               ),
             ),
 
-            const SizedBox(height: 24),
+            SizedBox(height: 24),
 
-            const Text(
+            Text(
               'Select Reminder Interval',
               style: TextStyle(
-                color: Colors.white,
+                color: Theme.of(context).colorScheme.onSurface,
                 fontSize: 15,
                 fontWeight: FontWeight.bold,
               ),
             ),
-            const SizedBox(height: 14),
+            SizedBox(height: 14),
 
             // Grid of intervals
             Row(
@@ -190,7 +190,7 @@ class _SetRemindersScreenState extends State<SetRemindersScreen> {
                     hasStar: false,
                   ),
                 ),
-                const SizedBox(width: 12),
+                SizedBox(width: 12),
                 Expanded(
                   child: _buildIntervalCard(
                     days: 7,
@@ -201,7 +201,7 @@ class _SetRemindersScreenState extends State<SetRemindersScreen> {
                 ),
               ],
             ),
-            const SizedBox(height: 12),
+            SizedBox(height: 12),
             Row(
               children: [
                 Expanded(
@@ -212,7 +212,7 @@ class _SetRemindersScreenState extends State<SetRemindersScreen> {
                     hasStar: true,
                   ),
                 ),
-                const SizedBox(width: 12),
+                SizedBox(width: 12),
                 Expanded(
                   child: _buildIntervalCard(
                     days: 21,
@@ -224,26 +224,26 @@ class _SetRemindersScreenState extends State<SetRemindersScreen> {
               ],
             ),
 
-            const SizedBox(height: 28),
+            SizedBox(height: 28),
 
             // Reminder Schedule Card
             if (_enableReminders) ...[
-              const Text(
+              Text(
                 'Reminder Schedule',
                 style: TextStyle(
-                  color: Colors.white,
+                  color: Theme.of(context).colorScheme.onSurface,
                   fontSize: 15,
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              const SizedBox(height: 14),
+              SizedBox(height: 14),
               Container(
-                padding: const EdgeInsets.all(20),
+                padding: EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF0C162A),
+                  color: Theme.of(context).colorScheme.surface,
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(
-                    color: Colors.white.withOpacity(0.04),
+                    color: Theme.of(context).colorScheme.outline,
                   ),
                 ),
                 child: Column(
@@ -264,7 +264,7 @@ class _SetRemindersScreenState extends State<SetRemindersScreen> {
                     ),
                     _buildScheduleStep(
                       icon: Icons.notifications_none,
-                      iconColor: Colors.white60,
+                      iconColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                       title: 'Follow-Up Alert',
                       subtitle: 'If no response after $_selectedInterval days',
                       isLast: true,
@@ -272,31 +272,31 @@ class _SetRemindersScreenState extends State<SetRemindersScreen> {
                   ],
                 ),
               ),
-              const SizedBox(height: 24),
+              SizedBox(height: 24),
             ],
 
             // "How it works" Info Card
             Container(
-              padding: const EdgeInsets.all(18),
+              padding: EdgeInsets.all(18),
               decoration: BoxDecoration(
-                color: const Color(0xFF0C162A),
+                color: Theme.of(context).colorScheme.surface,
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(
-                  color: Colors.white.withOpacity(0.04),
+                  color: Theme.of(context).colorScheme.outline,
                 ),
               ),
               child: RichText(
                 text: TextSpan(
                   style: TextStyle(
-                    color: Colors.white.withOpacity(0.5),
+                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
                     fontSize: 12,
                     height: 1.45,
                   ),
                   children: [
-                    const TextSpan(
+                    TextSpan(
                       text: 'How it works: ',
                       style: TextStyle(
-                        color: Colors.white,
+                        color: Theme.of(context).colorScheme.onSurface,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -308,7 +308,7 @@ class _SetRemindersScreenState extends State<SetRemindersScreen> {
               ),
             ),
 
-            const SizedBox(height: 32),
+            SizedBox(height: 32),
 
             // Complete Setup Action Button
             GestureDetector(
@@ -322,12 +322,12 @@ class _SetRemindersScreenState extends State<SetRemindersScreen> {
               },
               child: Container(
                 width: double.infinity,
-                padding: const EdgeInsets.symmetric(vertical: 18),
+                padding: EdgeInsets.symmetric(vertical: 18),
                 decoration: BoxDecoration(
                   color: const Color(0xFFFFC229), // Yellow
                   borderRadius: BorderRadius.circular(16),
                 ),
-                child: const Row(
+                child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
@@ -370,12 +370,12 @@ class _SetRemindersScreenState extends State<SetRemindersScreen> {
         });
       },
       child: Container(
-        padding: const EdgeInsets.all(16),
+        padding: EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: const Color(0xFF0C162A),
+          color: Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: isSelected ? const Color(0xFFFFC229) : Colors.white.withOpacity(0.04),
+            color: isSelected ? const Color(0xFFFFC229) : Theme.of(context).colorScheme.outline,
             width: isSelected ? 1.5 : 1.0,
           ),
         ),
@@ -386,27 +386,27 @@ class _SetRemindersScreenState extends State<SetRemindersScreen> {
               children: [
                 Row(
                   children: [
-                    const Icon(
+                    Icon(
                       Icons.access_time_outlined,
-                      color: Colors.white54,
+                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.54),
                       size: 14,
                     ),
-                    const SizedBox(width: 6),
+                    SizedBox(width: 6),
                     Text(
                       label,
-                      style: const TextStyle(
-                        color: Colors.white,
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onSurface,
                         fontSize: 13,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 6),
+                SizedBox(height: 6),
                 Text(
                   description,
                   style: TextStyle(
-                    color: Colors.white.withOpacity(0.4),
+                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
                     fontSize: 10,
                   ),
                 ),
@@ -418,7 +418,7 @@ class _SetRemindersScreenState extends State<SetRemindersScreen> {
                 top: 0,
                 child: Icon(
                   Icons.star,
-                  color: const Color(0xFFFFC229).withOpacity(0.8),
+                  color: Color(0xFFFFC229).withOpacity(0.8),
                   size: 12,
                 ),
               ),
@@ -451,33 +451,33 @@ class _SetRemindersScreenState extends State<SetRemindersScreen> {
                   child: Container(
                     width: 2,
                     color: Colors.white10,
-                    margin: const EdgeInsets.symmetric(vertical: 4),
+                    margin: EdgeInsets.symmetric(vertical: 4),
                   ),
                 ),
             ],
           ),
-          const SizedBox(width: 14),
+          SizedBox(width: 14),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   title,
-                  style: const TextStyle(
-                    color: Colors.white,
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurface,
                     fontSize: 13,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                const SizedBox(height: 4),
+                SizedBox(height: 4),
                 Text(
                   subtitle,
                   style: TextStyle(
-                    color: Colors.white.withOpacity(0.4),
+                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
                     fontSize: 11,
                   ),
                 ),
-                if (!isLast) const SizedBox(height: 18),
+                if (!isLast) SizedBox(height: 18),
               ],
             ),
           ),

@@ -16,21 +16,21 @@ class _SendComplaintScreenState extends State<SendComplaintScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          icon: Icon(Icons.arrow_back, color: Theme.of(context).colorScheme.onSurface),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Column(
+        title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               'Send Your Complaint',
               style: TextStyle(
-                color: Colors.white,
+                color: Theme.of(context).colorScheme.onSurface,
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
               ),
@@ -39,7 +39,7 @@ class _SendComplaintScreenState extends State<SendComplaintScreen> {
             Text(
               "Choose how you'd like to send your email",
               style: TextStyle(
-                color: Colors.white54,
+                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.54),
                 fontSize: 12,
                 fontWeight: FontWeight.normal,
               ),
@@ -49,18 +49,18 @@ class _SendComplaintScreenState extends State<SendComplaintScreen> {
         titleSpacing: 0,
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24),
+        padding: EdgeInsets.all(24),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             // "You Remain in Control" Warning/Info Card
             Container(
-              padding: const EdgeInsets.all(18),
+              padding: EdgeInsets.all(18),
               decoration: BoxDecoration(
-                color: const Color(0xFF0C162A),
+                color: Theme.of(context).colorScheme.surface,
                 borderRadius: BorderRadius.circular(20),
                 border: Border.all(
-                  color: const Color(0xFFFFC229).withOpacity(0.12),
+                  color: Color(0xFFFFC229).withOpacity(0.12),
                 ),
               ),
               child: Column(
@@ -69,16 +69,16 @@ class _SendComplaintScreenState extends State<SendComplaintScreen> {
                   Text(
                     'You Remain in Control',
                     style: TextStyle(
-                      color: const Color(0xFFFFC229).withOpacity(0.9),
+                      color: Color(0xFFFFC229).withOpacity(0.9),
                       fontSize: 14,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  const SizedBox(height: 6),
+                  SizedBox(height: 6),
                   Text(
                     "We don't send emails on your behalf. You'll send this complaint from your own email account, giving you full control and transparency.",
                     style: TextStyle(
-                      color: Colors.white.withOpacity(0.55),
+                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.55),
                       fontSize: 12,
                       height: 1.45,
                     ),
@@ -87,17 +87,17 @@ class _SendComplaintScreenState extends State<SendComplaintScreen> {
               ),
             ),
 
-            const SizedBox(height: 24),
+            SizedBox(height: 24),
 
-            const Text(
+            Text(
               'Send Options',
               style: TextStyle(
-                color: Colors.white,
+                color: Theme.of(context).colorScheme.onSurface,
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
               ),
             ),
-            const SizedBox(height: 14),
+            SizedBox(height: 14),
 
             // Option 1: Open in Email App
             _buildOptionCard(
@@ -107,7 +107,7 @@ class _SendComplaintScreenState extends State<SendComplaintScreen> {
               subtitle: 'Your email app will open with the complaint pre-filled',
               recommended: true,
             ),
-            const SizedBox(height: 12),
+            SizedBox(height: 12),
 
             // Option 2: Copy Email Content
             _buildOptionCard(
@@ -117,7 +117,7 @@ class _SendComplaintScreenState extends State<SendComplaintScreen> {
               subtitle: 'Paste into your preferred email client manually',
               recommended: false,
             ),
-            const SizedBox(height: 12),
+            SizedBox(height: 12),
 
             // Option 3: Download as PDF
             _buildOptionCard(
@@ -127,7 +127,7 @@ class _SendComplaintScreenState extends State<SendComplaintScreen> {
               subtitle: 'Save for your records or print',
               recommended: false,
             ),
-            const SizedBox(height: 12),
+            SizedBox(height: 12),
 
             // Option 4: Share
             _buildOptionCard(
@@ -138,64 +138,64 @@ class _SendComplaintScreenState extends State<SendComplaintScreen> {
               recommended: false,
             ),
 
-            const SizedBox(height: 24),
+            SizedBox(height: 24),
 
             // Email Summary Card
             Container(
-              padding: const EdgeInsets.all(20),
+              padding: EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: const Color(0xFF0C162A),
+                color: Theme.of(context).colorScheme.surface,
                 borderRadius: BorderRadius.circular(20),
                 border: Border.all(
-                  color: Colors.white.withOpacity(0.04),
+                  color: Theme.of(context).colorScheme.outline,
                 ),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  const Text(
+                  Text(
                     'Email Summary',
                     style: TextStyle(
-                      color: Colors.white,
+                      color: Theme.of(context).colorScheme.onSurface,
                       fontSize: 14,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  const SizedBox(height: 14),
+                  SizedBox(height: 14),
                   _buildSummaryRow('To:', 'complaints@airpeace.com'),
-                  const SizedBox(height: 10),
+                  SizedBox(height: 10),
                   _buildSummaryRow('CC:', '2 authorities'),
-                  const SizedBox(height: 10),
+                  SizedBox(height: 10),
                   _buildSummaryRow('Attachments:', '3 files'),
-                  const SizedBox(height: 10),
+                  SizedBox(height: 10),
                   _buildSummaryRow('Claim Amount:', '₦130,000', highlightValue: true),
                 ],
               ),
             ),
 
-            const SizedBox(height: 20),
+            SizedBox(height: 20),
 
             // Next Step Card
             Container(
-              padding: const EdgeInsets.all(16),
+              padding: EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: const Color(0xFF0C162A),
+                color: Theme.of(context).colorScheme.surface,
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(
-                  color: Colors.white.withOpacity(0.04),
+                  color: Theme.of(context).colorScheme.outline,
                 ),
               ),
               child: Text(
                 'Next Step: After sending, set up follow-up reminders so we can notify you if you don\'t receive a response.',
                 style: TextStyle(
-                  color: Colors.white.withOpacity(0.4),
+                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
                   fontSize: 12,
                   height: 1.4,
                 ),
               ),
             ),
 
-            const SizedBox(height: 28),
+            SizedBox(height: 28),
 
             // Action Button to proceed to Reminders
             GestureDetector(
@@ -209,12 +209,12 @@ class _SendComplaintScreenState extends State<SendComplaintScreen> {
               },
               child: Container(
                 width: double.infinity,
-                padding: const EdgeInsets.symmetric(vertical: 18),
+                padding: EdgeInsets.symmetric(vertical: 18),
                 decoration: BoxDecoration(
                   color: const Color(0xFFFFC229), // Yellow
                   borderRadius: BorderRadius.circular(16),
                 ),
-                child: const Row(
+                child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
@@ -258,30 +258,30 @@ class _SendComplaintScreenState extends State<SendComplaintScreen> {
         });
       },
       child: Container(
-        padding: const EdgeInsets.all(18),
+        padding: EdgeInsets.all(18),
         decoration: BoxDecoration(
-          color: const Color(0xFF0C162A),
+          color: Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.circular(18),
           border: Border.all(
-            color: isSelected ? const Color(0xFFFFC229) : Colors.white.withOpacity(0.04),
+            color: isSelected ? const Color(0xFFFFC229) : Theme.of(context).colorScheme.outline,
             width: isSelected ? 1.5 : 1.0,
           ),
         ),
         child: Row(
           children: [
             Container(
-              padding: const EdgeInsets.all(10),
+              padding: EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.04),
+                color: Theme.of(context).colorScheme.outline,
                 shape: BoxShape.circle,
               ),
               child: Icon(
                 icon,
-                color: isSelected ? const Color(0xFFFFC229) : Colors.white60,
+                color: isSelected ? const Color(0xFFFFC229) : Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                 size: 18,
               ),
             ),
-            const SizedBox(width: 14),
+            SizedBox(width: 14),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -290,21 +290,21 @@ class _SendComplaintScreenState extends State<SendComplaintScreen> {
                     children: [
                       Text(
                         title,
-                        style: const TextStyle(
-                          color: Colors.white,
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.onSurface,
                           fontSize: 13,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                       if (recommended) ...[
-                        const SizedBox(width: 6),
+                        SizedBox(width: 6),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                           decoration: BoxDecoration(
-                            color: const Color(0xFFFFC229).withOpacity(0.12),
+                            color: Color(0xFFFFC229).withOpacity(0.12),
                             borderRadius: BorderRadius.circular(4),
                           ),
-                          child: const Text(
+                          child: Text(
                             'Recommended',
                             style: TextStyle(
                               color: Color(0xFFFFC229),
@@ -316,11 +316,11 @@ class _SendComplaintScreenState extends State<SendComplaintScreen> {
                       ],
                     ],
                   ),
-                  const SizedBox(height: 4),
+                  SizedBox(height: 4),
                   Text(
                     subtitle,
                     style: TextStyle(
-                      color: Colors.white.withOpacity(0.4),
+                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
                       fontSize: 11,
                     ),
                   ),
@@ -329,12 +329,12 @@ class _SendComplaintScreenState extends State<SendComplaintScreen> {
             ),
             if (isSelected)
               Container(
-                decoration: const BoxDecoration(
+                decoration: BoxDecoration(
                   color: Color(0xFFFFC229),
                   shape: BoxShape.circle,
                 ),
-                padding: const EdgeInsets.all(4),
-                child: const Icon(
+                padding: EdgeInsets.all(4),
+                child: Icon(
                   Icons.check,
                   color: Colors.black,
                   size: 12,
@@ -353,14 +353,14 @@ class _SendComplaintScreenState extends State<SendComplaintScreen> {
         Text(
           label,
           style: TextStyle(
-            color: Colors.white.withOpacity(0.4),
+            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
             fontSize: 13,
           ),
         ),
         Text(
           value,
           style: TextStyle(
-            color: highlightValue ? const Color(0xFFFFC229) : Colors.white,
+            color: highlightValue ? const Color(0xFFFFC229) : Theme.of(context).colorScheme.onSurface,
             fontSize: 13,
             fontWeight: FontWeight.bold,
           ),

@@ -10,21 +10,21 @@ class ActiveDisruptionsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          icon: Icon(Icons.arrow_back, color: Theme.of(context).colorScheme.onSurface),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Column(
+        title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               'Disruptions',
               style: TextStyle(
-                color: Colors.white,
+                color: Theme.of(context).colorScheme.onSurface,
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
               ),
@@ -33,7 +33,7 @@ class ActiveDisruptionsScreen extends StatelessWidget {
             Text(
               'Sentinel™ detected issues',
               style: TextStyle(
-                color: Colors.white54,
+                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.54),
                 fontSize: 12,
                 fontWeight: FontWeight.normal,
               ),
@@ -43,18 +43,18 @@ class ActiveDisruptionsScreen extends StatelessWidget {
         titleSpacing: 0,
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24),
+        padding: EdgeInsets.all(24),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             // Potential Compensation Card
             Container(
-              padding: const EdgeInsets.all(20),
+              padding: EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: const Color(0xFF0C162A),
+                color: Theme.of(context).colorScheme.surface,
                 borderRadius: BorderRadius.circular(24),
                 border: Border.all(
-                  color: Colors.white.withOpacity(0.04),
+                  color: Theme.of(context).colorScheme.outline,
                 ),
               ),
               child: Row(
@@ -63,15 +63,15 @@ class ActiveDisruptionsScreen extends StatelessWidget {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
+                      Text(
                         'Potential Compensation',
                         style: TextStyle(
-                          color: Colors.white54,
+                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.54),
                           fontSize: 12,
                         ),
                       ),
-                      const SizedBox(height: 8),
-                      const Text(
+                      SizedBox(height: 8),
+                      Text(
                         '\$1,800',
                         style: TextStyle(
                           color: Color(0xFFFFC229), // Gold/Yellow
@@ -79,23 +79,23 @@ class ActiveDisruptionsScreen extends StatelessWidget {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      const SizedBox(height: 6),
+                      SizedBox(height: 6),
                       Text(
                         'Sentinel™ detected 2 disruptions',
                         style: TextStyle(
-                          color: Colors.white.withOpacity(0.4),
+                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
                           fontSize: 11,
                         ),
                       ),
                     ],
                   ),
                   Container(
-                    padding: const EdgeInsets.all(12),
+                    padding: EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFEF4444).withOpacity(0.1),
+                      color: Color(0xFFEF4444).withOpacity(0.1),
                       shape: BoxShape.circle,
                     ),
-                    child: const Icon(
+                    child: Icon(
                       Icons.warning_amber_outlined,
                       color: Color(0xFFEF4444),
                       size: 24,
@@ -105,49 +105,49 @@ class ActiveDisruptionsScreen extends StatelessWidget {
               ),
             ),
 
-            const SizedBox(height: 16),
+            SizedBox(height: 16),
 
             // Two Indicators Row
             Row(
               children: [
                 Expanded(
                   child: Container(
-                    padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+                    padding: EdgeInsets.symmetric(vertical: 14, horizontal: 16),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF0C162A),
+                      color: Theme.of(context).colorScheme.surface,
                       borderRadius: BorderRadius.circular(16),
                       border: Border.all(
-                        color: Colors.white.withOpacity(0.04),
+                        color: Theme.of(context).colorScheme.outline,
                       ),
                     ),
                     child: Row(
                       children: [
                         Container(
-                          padding: const EdgeInsets.all(6),
+                          padding: EdgeInsets.all(6),
                           decoration: BoxDecoration(
-                            color: const Color(0xFFEF4444).withOpacity(0.12),
+                            color: Color(0xFFEF4444).withOpacity(0.12),
                             shape: BoxShape.circle,
                           ),
-                          child: const Icon(
+                          child: Icon(
                             Icons.error_outline,
                             color: Color(0xFFEF4444),
                             size: 14,
                           ),
                         ),
-                        const SizedBox(width: 10),
-                        const Text(
+                        SizedBox(width: 10),
+                        Text(
                           '1',
                           style: TextStyle(
-                            color: Colors.white,
+                            color: Theme.of(context).colorScheme.onSurface,
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        const SizedBox(width: 8),
+                        SizedBox(width: 8),
                         Text(
                           'Need Action',
                           style: TextStyle(
-                            color: Colors.white.withOpacity(0.4),
+                            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
                             fontSize: 11,
                           ),
                         ),
@@ -155,45 +155,45 @@ class ActiveDisruptionsScreen extends StatelessWidget {
                     ),
                   ),
                 ),
-                const SizedBox(width: 12),
+                SizedBox(width: 12),
                 Expanded(
                   child: Container(
-                    padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+                    padding: EdgeInsets.symmetric(vertical: 14, horizontal: 16),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF0C162A),
+                      color: Theme.of(context).colorScheme.surface,
                       borderRadius: BorderRadius.circular(16),
                       border: Border.all(
-                        color: Colors.white.withOpacity(0.04),
+                        color: Theme.of(context).colorScheme.outline,
                       ),
                     ),
                     child: Row(
                       children: [
                         Container(
-                          padding: const EdgeInsets.all(6),
+                          padding: EdgeInsets.all(6),
                           decoration: BoxDecoration(
-                            color: const Color(0xFF10B981).withOpacity(0.12),
+                            color: Color(0xFF10B981).withOpacity(0.12),
                             shape: BoxShape.circle,
                           ),
-                          child: const Icon(
+                          child: Icon(
                             Icons.check_circle_outline,
                             color: Color(0xFF10B981),
                             size: 14,
                           ),
                         ),
-                        const SizedBox(width: 10),
-                        const Text(
+                        SizedBox(width: 10),
+                        Text(
                           '1',
                           style: TextStyle(
-                            color: Colors.white,
+                            color: Theme.of(context).colorScheme.onSurface,
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        const SizedBox(width: 8),
+                        SizedBox(width: 8),
                         Text(
                           'Handled',
                           style: TextStyle(
-                            color: Colors.white.withOpacity(0.4),
+                            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
                             fontSize: 11,
                           ),
                         ),
@@ -204,16 +204,16 @@ class ActiveDisruptionsScreen extends StatelessWidget {
               ],
             ),
 
-            const SizedBox(height: 28),
+            SizedBox(height: 28),
 
             // Active Issues Section Header
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
+                Text(
                   'Active Issues',
                   style: TextStyle(
-                    color: Colors.white,
+                    color: Theme.of(context).colorScheme.onSurface,
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
                   ),
@@ -222,20 +222,20 @@ class ActiveDisruptionsScreen extends StatelessWidget {
                   onTap: () {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: const Text(
+                        content: Text(
                           'History is empty.',
-                          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                          style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.bold),
                         ),
-                        backgroundColor: const Color(0xFF0C162A),
+                        backgroundColor: Theme.of(context).colorScheme.surface,
                         behavior: SnackBarBehavior.floating,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
-                          side: BorderSide(color: Colors.white.withOpacity(0.08)),
+                          side: BorderSide(color: Theme.of(context).colorScheme.outline),
                         ),
                       ),
                     );
                   },
-                  child: const Text(
+                  child: Text(
                     'View history',
                     style: TextStyle(
                       color: Color(0xFFFFC229),
@@ -246,16 +246,16 @@ class ActiveDisruptionsScreen extends StatelessWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 14),
+            SizedBox(height: 14),
 
             // Disruption 1: UA 2847
             Container(
-              padding: const EdgeInsets.all(18),
+              padding: EdgeInsets.all(18),
               decoration: BoxDecoration(
-                color: const Color(0xFF0C162A),
+                color: Theme.of(context).colorScheme.surface,
                 borderRadius: BorderRadius.circular(20),
                 border: Border.all(
-                  color: Colors.white.withOpacity(0.04),
+                  color: Theme.of(context).colorScheme.outline,
                 ),
               ),
               child: Column(
@@ -266,21 +266,21 @@ class ActiveDisruptionsScreen extends StatelessWidget {
                     children: [
                       Row(
                         children: [
-                          const Text(
+                          Text(
                             'Sentinel™ Alert',
                             style: TextStyle(
-                              color: Colors.white38,
+                              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.38),
                               fontSize: 11,
                             ),
                           ),
-                          const SizedBox(width: 6),
+                          SizedBox(width: 6),
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                            padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                             decoration: BoxDecoration(
-                              color: const Color(0xFFFFC229).withOpacity(0.1),
+                              color: Color(0xFFFFC229).withOpacity(0.1),
                               borderRadius: BorderRadius.circular(4),
                             ),
-                            child: const Text(
+                            child: Text(
                               'Delayed',
                               style: TextStyle(
                                 color: Color(0xFFFFC229),
@@ -291,48 +291,48 @@ class ActiveDisruptionsScreen extends StatelessWidget {
                           ),
                         ],
                       ),
-                      const Text(
+                      Text(
                         'UA 2847',
                         style: TextStyle(
-                          color: Colors.white,
+                          color: Theme.of(context).colorScheme.onSurface,
                           fontSize: 13,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 12),
-                  const Text(
+                  SizedBox(height: 12),
+                  Text(
                     'SFO → JFK',
                     style: TextStyle(
-                      color: Colors.white,
+                      color: Theme.of(context).colorScheme.onSurface,
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  const SizedBox(height: 6),
+                  SizedBox(height: 6),
                   Row(
                     children: [
-                      const Icon(Icons.access_time, color: Color(0xFFFFC229), size: 14),
-                      const SizedBox(width: 6),
+                      Icon(Icons.access_time, color: Color(0xFFFFC229), size: 14),
+                      SizedBox(width: 6),
                       Text(
                         'Delayed by 2h 30m',
                         style: TextStyle(
-                          color: Colors.white.withOpacity(0.6),
+                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                           fontSize: 12,
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 14),
-                  Divider(color: Colors.white.withOpacity(0.04)),
-                  const SizedBox(height: 10),
-                  _buildDetailsRow('Reason:', 'Air traffic congestion'),
-                  const SizedBox(height: 8),
-                  _buildDetailsRow('Est. Compensation:', '\$600', highlightValue: true),
-                  const SizedBox(height: 8),
-                  _buildDetailsRow('Date:', 'May 15, 2026'),
-                  const SizedBox(height: 18),
+                  SizedBox(height: 14),
+                  Divider(color: Theme.of(context).colorScheme.outline),
+                  SizedBox(height: 10),
+                  _buildDetailsRow(context, 'Reason:', 'Air traffic congestion'),
+                  SizedBox(height: 8),
+                  _buildDetailsRow(context, 'Est. Compensation:', '\$600', highlightValue: true),
+                  SizedBox(height: 8),
+                  _buildDetailsRow(context, 'Date:', 'May 15, 2026'),
+                  SizedBox(height: 18),
                   Row(
                     children: [
                       Expanded(
@@ -346,13 +346,13 @@ class ActiveDisruptionsScreen extends StatelessWidget {
                             );
                           },
                           child: Container(
-                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            padding: EdgeInsets.symmetric(vertical: 12),
                             decoration: BoxDecoration(
                               color: const Color(0xFFFFC229),
                               borderRadius: BorderRadius.circular(12),
                             ),
                             alignment: Alignment.center,
-                            child: const Row(
+                            child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Icon(Icons.assignment_outlined, color: Colors.black, size: 14),
@@ -370,7 +370,7 @@ class ActiveDisruptionsScreen extends StatelessWidget {
                           ),
                         ),
                       ),
-                      const SizedBox(width: 12),
+                      SizedBox(width: 12),
                       Expanded(
                         child: GestureDetector(
                           onTap: () {
@@ -382,24 +382,24 @@ class ActiveDisruptionsScreen extends StatelessWidget {
                             );
                           },
                           child: Container(
-                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            padding: EdgeInsets.symmetric(vertical: 12),
                             decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.04),
+                              color: Theme.of(context).colorScheme.outline,
                               borderRadius: BorderRadius.circular(12),
                               border: Border.all(
-                                color: Colors.white.withOpacity(0.08),
+                                color: Theme.of(context).colorScheme.outline,
                               ),
                             ),
                             alignment: Alignment.center,
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Icon(Icons.auto_awesome, color: Colors.white.withOpacity(0.8), size: 14),
-                                const SizedBox(width: 6),
-                                const Text(
+                                Icon(Icons.auto_awesome, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.8), size: 14),
+                                SizedBox(width: 6),
+                                Text(
                                   'Get AI Guidance',
                                   style: TextStyle(
-                                    color: Colors.white,
+                                    color: Theme.of(context).colorScheme.onSurface,
                                     fontSize: 12,
                                     fontWeight: FontWeight.bold,
                                   ),
@@ -415,16 +415,16 @@ class ActiveDisruptionsScreen extends StatelessWidget {
               ),
             ),
 
-            const SizedBox(height: 14),
+            SizedBox(height: 14),
 
             // Disruption 2: BA 112
             Container(
-              padding: const EdgeInsets.all(18),
+              padding: EdgeInsets.all(18),
               decoration: BoxDecoration(
-                color: const Color(0xFF0C162A),
+                color: Theme.of(context).colorScheme.surface,
                 borderRadius: BorderRadius.circular(20),
                 border: Border.all(
-                  color: Colors.white.withOpacity(0.04),
+                  color: Theme.of(context).colorScheme.outline,
                 ),
               ),
               child: Column(
@@ -435,21 +435,21 @@ class ActiveDisruptionsScreen extends StatelessWidget {
                     children: [
                       Row(
                         children: [
-                          const Text(
+                          Text(
                             'Sentinel™ Alert',
                             style: TextStyle(
-                              color: Colors.white38,
+                              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.38),
                               fontSize: 11,
                             ),
                           ),
-                          const SizedBox(width: 6),
+                          SizedBox(width: 6),
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                            padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                             decoration: BoxDecoration(
-                              color: const Color(0xFFEF4444).withOpacity(0.1),
+                              color: Color(0xFFEF4444).withOpacity(0.1),
                               borderRadius: BorderRadius.circular(4),
                             ),
-                            child: const Text(
+                            child: Text(
                               'Cancelled',
                               style: TextStyle(
                                 color: Color(0xFFEF4444),
@@ -460,59 +460,59 @@ class ActiveDisruptionsScreen extends StatelessWidget {
                           ),
                         ],
                       ),
-                      const Text(
+                      Text(
                         'BA 112',
                         style: TextStyle(
-                          color: Colors.white,
+                          color: Theme.of(context).colorScheme.onSurface,
                           fontSize: 13,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 12),
-                  const Text(
+                  SizedBox(height: 12),
+                  Text(
                     'LHR → SFO',
                     style: TextStyle(
-                      color: Colors.white,
+                      color: Theme.of(context).colorScheme.onSurface,
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  const SizedBox(height: 6),
+                  SizedBox(height: 6),
                   Row(
                     children: [
-                      const Icon(Icons.cancel_outlined, color: Color(0xFFEF4444), size: 14),
-                      const SizedBox(width: 6),
+                      Icon(Icons.cancel_outlined, color: Color(0xFFEF4444), size: 14),
+                      SizedBox(width: 6),
                       Text(
                         'Flight cancelled',
                         style: TextStyle(
-                          color: Colors.white.withOpacity(0.6),
+                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                           fontSize: 12,
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 14),
-                  Divider(color: Colors.white.withOpacity(0.04)),
-                  const SizedBox(height: 10),
-                  _buildDetailsRow('Reason:', 'Technical issue'),
-                  const SizedBox(height: 8),
-                  _buildDetailsRow('Est. Compensation:', '\$1,200', highlightValue: true),
-                  const SizedBox(height: 8),
-                  _buildDetailsRow('Date:', 'May 10, 2026'),
-                  const SizedBox(height: 18),
+                  SizedBox(height: 14),
+                  Divider(color: Theme.of(context).colorScheme.outline),
+                  SizedBox(height: 10),
+                  _buildDetailsRow(context, 'Reason:', 'Technical issue'),
+                  SizedBox(height: 8),
+                  _buildDetailsRow(context, 'Est. Compensation:', '\$1,200', highlightValue: true),
+                  SizedBox(height: 8),
+                  _buildDetailsRow(context, 'Date:', 'May 10, 2026'),
+                  SizedBox(height: 18),
                   // Green Handled Claim Filed badge
                   Container(
-                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    padding: EdgeInsets.symmetric(vertical: 12),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF10B981).withOpacity(0.1),
+                      color: Color(0xFF10B981).withOpacity(0.1),
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(
-                        color: const Color(0xFF10B981).withOpacity(0.2),
+                        color: Color(0xFF10B981).withOpacity(0.2),
                       ),
                     ),
-                    child: const Row(
+                    child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Icon(Icons.check_circle_outline, color: Color(0xFF10B981), size: 14),
@@ -532,34 +532,34 @@ class ActiveDisruptionsScreen extends StatelessWidget {
               ),
             ),
 
-            const SizedBox(height: 24),
+            SizedBox(height: 24),
 
             // Footer protection card
             Container(
-              padding: const EdgeInsets.all(20),
+              padding: EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: const Color(0xFF0C162A),
+                color: Theme.of(context).colorScheme.surface,
                 borderRadius: BorderRadius.circular(20),
                 border: Border.all(
-                  color: Colors.white.withOpacity(0.04),
+                  color: Theme.of(context).colorScheme.outline,
                 ),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
+                  Text(
                     'Sentinel™ Protection',
                     style: TextStyle(
-                      color: Colors.white,
+                      color: Theme.of(context).colorScheme.onSurface,
                       fontSize: 14,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  const SizedBox(height: 8),
+                  SizedBox(height: 8),
                   Text(
                     "We're monitoring all your flights 24/7 and will alert you instantly if any issues are detected.",
                     style: TextStyle(
-                      color: Colors.white.withOpacity(0.4),
+                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
                       fontSize: 12,
                       height: 1.4,
                     ),
@@ -574,21 +574,21 @@ class ActiveDisruptionsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildDetailsRow(String label, String value, {bool highlightValue = false}) {
+  Widget _buildDetailsRow(BuildContext context, String label, String value, {bool highlightValue = false}) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(
           label,
           style: TextStyle(
-            color: Colors.white.withOpacity(0.35),
+            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.35),
             fontSize: 12,
           ),
         ),
         Text(
           value,
           style: TextStyle(
-            color: highlightValue ? const Color(0xFFFFC229) : Colors.white,
+            color: highlightValue ? const Color(0xFFFFC229) : Theme.of(context).colorScheme.onSurface,
             fontSize: 12,
             fontWeight: FontWeight.bold,
           ),

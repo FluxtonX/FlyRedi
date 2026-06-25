@@ -16,30 +16,30 @@ class _PrivacySecurityScreenState extends State<PrivacySecurityScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
           onPressed: () => Navigator.pop(context),
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          icon: Icon(Icons.arrow_back, color: Theme.of(context).colorScheme.onSurface),
         ),
-        title: const Text(
+        title: Text(
           'Privacy & Security',
           style: TextStyle(
-            color: Colors.white,
+            color: Theme.of(context).colorScheme.onSurface,
             fontSize: 20,
             fontWeight: FontWeight.bold,
           ),
         ),
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.fromLTRB(24, 12, 24, 28),
+        padding: EdgeInsets.fromLTRB(24, 12, 24, 28),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             _sectionLabel('Security'),
-            const SizedBox(height: 14),
+            SizedBox(height: 14),
             _settingSwitch(
               icon: Icons.fingerprint,
               title: 'Biometric Unlock',
@@ -47,7 +47,7 @@ class _PrivacySecurityScreenState extends State<PrivacySecurityScreen> {
               value: _biometricUnlock,
               onChanged: (value) => setState(() => _biometricUnlock = value),
             ),
-            const SizedBox(height: 10),
+            SizedBox(height: 10),
             _settingSwitch(
               icon: Icons.notifications_active_outlined,
               title: 'Security Alerts',
@@ -55,9 +55,9 @@ class _PrivacySecurityScreenState extends State<PrivacySecurityScreen> {
               value: _securityAlerts,
               onChanged: (value) => setState(() => _securityAlerts = value),
             ),
-            const SizedBox(height: 22),
+            SizedBox(height: 22),
             _sectionLabel('Privacy'),
-            const SizedBox(height: 14),
+            SizedBox(height: 14),
             _settingSwitch(
               icon: Icons.insights_outlined,
               title: 'Product Analytics',
@@ -65,21 +65,21 @@ class _PrivacySecurityScreenState extends State<PrivacySecurityScreen> {
               value: _shareAnalytics,
               onChanged: (value) => setState(() => _shareAnalytics = value),
             ),
-            const SizedBox(height: 10),
+            SizedBox(height: 10),
             _actionRow(
               icon: Icons.password_outlined,
               title: 'Change Password',
               subtitle: 'Update your account password',
               onTap: () => _showComingSoon('Password changes'),
             ),
-            const SizedBox(height: 10),
+            SizedBox(height: 10),
             _actionRow(
               icon: Icons.devices_outlined,
               title: 'Trusted Devices',
               subtitle: 'Review devices with access to your account',
               onTap: () => _showComingSoon('Trusted devices'),
             ),
-            const SizedBox(height: 10),
+            SizedBox(height: 10),
             _actionRow(
               icon: Icons.download_outlined,
               title: 'Download My Data',
@@ -96,7 +96,7 @@ class _PrivacySecurityScreenState extends State<PrivacySecurityScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text('$feature will be available soon.'),
-        backgroundColor: const Color(0xFF10284F),
+        backgroundColor: Theme.of(context).colorScheme.surface,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
@@ -107,7 +107,7 @@ class _PrivacySecurityScreenState extends State<PrivacySecurityScreen> {
     return Text(
       text.toUpperCase(),
       style: TextStyle(
-        color: Colors.white.withOpacity(0.38),
+        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.38),
         fontSize: 12,
         fontWeight: FontWeight.bold,
         letterSpacing: 0.8,
@@ -123,25 +123,25 @@ class _PrivacySecurityScreenState extends State<PrivacySecurityScreen> {
     required ValueChanged<bool> onChanged,
   }) {
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 18),
+      padding: EdgeInsets.symmetric(vertical: 14, horizontal: 18),
       decoration: _cardDecoration(),
       child: Row(
         children: [
-          Icon(icon, color: Colors.white54, size: 20),
-          const SizedBox(width: 14),
+          Icon(icon, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.54), size: 20),
+          SizedBox(width: 14),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   title,
-                  style: const TextStyle(color: Colors.white, fontSize: 14),
+                  style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 14),
                 ),
-                const SizedBox(height: 4),
+                SizedBox(height: 4),
                 Text(
                   subtitle,
                   style: TextStyle(
-                    color: Colors.white.withOpacity(0.42),
+                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.42),
                     fontSize: 11,
                     height: 1.3,
                   ),
@@ -168,25 +168,25 @@ class _PrivacySecurityScreenState extends State<PrivacySecurityScreen> {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 18),
+        padding: EdgeInsets.symmetric(vertical: 18, horizontal: 18),
         decoration: _cardDecoration(),
         child: Row(
           children: [
-            Icon(icon, color: Colors.white54, size: 20),
-            const SizedBox(width: 14),
+            Icon(icon, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.54), size: 20),
+            SizedBox(width: 14),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     title,
-                    style: const TextStyle(color: Colors.white, fontSize: 14),
+                    style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 14),
                   ),
-                  const SizedBox(height: 4),
+                  SizedBox(height: 4),
                   Text(
                     subtitle,
                     style: TextStyle(
-                      color: Colors.white.withOpacity(0.42),
+                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.42),
                       fontSize: 11,
                     ),
                   ),
@@ -195,7 +195,7 @@ class _PrivacySecurityScreenState extends State<PrivacySecurityScreen> {
             ),
             Icon(
               Icons.chevron_right,
-              color: Colors.white.withOpacity(0.24),
+              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.24),
               size: 20,
             ),
           ],
@@ -206,9 +206,9 @@ class _PrivacySecurityScreenState extends State<PrivacySecurityScreen> {
 
   BoxDecoration _cardDecoration() {
     return BoxDecoration(
-      color: const Color(0xFF0C162A),
+      color: Theme.of(context).colorScheme.surface,
       borderRadius: BorderRadius.circular(16),
-      border: Border.all(color: Colors.white.withOpacity(0.04)),
+      border: Border.all(color: Theme.of(context).colorScheme.outline),
     );
   }
 }

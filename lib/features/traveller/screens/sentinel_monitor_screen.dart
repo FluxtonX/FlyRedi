@@ -182,33 +182,33 @@ class _SentinelMonitorScreenState extends State<SentinelMonitorScreen> {
     final riskColor = _riskColor(risk);
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          icon: Icon(Icons.arrow_back, color: Theme.of(context).colorScheme.onSurface),
           onPressed: () => Navigator.pop(context),
         ),
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text(
+            Text(
               'Sentinel™ Monitor',
               style: TextStyle(
-                color: Colors.white,
+                color: Theme.of(context).colorScheme.onSurface,
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
               ),
             ),
-            const SizedBox(height: 2),
+            SizedBox(height: 2),
             Text(
               trip == null ? 'No monitored flight yet' : '$_flightLabel · $_routeLabel',
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
-                color: Colors.white.withOpacity(0.4),
+                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
                 fontSize: 11,
               ),
             ),
@@ -217,17 +217,17 @@ class _SentinelMonitorScreenState extends State<SentinelMonitorScreen> {
         titleSpacing: 0,
         actions: [
           Container(
-            margin: const EdgeInsets.only(right: 24, top: 12, bottom: 12),
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+            margin: EdgeInsets.only(right: 24, top: 12, bottom: 12),
+            padding: EdgeInsets.symmetric(horizontal: 10, vertical: 4),
             decoration: BoxDecoration(
               color: trip?.trackingEnabled == true
-                  ? const Color(0xFF0F2D24)
-                  : Colors.white.withOpacity(0.06),
+                  ? Theme.of(context).colorScheme.surface
+                  : Theme.of(context).colorScheme.outline.withOpacity(0.5),
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
                 color: (trip?.trackingEnabled == true
                         ? const Color(0xFF10B981)
-                        : Colors.white)
+                        : Theme.of(context).colorScheme.onSurface)
                     .withOpacity(0.2),
               ),
             ),
@@ -240,17 +240,17 @@ class _SentinelMonitorScreenState extends State<SentinelMonitorScreen> {
                   decoration: BoxDecoration(
                     color: trip?.trackingEnabled == true
                         ? const Color(0xFF10B981)
-                        : Colors.white54,
+                        : Theme.of(context).colorScheme.onSurface.withOpacity(0.54),
                     shape: BoxShape.circle,
                   ),
                 ),
-                const SizedBox(width: 6),
+                SizedBox(width: 6),
                 Text(
                   trip?.trackingEnabled == true ? 'Active' : 'Idle',
                   style: TextStyle(
                     color: trip?.trackingEnabled == true
                         ? const Color(0xFF10B981)
-                        : Colors.white54,
+                        : Theme.of(context).colorScheme.onSurface.withOpacity(0.54),
                     fontSize: 9,
                     fontWeight: FontWeight.bold,
                   ),
@@ -267,7 +267,7 @@ class _SentinelMonitorScreenState extends State<SentinelMonitorScreen> {
 
   Widget _buildBody(TripModel? trip, String risk, Color riskColor) {
     if (_isLoading) {
-      return const Center(
+      return Center(
         child: CircularProgressIndicator(
           valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFFFC229)),
         ),
@@ -295,33 +295,33 @@ class _SentinelMonitorScreenState extends State<SentinelMonitorScreen> {
 
     return RefreshIndicator(
       color: const Color(0xFFFFC229),
-      backgroundColor: const Color(0xFF0C162A),
+      backgroundColor: Theme.of(context).colorScheme.surface,
       onRefresh: _loadTrips,
       child: SingleChildScrollView(
         physics: const AlwaysScrollableScrollPhysics(),
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+        padding: EdgeInsets.symmetric(horizontal: 24, vertical: 8),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             _buildFlightSummaryCard(trip, risk, riskColor),
-            const SizedBox(height: 22),
+            SizedBox(height: 22),
             if (_trips.length > 1) ...[
               _buildTripSelector(),
-              const SizedBox(height: 22),
+              SizedBox(height: 22),
             ],
             _buildProtectionCard(trip),
-            const SizedBox(height: 28),
+            SizedBox(height: 28),
             _buildAlertsSection(trip),
-            const SizedBox(height: 28),
-            const Text(
+            SizedBox(height: 28),
+            Text(
               'Monitoring Metrics',
               style: TextStyle(
-                color: Colors.white,
+                color: Theme.of(context).colorScheme.onSurface,
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
               ),
             ),
-            const SizedBox(height: 14),
+            SizedBox(height: 14),
             GridView.count(
               crossAxisCount: 2,
               shrinkWrap: true,
@@ -362,9 +362,9 @@ class _SentinelMonitorScreenState extends State<SentinelMonitorScreen> {
                 ),
               ],
             ),
-            const SizedBox(height: 28),
+            SizedBox(height: 28),
             _buildNotificationSettings(),
-            const SizedBox(height: 24),
+            SizedBox(height: 24),
           ],
         ),
       ),
@@ -381,12 +381,12 @@ class _SentinelMonitorScreenState extends State<SentinelMonitorScreen> {
         _readable(trip.destination, fallback: _firstLeg?.to ?? '-');
 
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: const Color(0xFF0C162A),
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(22),
         border: Border.all(
-          color: const Color(0xFFFFC229).withOpacity(0.2),
+          color: Color(0xFFFFC229).withOpacity(0.2),
         ),
       ),
       child: Column(
@@ -402,17 +402,17 @@ class _SentinelMonitorScreenState extends State<SentinelMonitorScreen> {
                       _flightLabel,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        color: Colors.white,
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onSurface,
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    const SizedBox(height: 6),
+                    SizedBox(height: 6),
                     Text(
                       _statusLabel(trip.status),
                       style: TextStyle(
-                        color: Colors.white.withOpacity(0.45),
+                        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.45),
                         fontSize: 12,
                       ),
                     ),
@@ -421,7 +421,7 @@ class _SentinelMonitorScreenState extends State<SentinelMonitorScreen> {
               ),
               Container(
                 padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+                    EdgeInsets.symmetric(horizontal: 12, vertical: 7),
                 decoration: BoxDecoration(
                   color: riskColor.withOpacity(0.12),
                   borderRadius: BorderRadius.circular(14),
@@ -437,17 +437,17 @@ class _SentinelMonitorScreenState extends State<SentinelMonitorScreen> {
               ),
             ],
           ),
-          const SizedBox(height: 22),
+          SizedBox(height: 22),
           Container(
-            padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+            padding: EdgeInsets.symmetric(vertical: 20, horizontal: 16),
             decoration: BoxDecoration(
-              color: const Color(0xFF071B3A),
+              color: Theme.of(context).colorScheme.surface,
               borderRadius: BorderRadius.circular(18),
             ),
             child: Row(
               children: [
                 Expanded(child: _buildRoutePoint(origin, 'Departure')),
-                const Padding(
+                Padding(
                   padding: EdgeInsets.symmetric(horizontal: 14),
                   child: Icon(
                     Icons.flight,
@@ -459,7 +459,7 @@ class _SentinelMonitorScreenState extends State<SentinelMonitorScreen> {
               ],
             ),
           ),
-          const SizedBox(height: 18),
+          SizedBox(height: 18),
           _buildDetailRow(Icons.calendar_today_outlined, 'Departure Date',
               _readable(trip.departureDate)),
           _buildDetailRow(Icons.access_time, 'Departure Time',
@@ -482,17 +482,17 @@ class _SentinelMonitorScreenState extends State<SentinelMonitorScreen> {
           code,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
-          style: const TextStyle(
-            color: Colors.white,
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.onSurface,
             fontSize: 24,
             fontWeight: FontWeight.bold,
           ),
         ),
-        const SizedBox(height: 8),
+        SizedBox(height: 8),
         Text(
           label,
           style: TextStyle(
-            color: Colors.white.withOpacity(0.45),
+            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.45),
             fontSize: 12,
           ),
         ),
@@ -502,16 +502,16 @@ class _SentinelMonitorScreenState extends State<SentinelMonitorScreen> {
 
   Widget _buildDetailRow(IconData icon, String label, String value) {
     return Padding(
-      padding: const EdgeInsets.only(top: 12),
+      padding: EdgeInsets.only(top: 12),
       child: Row(
         children: [
-          Icon(icon, color: Colors.white38, size: 17),
-          const SizedBox(width: 10),
+          Icon(icon, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.38), size: 17),
+          SizedBox(width: 10),
           Expanded(
             child: Text(
               label,
               style: TextStyle(
-                color: Colors.white.withOpacity(0.42),
+                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.42),
                 fontSize: 12,
               ),
             ),
@@ -522,8 +522,8 @@ class _SentinelMonitorScreenState extends State<SentinelMonitorScreen> {
               textAlign: TextAlign.right,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
-                color: Colors.white,
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onSurface,
                 fontSize: 12,
                 fontWeight: FontWeight.w600,
               ),
@@ -540,7 +540,7 @@ class _SentinelMonitorScreenState extends State<SentinelMonitorScreen> {
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         itemCount: _trips.length,
-        separatorBuilder: (_, __) => const SizedBox(width: 10),
+        separatorBuilder: (_, __) => SizedBox(width: 10),
         itemBuilder: (context, index) {
           final trip = _trips[index];
           final selected = trip.id == _selectedTrip?.id;
@@ -552,18 +552,18 @@ class _SentinelMonitorScreenState extends State<SentinelMonitorScreen> {
             },
             child: Container(
               alignment: Alignment.center,
-              padding: const EdgeInsets.symmetric(horizontal: 14),
+              padding: EdgeInsets.symmetric(horizontal: 14),
               decoration: BoxDecoration(
                 color: selected
                     ? const Color(0xFFFFC229)
-                    : const Color(0xFF0C162A),
+                    : Theme.of(context).colorScheme.surface,
                 borderRadius: BorderRadius.circular(14),
-                border: Border.all(color: Colors.white.withOpacity(0.05)),
+                border: Border.all(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.05)),
               ),
               child: Text(
                 _readable(trip.flightNumber, fallback: trip.tripName),
                 style: TextStyle(
-                  color: selected ? Colors.black : Colors.white70,
+                  color: selected ? Colors.black : Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
                   fontSize: 12,
                   fontWeight: FontWeight.bold,
                 ),
@@ -577,40 +577,40 @@ class _SentinelMonitorScreenState extends State<SentinelMonitorScreen> {
 
   Widget _buildProtectionCard(TripModel trip) {
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: const Color(0xFF0C162A),
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(22),
         border: Border.all(
-          color: Colors.white.withOpacity(0.04),
+          color: Theme.of(context).colorScheme.outline,
         ),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Icon(
+          Icon(
             Icons.shield_outlined,
             color: Color(0xFFFFC229),
             size: 22,
           ),
-          const SizedBox(width: 14),
+          SizedBox(width: 14),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
+                Text(
                   'Real-Time Protection Active',
                   style: TextStyle(
-                    color: Colors.white,
+                    color: Theme.of(context).colorScheme.onSurface,
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                const SizedBox(height: 6),
+                SizedBox(height: 6),
                 Text(
                   'Monitoring $_flightLabel for delays, cancellations, route updates, gate changes, and disruption signals.',
                   style: TextStyle(
-                    color: Colors.white.withOpacity(0.5),
+                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
                     fontSize: 11,
                     height: 1.45,
                   ),
@@ -638,16 +638,16 @@ class _SentinelMonitorScreenState extends State<SentinelMonitorScreen> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text(
+            Text(
               'Active Alerts',
               style: TextStyle(
-                color: Colors.white,
+                color: Theme.of(context).colorScheme.onSurface,
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
               ),
             ),
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               decoration: BoxDecoration(
                 color: (_activeAlerts > 0
                         ? const Color(0xFFEF4444)
@@ -668,7 +668,7 @@ class _SentinelMonitorScreenState extends State<SentinelMonitorScreen> {
             ),
           ],
         ),
-        const SizedBox(height: 14),
+        SizedBox(height: 14),
         if (timelineAlerts.isEmpty && dbAlertsForFlight.isEmpty)
           _buildAlertCard(
             icon: Icons.check_circle_outline,
@@ -681,7 +681,7 @@ class _SentinelMonitorScreenState extends State<SentinelMonitorScreen> {
         else ...[
           ...dbAlertsForFlight.map(
             (item) => Padding(
-              padding: const EdgeInsets.only(bottom: 12),
+              padding: EdgeInsets.only(bottom: 12),
               child: _buildAlertCard(
                 icon: item.priority == 'CRITICAL' || item.priority == 'HIGH'
                     ? Icons.error_outline
@@ -697,7 +697,7 @@ class _SentinelMonitorScreenState extends State<SentinelMonitorScreen> {
           ),
           ...timelineAlerts.map(
             (item) => Padding(
-              padding: const EdgeInsets.only(bottom: 12),
+              padding: EdgeInsets.only(bottom: 12),
               child: _buildAlertCard(
                 icon: (item.riskLevel ?? '').toLowerCase() == 'high'
                     ? Icons.error_outline
@@ -724,9 +724,9 @@ class _SentinelMonitorScreenState extends State<SentinelMonitorScreen> {
     required String time,
   }) {
     return Container(
-      padding: const EdgeInsets.all(18),
+      padding: EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: const Color(0xFF0C162A),
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
           color: color.withOpacity(0.15),
@@ -736,35 +736,35 @@ class _SentinelMonitorScreenState extends State<SentinelMonitorScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Icon(icon, color: color, size: 20),
-          const SizedBox(width: 14),
+          SizedBox(width: 14),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   title,
-                  style: const TextStyle(
-                    color: Colors.white,
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurface,
                     fontSize: 13,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                const SizedBox(height: 6),
+                SizedBox(height: 6),
                 Text(
                   message,
                   style: TextStyle(
-                    color: Colors.white.withOpacity(0.5),
+                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
                     fontSize: 11,
                     height: 1.35,
                   ),
                 ),
-                const SizedBox(height: 12),
+                SizedBox(height: 12),
                 Align(
                   alignment: Alignment.bottomRight,
                   child: Text(
                     time,
                     style: TextStyle(
-                      color: Colors.white.withOpacity(0.25),
+                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.25),
                       fontSize: 9,
                     ),
                   ),
@@ -784,12 +784,12 @@ class _SentinelMonitorScreenState extends State<SentinelMonitorScreen> {
     required Color iconColor,
   }) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFF0C162A),
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: Colors.white.withOpacity(0.04),
+          color: Theme.of(context).colorScheme.outline,
         ),
       ),
       child: Column(
@@ -804,7 +804,7 @@ class _SentinelMonitorScreenState extends State<SentinelMonitorScreen> {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
-                    color: Colors.white.withOpacity(0.35),
+                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.35),
                     fontSize: 11,
                   ),
                 ),
@@ -816,8 +816,8 @@ class _SentinelMonitorScreenState extends State<SentinelMonitorScreen> {
             value,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: const TextStyle(
-              color: Colors.white,
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.onSurface,
               fontSize: 18,
               fontWeight: FontWeight.bold,
             ),
@@ -829,18 +829,18 @@ class _SentinelMonitorScreenState extends State<SentinelMonitorScreen> {
 
   Widget _buildNotificationSettings() {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
       decoration: BoxDecoration(
-        color: const Color(0xFF0C162A),
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(22),
         border: Border.all(
-          color: Colors.white.withOpacity(0.04),
+          color: Theme.of(context).colorScheme.outline,
         ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const Row(
+          Row(
             children: [
               Icon(
                 Icons.notifications_none,
@@ -851,14 +851,14 @@ class _SentinelMonitorScreenState extends State<SentinelMonitorScreen> {
               Text(
                 'Notification Settings',
                 style: TextStyle(
-                  color: Colors.white,
+                  color: Theme.of(context).colorScheme.onSurface,
                   fontSize: 14,
                   fontWeight: FontWeight.bold,
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          SizedBox(height: 12),
           _buildSwitchRow(
             label: 'Push Notifications',
             value: _pushNotifications,
@@ -868,7 +868,7 @@ class _SentinelMonitorScreenState extends State<SentinelMonitorScreen> {
               });
             },
           ),
-          Divider(color: Colors.white.withOpacity(0.04)),
+          Divider(color: Theme.of(context).colorScheme.outline),
           _buildSwitchRow(
             label: 'Email Alerts',
             value: _emailAlerts,
@@ -878,7 +878,7 @@ class _SentinelMonitorScreenState extends State<SentinelMonitorScreen> {
               });
             },
           ),
-          Divider(color: Colors.white.withOpacity(0.04)),
+          Divider(color: Theme.of(context).colorScheme.outline),
           _buildSwitchRow(
             label: 'WhatsApp Messages',
             value: _whatsappMessages,
@@ -903,8 +903,8 @@ class _SentinelMonitorScreenState extends State<SentinelMonitorScreen> {
       children: [
         Text(
           label,
-          style: const TextStyle(
-            color: Colors.white,
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.onSurface,
             fontSize: 13,
           ),
         ),
@@ -912,8 +912,8 @@ class _SentinelMonitorScreenState extends State<SentinelMonitorScreen> {
           value: value,
           onChanged: onChanged,
           activeColor: const Color(0xFFFFC229),
-          activeTrackColor: const Color(0xFFFFC229).withOpacity(0.3),
-          inactiveThumbColor: Colors.white24,
+          activeTrackColor: Color(0xFFFFC229).withOpacity(0.3),
+          inactiveThumbColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.24),
           inactiveTrackColor: Colors.white10,
         ),
       ],
@@ -929,38 +929,38 @@ class _SentinelMonitorScreenState extends State<SentinelMonitorScreen> {
   }) {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(28),
+        padding: EdgeInsets.all(28),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(icon, color: const Color(0xFFFFC229), size: 42),
-            const SizedBox(height: 18),
+            SizedBox(height: 18),
             Text(
               title,
               textAlign: TextAlign.center,
-              style: const TextStyle(
-                color: Colors.white,
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onSurface,
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
               ),
             ),
-            const SizedBox(height: 8),
+            SizedBox(height: 8),
             Text(
               message,
               textAlign: TextAlign.center,
               style: TextStyle(
-                color: Colors.white.withOpacity(0.48),
+                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.48),
                 fontSize: 12,
                 height: 1.4,
               ),
             ),
             if (actionLabel != null && onAction != null) ...[
-              const SizedBox(height: 20),
+              SizedBox(height: 20),
               TextButton(
                 onPressed: onAction,
                 child: Text(
                   actionLabel,
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: Color(0xFFFFC229),
                     fontWeight: FontWeight.bold,
                   ),

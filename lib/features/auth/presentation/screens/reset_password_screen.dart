@@ -51,17 +51,17 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF071B3A),
+      
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.all(24),
+          padding: EdgeInsets.all(24),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(height: 20),
+              SizedBox(height: 20),
               GestureDetector(
                 onTap: () => Get.back(),
-                child: const Row(
+                child: Row(
                   children: [
                     Icon(
                       Icons.arrow_back,
@@ -78,7 +78,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                   ],
                 ),
               ),
-              const SizedBox(height: 60),
+              SizedBox(height: 60),
               const Text(
                 'Reset password',
                 style: TextStyle(
@@ -87,7 +87,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              const SizedBox(height: 10),
+              SizedBox(height: 10),
               const Text(
                 'Enter your email to receive a reset link',
                 style: TextStyle(
@@ -95,7 +95,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                   fontSize: 18,
                 ),
               ),
-              const SizedBox(height: 40),
+              SizedBox(height: 40),
               AuthTextField(
                 controller: emailController,
                 label: 'Email',
@@ -107,12 +107,12 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
               Obx(() => _emailError.value != null
                   ? Column(
                       children: [
-                        const SizedBox(height: 6),
+                        SizedBox(height: 6),
                         _buildFieldError(_emailError.value!),
                       ],
                     )
-                  : const SizedBox.shrink()),
-              const SizedBox(height: 40),
+                  : SizedBox.shrink()),
+              SizedBox(height: 40),
               Obx(() => CustomButton(
                     title: _authController.isLoading.value ? 'Sending Link...' : 'Send Reset Link',
                     onTap: _authController.isLoading.value ? () {} : _handleSendResetLink,
@@ -126,15 +126,15 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
 
   Widget _buildFieldError(String message) {
     return Padding(
-      padding: const EdgeInsets.only(left: 4),
+      padding: EdgeInsets.only(left: 4),
       child: Row(
         children: [
-          const Icon(Icons.info_outline_rounded, size: 14, color: Color(0xFFE11D48)),
-          const SizedBox(width: 6),
+          Icon(Icons.info_outline_rounded, size: 14, color: Color(0xFFE11D48)),
+          SizedBox(width: 6),
           Expanded(
             child: Text(
               message,
-              style: const TextStyle(
+              style: TextStyle(
                 color: Color(0xFFE11D48),
                 fontSize: 12,
                 fontWeight: FontWeight.w500,
