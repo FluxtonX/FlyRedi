@@ -732,7 +732,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
               ),
             ),
-            SizedBox(height: 10),
+            SizedBox(height: 24),
+            _sectionLabel('Security'),
+            SizedBox(height: 14),
             _buildSettingsItem(
               icon: Icons.shield_outlined,
               title: 'Account Security',
@@ -743,15 +745,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
               ),
             ),
-            SizedBox(height: 10),
-            _buildSettingsItem(
-              icon: Icons.luggage_outlined,
-              title: 'Baggage Claim History',
-              onTap: () {
-                // Placeholder for baggage history
-              },
-            ),
-            
+            // ── Past Claims History ──────────────────────────────────────────
+            SizedBox(height: 24),
+            _sectionLabel('Past Claims History'),
+            SizedBox(height: 14),
+            _buildPastClaimsSection(),
+
+            // ── Help & Support ──────────────────────────────────────────────
+            SizedBox(height: 24),
+            _sectionLabel('Help & Support'),
+            SizedBox(height: 14),
+            _buildHelpSupportSection(),
+
             SizedBox(height: 24),
             _sectionLabel('Preferences'),
             SizedBox(height: 14),
@@ -760,6 +765,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
             SizedBox(height: 24),
 
             // ── Log Out Button ────────────────────────────────────────────
+            _sectionLabel('Actions'),
+            SizedBox(height: 14),
             _buildSettingsItem(
               icon: Icons.logout,
               title: 'Log Out',
@@ -772,7 +779,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
             // ── Footer ────────────────────────────────────────────────────
             Text(
-              'SKYRIGHTZ360 v1.0.0',
+              'FLYREDI v1.0.0',
               textAlign: TextAlign.center,
               style: TextStyle(
                   color: Theme.of(context).colorScheme.onSurface.withOpacity(0.18),
@@ -1115,6 +1122,130 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildPastClaimsSection() {
+    return Container(
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Theme.of(context).colorScheme.outline),
+      ),
+      child: Theme(
+        data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+        child: ExpansionTile(
+          iconColor: const Color(0xFFFFC229),
+          collapsedIconColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+          leading: Icon(Icons.luggage_outlined, size: 20, color: const Color(0xFFFFC229)),
+          title: Text(
+            'View Past Claims History',
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.onSurface,
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          childrenPadding: EdgeInsets.only(left: 16, right: 16, bottom: 16),
+          children: [
+            _buildClaimHistoryItem('Flight PK 786', 'Resolved'),
+            SizedBox(height: 10),
+            _buildClaimHistoryItem('Flight EK 612', 'Compensated'),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildClaimHistoryItem(String title, String status) {
+    return Container(
+      padding: EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Theme.of(context).colorScheme.outline),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF10B981).withOpacity(0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(Icons.check, color: const Color(0xFF10B981), size: 16),
+              ),
+              SizedBox(width: 14),
+              Text(title,
+                  style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 14, fontWeight: FontWeight.w600)),
+            ],
+          ),
+          Text(status,
+              style: TextStyle(color: const Color(0xFF10B981), fontSize: 12, fontWeight: FontWeight.bold)),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildHelpSupportSection() {
+    return Container(
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Theme.of(context).colorScheme.outline),
+      ),
+      child: Theme(
+        data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+        child: ExpansionTile(
+          iconColor: const Color(0xFFFFC229),
+          collapsedIconColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+          leading: Icon(Icons.help_outline, size: 20, color: const Color(0xFFFFC229)),
+          title: Text(
+            'Help & Support (FAQ)',
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.onSurface,
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          childrenPadding: EdgeInsets.only(left: 16, right: 16, bottom: 16),
+          children: [
+            _buildFaqItem('How do I claim baggage compensation?', 'You can file a new claim directly from the "Claims" tab by providing your flight details and a picture of your baggage receipt. Our system will handle the rest.'),
+            SizedBox(height: 12),
+            _buildFaqItem('What is the processing time?', 'Typically, initial airline responses take between 14-30 days. However, our Resolution Assistant™ automatically follows up on your behalf to speed up the process.'),
+            SizedBox(height: 12),
+            _buildFaqItem('Are there any hidden fees?', 'No, our basic tracking is completely free. We only charge a small success fee if we successfully win compensation on your behalf.'),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFaqItem(String question, String answer) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          question,
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.onSurface,
+            fontSize: 13,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        SizedBox(height: 4),
+        Text(
+          answer,
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+            fontSize: 12,
+            height: 1.4,
+          ),
+        ),
+      ],
     );
   }
 }
