@@ -11,7 +11,7 @@ import 'features/auth/presentation/screens/sign_up_screen.dart';
 import 'features/auth/presentation/screens/reset_password_screen.dart';
 import 'features/splash/screens/splash_screen.dart';
 import 'features/traveller/screens/traveller_tabs_screen.dart';
-import 'features/onboarding/screens/onboarding_screen.dart'; // TODO: Remove after testing
+import 'features/onboarding/screens/onboarding_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -55,10 +55,8 @@ class SkyRightz360App extends StatelessWidget {
       theme: AppTheme.darkTheme,
       debugShowCheckedModeBanner: false,
       initialBinding: AuthBinding(),
-      // initialRoute: '/splash', // TODO: Restore after testing
-      initialRoute: '/home', // TEMP: Force home for testing
+      initialRoute: '/home',
       getPages: [
-        // TEMP: Onboarding route for direct testing
         GetPage(
           name: '/onboarding',
           page: () => const OnboardingScreen(),

@@ -53,6 +53,7 @@ class _TravellerDashboardScreenState extends State<TravellerDashboardScreen> {
 
   bool _hasLoadedData = false;
   String? _errorMessage;
+  late final String _displayName;
 
   DashboardSummary? _summary;
   List<DashboardActivity> _activities = [];
@@ -72,6 +73,9 @@ class _TravellerDashboardScreenState extends State<TravellerDashboardScreen> {
   @override
   void initState() {
     super.initState();
+    // Cache user display name once — avoids FirebaseAuth lookup every rebuild
+    final user = FirebaseAuth.instance.currentUser;
+    _displayName = user?.displayName ?? user?.email?.split('@').first ?? 'Traveller';
     TripRepository.tripsVersion.addListener(_onTripsChanged);
     _loadDashboardData();
   }
@@ -282,6 +286,8 @@ class _TravellerDashboardScreenState extends State<TravellerDashboardScreen> {
     }
   }
 
+  /// Called inside setState closures — must NOT call setState itself.
+  /// Just mutates fields; the enclosing setState handles the rebuild.
   void _checkAllLoaded() {
     if (!_isSummaryLoading &&
         !_isActivitiesLoading &&
@@ -289,15 +295,11 @@ class _TravellerDashboardScreenState extends State<TravellerDashboardScreen> {
         !_isTripsLoading &&
         !_isProfileLoading &&
         !_isStatsLoading) {
-      if (mounted) {
-        setState(() {
-          if (_anyDataLoaded) {
-            _hasLoadedData = true;
-            _errorMessage = null;
-          } else {
-            _errorMessage = 'Failed to load dashboard data. Please check your connection.';
-          }
-        });
+      if (_anyDataLoaded) {
+        _hasLoadedData = true;
+        _errorMessage = null;
+      } else {
+        _errorMessage = 'Failed to load dashboard data. Please check your connection.';
       }
     }
   }
@@ -316,9 +318,6 @@ class _TravellerDashboardScreenState extends State<TravellerDashboardScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final user = FirebaseAuth.instance.currentUser;
-    final displayName =
-        user?.displayName ?? user?.email?.split('@').first ?? 'Traveller';
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -327,7 +326,7 @@ class _TravellerDashboardScreenState extends State<TravellerDashboardScreen> {
           onRefresh: _loadDashboardData,
           color: const Color(0xFFFFC229),
           backgroundColor: const Color(0xFF10284F),
-          child: _buildBody(displayName),
+          child: _buildBody(_displayName),
         ),
       ),
       bottomNavigationBar: widget.showBottomNav

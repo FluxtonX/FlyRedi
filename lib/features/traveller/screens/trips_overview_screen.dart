@@ -35,6 +35,13 @@ class _TripsOverviewScreenState extends State<TripsOverviewScreen> {
   bool _hasLoadedTrips = false;
   String? _errorMessage;
 
+  // Reusable decoration — avoids recreating identical objects per card per rebuild
+  static final _cardDecoration = BoxDecoration(
+    color: const Color(0xFF0C162A),
+    borderRadius: BorderRadius.circular(18),
+    border: Border.all(color: Colors.white.withOpacity(0.04)),
+  );
+
   @override
   void initState() {
     super.initState();
@@ -378,15 +385,15 @@ class _TripsOverviewScreenState extends State<TripsOverviewScreen> {
       );
     }
 
-    bool isEmpty = _trips.isEmpty;
-    int monitoredCount = _trips.where((t) => t.trackingEnabled).length;
-    int alertsCount = _trips
+    final bool isEmpty = _trips.isEmpty;
+    final int monitoredCount = _trips.where((t) => t.trackingEnabled).length;
+    final int alertsCount = _trips
         .expand((t) => t.timeline)
         .where((leg) => (leg.activeAlerts ?? 0) > 0)
         .length;
-    int upcomingCount = _trips.length;
+    final int upcomingCount = _trips.length;
 
-    List<TripModel> monitoredTrips =
+    final List<TripModel> monitoredTrips =
         _trips.where((t) => t.trackingEnabled).toList();
 
     return Scaffold(
@@ -801,13 +808,7 @@ class _TripsOverviewScreenState extends State<TripsOverviewScreen> {
 
     return Container(
       padding: const EdgeInsets.all(18),
-      decoration: BoxDecoration(
-        color: const Color(0xFF0C162A),
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(
-          color: Colors.white.withOpacity(0.04),
-        ),
-      ),
+      decoration: _cardDecoration,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
