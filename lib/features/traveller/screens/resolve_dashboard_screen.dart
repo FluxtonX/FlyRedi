@@ -3,6 +3,9 @@ import 'package:sky_rightz_360/core/constants/app_colors.dart';
 import '../widgets/traveller_bottom_nav.dart';
 import '../widgets/resolve_header_gradient.dart';
 import '../widgets/case_card.dart';
+import '../models/claim_model.dart';
+import '../repositories/claim_repository.dart';
+import '../widgets/skeleton_box.dart';
 
 class ResolveDashboardScreen extends StatefulWidget {
   final bool showBottomNav;
@@ -17,25 +20,42 @@ class ResolveDashboardScreen extends StatefulWidget {
 }
 
 class _ResolveDashboardScreenState extends State<ResolveDashboardScreen> {
-  final List<Map<String, dynamic>> _activeCases = [
-    {
-      'flightCode': 'BA 082',
-      'airline': 'British Airways',
-      'disruptionType': 'Flight Cancellation',
-      'status': CaseStatus.pending,
-    },
-    {
-      'flightCode': 'AA 301',
-      'airline': 'American Airlines',
-      'disruptionType': '4 Hour Delay',
-      'status': CaseStatus.inProgress,
-      'progress': 0.3,
-      'stepText': 'Investigating claim',
-    },
-  ];
+  List<ClaimModel> _claims = [];
+  bool _isLoading = true;
+  bool _isSubmitting = false;
+  String? _errorMessage;
 
   final TextEditingController _flightController = TextEditingController();
   final TextEditingController _baggageController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _loadClaims();
+  }
+
+  Future<void> _loadClaims() async {
+    if (!mounted) return;
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
+
+    try {
+      final claims = await ClaimRepository.getUserClaims();
+      if (!mounted) return;
+      setState(() {
+        _claims = claims;
+        _isLoading = false;
+      });
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _errorMessage = e.toString();
+        _isLoading = false;
+      });
+    }
+  }
 
   @override
   void dispose() {
@@ -151,27 +171,43 @@ class _ResolveDashboardScreenState extends State<ResolveDashboardScreen> {
                 const SizedBox(height: 32),
                 // Submit Button
                 GestureDetector(
-                  onTap: () {
+                  onTap: _isSubmitting ? null : () async {
                     if (_flightController.text.trim().isNotEmpty) {
                       setState(() {
-                        _activeCases.insert(0, {
-                          'flightCode':
-                              _flightController.text.trim().toUpperCase(),
-                          'airline': 'TBD',
-                          'disruptionType': 'Reported Disruption',
-                          'status': CaseStatus.pending,
-                        });
+                        _isSubmitting = true;
                       });
-                      Navigator.pop(context);
+                      try {
+                        await ClaimRepository.submitClaim(
+                          flightCode: _flightController.text.trim().toUpperCase(),
+                          airline: 'Pending Airline',
+                          disruptionType: 'Reported Disruption',
+                        );
+                        if (mounted) {
+                          Navigator.pop(context);
+                          _loadClaims();
+                        }
+                      } catch (e) {
+                        if (mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text('Failed to submit: $e')),
+                          );
+                        }
+                      } finally {
+                        if (mounted) {
+                          setState(() {
+                            _isSubmitting = false;
+                          });
+                        }
+                      }
                     }
                   },
                   child: Container(
                     width: double.infinity,
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFFFC229),
+                      color: _isSubmitting ? Colors.grey : const Color(0xFFFFC229),
                       borderRadius: BorderRadius.circular(16),
-                      boxShadow: [
+                      boxShadow: _isSubmitting ? null : [
                         BoxShadow(
                           color: const Color(0xFFFFC229).withOpacity(0.2),
                           blurRadius: 12,
@@ -180,14 +216,21 @@ class _ResolveDashboardScreenState extends State<ResolveDashboardScreen> {
                       ],
                     ),
                     alignment: Alignment.center,
-                    child: const Text(
-                      'Submit Complaint',
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                      ),
-                    ),
+                    child: _isSubmitting
+                        ? const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                                strokeWidth: 2, valueColor: AlwaysStoppedAnimation<Color>(Colors.black)),
+                          )
+                        : const Text(
+                            'Submit Complaint',
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
+                          ),
                   ),
                 ),
                 const SizedBox(height: 16),
@@ -199,9 +242,19 @@ class _ResolveDashboardScreenState extends State<ResolveDashboardScreen> {
     );
   }
 
+  CaseStatus _mapClaimStatus(String status) {
+    if (status == 'PENDING') return CaseStatus.pending;
+    if (status == 'COMPLETED' || status == 'REJECTED') return CaseStatus.completed;
+    return CaseStatus.inProgress;
+  }
+
   @override
   Widget build(BuildContext context) {
-    bool isEmpty = _activeCases.isEmpty;
+    final activeCases = _claims.where((c) => c.status != 'COMPLETED' && c.status != 'REJECTED').toList();
+    final completedCases = _claims.where((c) => c.status == 'COMPLETED' || c.status == 'REJECTED').toList();
+    bool isEmptyActive = activeCases.isEmpty;
+    bool isEmptyCompleted = completedCases.isEmpty;
+
     return Scaffold(
       backgroundColor: AppColors.background,
       floatingActionButton: FloatingActionButton.extended(
@@ -243,9 +296,9 @@ class _ResolveDashboardScreenState extends State<ResolveDashboardScreen> {
                           ),
                         ),
                         Text(
-                          isEmpty
+                          isEmptyActive
                               ? '0 in progress'
-                              : '${_activeCases.length} in progress',
+                              : '${activeCases.length} in progress',
                           style: const TextStyle(
                             color: Colors.white38,
                             fontSize: 14,
@@ -255,7 +308,9 @@ class _ResolveDashboardScreenState extends State<ResolveDashboardScreen> {
                     ),
                     const SizedBox(height: 10),
 
-                    if (isEmpty)
+                    if (_isLoading)
+                      const SkeletonBox(height: 140, radius: 24)
+                    else if (isEmptyActive)
                       Container(
                         padding: const EdgeInsets.symmetric(vertical: 36),
                         decoration: BoxDecoration(
@@ -276,13 +331,13 @@ class _ResolveDashboardScreenState extends State<ResolveDashboardScreen> {
                         ),
                       )
                     else
-                      ..._activeCases.map((caseData) => CaseCard(
-                            flightCode: caseData['flightCode'],
-                            airline: caseData['airline'],
-                            disruptionType: caseData['disruptionType'],
-                            status: caseData['status'],
-                            progress: caseData['progress'] ?? 0.0,
-                            stepText: caseData['stepText'],
+                      ...activeCases.map((claim) => CaseCard(
+                            flightCode: claim.flightCode,
+                            airline: claim.airline,
+                            disruptionType: claim.disruptionType,
+                            status: _mapClaimStatus(claim.status),
+                            progress: claim.progress,
+                            stepText: 'Processing claim',
                           )),
 
                     const SizedBox(height: 1),
@@ -298,7 +353,9 @@ class _ResolveDashboardScreenState extends State<ResolveDashboardScreen> {
                     ),
                     const SizedBox(height: 18),
 
-                    if (isEmpty)
+                    if (_isLoading)
+                      const SkeletonBox(height: 100, radius: 24)
+                    else if (isEmptyCompleted)
                       Container(
                         padding: const EdgeInsets.symmetric(vertical: 36),
                         decoration: BoxDecoration(
@@ -319,14 +376,13 @@ class _ResolveDashboardScreenState extends State<ResolveDashboardScreen> {
                         ),
                       )
                     else
-                      // Card 3: LOS 102 (Completed)
-                      const CaseCard(
-                        flightCode: 'LOS 102',
-                        airline: 'Dana Air',
-                        disruptionType: 'Baggage Delay',
-                        status: CaseStatus.completed,
-                        compensationAmount: '₦25,000',
-                      ),
+                      ...completedCases.map((claim) => CaseCard(
+                            flightCode: claim.flightCode,
+                            airline: claim.airline,
+                            disruptionType: claim.disruptionType,
+                            status: CaseStatus.completed,
+                            compensationAmount: claim.compensationAmount ?? 'N/A',
+                          )),
                     const SizedBox(height: 16),
                   ],
                 ),

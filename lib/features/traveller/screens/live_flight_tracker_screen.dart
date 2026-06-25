@@ -4,7 +4,14 @@ import 'package:sky_rightz_360/core/constants/app_colors.dart';
 import 'dart:async';
 
 class LiveFlightTrackerScreen extends StatefulWidget {
-  const LiveFlightTrackerScreen({super.key});
+  final String flightCode;
+  final String airline;
+
+  const LiveFlightTrackerScreen({
+    super.key,
+    this.flightCode = 'BA 117',
+    this.airline = 'British Airways',
+  });
 
   @override
   State<LiveFlightTrackerScreen> createState() => _LiveFlightTrackerScreenState();
@@ -138,7 +145,7 @@ class _LiveFlightTrackerScreenState extends State<LiveFlightTrackerScreen> {
       Marker(
         markerId: const MarkerId('airplane'),
         position: _currentPosition,
-        infoWindow: const InfoWindow(title: 'Flight BA117'),
+        infoWindow: InfoWindow(title: 'Flight ${widget.flightCode}'),
         icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueYellow), // Using yellow to represent the plane
         zIndex: 2,
       ),
@@ -229,9 +236,9 @@ class _LiveFlightTrackerScreenState extends State<LiveFlightTrackerScreen> {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
-                            'BA 117',
-                            style: TextStyle(
+                          Text(
+                            widget.flightCode,
+                            style: const TextStyle(
                               color: Colors.white,
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
@@ -239,7 +246,7 @@ class _LiveFlightTrackerScreenState extends State<LiveFlightTrackerScreen> {
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            'London (LHR) to New York (JFK)',
+                            widget.airline,
                             style: TextStyle(
                               color: Colors.white.withOpacity(0.5),
                               fontSize: 12,
