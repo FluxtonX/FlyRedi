@@ -21,6 +21,7 @@ import '../models/alert_model.dart';
 import '../models/user_profile.dart';
 import '../utils/add_flight_navigation.dart';
 import 'plan_usage_screen.dart';
+import 'resolve_dashboard_screen.dart';
 import '../repositories/trip_repository.dart';
 import '../models/trip_model.dart';
 import '../repositories/profile_repository.dart';
@@ -410,6 +411,7 @@ class _TravellerDashboardScreenState extends State<TravellerDashboardScreen> {
             planLabel: _isProfileLoading ? 'Free Plan' : planLabel,
             notificationCount: _isSummaryLoading ? 0 : (summary?.alertsCount ?? 0),
           ),
+          _buildAlertBanner(usedClaims >= maxClaims && planLabel.contains('Free')),
           SizedBox(height: 18),
           if (_isStatsLoading || _isProfileLoading || _isTripsLoading || _isSummaryLoading)
             const SkeletonBox(height: 128, radius: 22)
@@ -510,5 +512,71 @@ class _TravellerDashboardScreenState extends State<TravellerDashboardScreen> {
   String _planLabel(String? plan) {
     if (plan == null || plan.trim().isEmpty) return 'Free Plan';
     return plan.endsWith('Plan') || plan.endsWith('Pass') ? plan : '$plan Plan';
+  }
+
+  Widget _buildAlertBanner(bool showBanner) {
+    return AnimatedSize(
+      duration: const Duration(milliseconds: 600),
+      curve: Curves.easeOutQuart,
+      child: !showBanner
+          ? const SizedBox.shrink()
+          : Container(
+              margin: const EdgeInsets.only(top: 18),
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.error.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: Theme.of(context).colorScheme.error.withOpacity(0.3)),
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.error.withOpacity(0.2),
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Theme.of(context).colorScheme.error.withOpacity(0.3),
+                          blurRadius: 8,
+                          spreadRadius: 2,
+                        ),
+                      ],
+                    ),
+                    child: Icon(Icons.warning_amber_rounded, color: Theme.of(context).colorScheme.error, size: 24),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Text(
+                      "ALERT: Your claim for Flight BA 082 has updated to 'PENDING'. Action required.",
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onSurface,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  InkWell(
+                    onTap: () async {
+                      final upgraded = await showUpgradeToProDialog(context);
+                      if (upgraded == true && mounted) {
+                        _loadDashboardData();
+                      }
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.surface,
+                        shape: BoxShape.circle,
+                        border: Border.all(color: Theme.of(context).colorScheme.outline),
+                      ),
+                      child: Icon(Icons.arrow_forward_rounded, color: Theme.of(context).colorScheme.onSurface, size: 18),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+    );
   }
 }
