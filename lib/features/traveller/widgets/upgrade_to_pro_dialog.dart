@@ -25,14 +25,13 @@ class _UpgradeToProDialogState extends State<UpgradeToProDialog> {
       // Send mock request to update plan to Plus, giving max 999 limit
       final repository = ProfileRepository();
       await repository.updateProfile(plan: 'Plus');
-      
+
       if (!mounted) return;
       Navigator.pop(context, true); // Return true indicating success
-      
+
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Successfully upgraded to Pro! Welcome aboard.'),
-          
         ),
       );
     } catch (e) {
@@ -40,7 +39,6 @@ class _UpgradeToProDialogState extends State<UpgradeToProDialog> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Failed to upgrade: $e'),
-          
         ),
       );
     } finally {
@@ -71,10 +69,11 @@ class _UpgradeToProDialogState extends State<UpgradeToProDialog> {
                 alignment: Alignment.centerRight,
                 child: IconButton(
                   onPressed: () => Navigator.pop(context),
-                  icon: Icon(Icons.close, color: Theme.of(context).colorScheme.onSurface, size: 24),
+                  icon: Icon(Icons.close,
+                      color: Theme.of(context).colorScheme.onSurface, size: 24),
                 ),
               ),
-              SizedBox(height: 8),
+              SizedBox(height: 2),
               Center(
                 child: Stack(
                   clipBehavior: Clip.none,
@@ -86,7 +85,7 @@ class _UpgradeToProDialogState extends State<UpgradeToProDialog> {
                         color: Theme.of(context).colorScheme.surface,
                         shape: BoxShape.circle,
                       ),
-                      child: Icon(
+                      child: const Icon(
                         Icons.flight_takeoff,
                         color: Color(0xFFFFC943),
                         size: 54,
@@ -104,7 +103,7 @@ class _UpgradeToProDialogState extends State<UpgradeToProDialog> {
                   ],
                 ),
               ),
-              SizedBox(height: 28),
+              SizedBox(height: 1),
               Text(
                 'Add More Flights',
                 textAlign: TextAlign.center,
@@ -119,26 +118,29 @@ class _UpgradeToProDialogState extends State<UpgradeToProDialog> {
                 "You've reached your monthly\nlimit of 2 flights",
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                  color:
+                      Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                   fontSize: 16,
                   height: 1.45,
                 ),
               ),
-              SizedBox(height: 30),
+              SizedBox(height: 20),
               Text(
                 'Included in Pro:',
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                  color:
+                      Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                   fontSize: 15,
                 ),
               ),
-              SizedBox(height: 16),
+              SizedBox(height: 10),
               const _DialogFeature(text: 'Monitor unlimited flights'),
               const _DialogFeature(text: 'Real-time disruption alerts'),
-              const _DialogFeature(text: 'WhatsApp + Email + Push\nnotifications'),
+              const _DialogFeature(
+                  text: 'WhatsApp + Email + Push\nnotifications'),
               const _DialogFeature(text: 'Advanced flight risk analysis'),
-              SizedBox(height: 20),
+              SizedBox(height: 5),
               Container(
                 padding: EdgeInsets.all(18),
                 decoration: BoxDecoration(
@@ -155,18 +157,22 @@ class _UpgradeToProDialogState extends State<UpgradeToProDialog> {
                           Text(
                             'Traveler Pro',
                             style: TextStyle(
-                              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSurface
+                                  .withOpacity(0.6),
                               fontSize: 14,
                             ),
                           ),
-                          SizedBox(height: 8),
+                          SizedBox(height: 5),
                           Row(
                             crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
                               Text(
                                 '\$9',
                                 style: TextStyle(
-                                  color: Theme.of(context).colorScheme.onSurface,
+                                  color:
+                                      Theme.of(context).colorScheme.onSurface,
                                   fontSize: 30,
                                 ),
                               ),
@@ -175,7 +181,10 @@ class _UpgradeToProDialogState extends State<UpgradeToProDialog> {
                                 child: Text(
                                   '/month',
                                   style: TextStyle(
-                                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurface
+                                        .withOpacity(0.6),
                                     fontSize: 15,
                                   ),
                                 ),
@@ -193,7 +202,7 @@ class _UpgradeToProDialogState extends State<UpgradeToProDialog> {
                   ],
                 ),
               ),
-              SizedBox(height: 26),
+              SizedBox(height: 20),
               SizedBox(
                 height: 60,
                 child: ElevatedButton(
@@ -206,32 +215,33 @@ class _UpgradeToProDialogState extends State<UpgradeToProDialog> {
                       borderRadius: BorderRadius.circular(15),
                     ),
                   ),
-                  child: _isLoading 
-                    ? SizedBox(
-                        width: 24,
-                        height: 24,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          valueColor: AlwaysStoppedAnimation<Color>(Colors.black),
-                        ),
-                      )
-                    : Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.workspace_premium_outlined, size: 19),
-                          SizedBox(width: 12),
-                          Text(
-                            'Upgrade to Pro',
-                            style: TextStyle(
-                              fontSize: 17,
-                              fontWeight: FontWeight.w900,
-                            ),
+                  child: _isLoading
+                      ? const SizedBox(
+                          width: 24,
+                          height: 24,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            valueColor:
+                                AlwaysStoppedAnimation<Color>(Colors.black),
                           ),
-                        ],
-                      ),
+                        )
+                      : const Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.workspace_premium_outlined, size: 19),
+                            SizedBox(width: 12),
+                            Text(
+                              'Upgrade to Pro',
+                              style: TextStyle(
+                                fontSize: 17,
+                                fontWeight: FontWeight.w900,
+                              ),
+                            ),
+                          ],
+                        ),
                 ),
               ),
-              SizedBox(height: 24),
+              SizedBox(height: 20),
               TextButton(
                 onPressed: () => Navigator.pop(context),
                 child: Text(
