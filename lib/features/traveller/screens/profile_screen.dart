@@ -14,6 +14,8 @@ import 'personal_information_screen.dart';
 import 'privacy_security_screen.dart';
 import 'help_support_screen.dart';
 import 'package:sky_rightz_360/core/theme/theme_controller.dart';
+import '../repositories/claim_repository.dart';
+import '../models/claim_model.dart';
 
 class ProfileScreen extends StatefulWidget {
   final bool showBottomNav;
@@ -37,6 +39,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   UserProfile? get _profile => _authController.userProfile.value;
   ProfileStats? _stats;
+  List<ClaimModel> _pastClaims = [];
 
   @override
   void initState() {
@@ -68,10 +71,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
             }
           },
         ),
+        ClaimRepository.getUserClaims(),
       ]);
       if (mounted) {
         setState(() {
           _stats = results[1] as ProfileStats;
+          _pastClaims = results[2] as List<ClaimModel>;
           _isLoading = false;
           _hasLoadedProfile = true;
         });
@@ -1149,11 +1154,28 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
           ),
           childrenPadding: EdgeInsets.only(left: 16, right: 16, bottom: 16),
-          children: [
-            _buildClaimHistoryItem('Flight PK 786', 'Resolved'),
-            SizedBox(height: 10),
-            _buildClaimHistoryItem('Flight EK 612', 'Compensated'),
-          ],
+          children: _pastClaims.isEmpty
+              ? [
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Text(
+                      'No past claims found.',
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+                        fontSize: 13,
+                      ),
+                    ),
+                  )
+                ]
+              : _pastClaims.map((claim) {
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 10),
+                    child: _buildClaimHistoryItem(
+                      'Flight ${claim.flightCode}',
+                      claim.status.capitalizeFirst ?? claim.status,
+                    ),
+                  );
+                }).toList(),
         ),
       ),
     );

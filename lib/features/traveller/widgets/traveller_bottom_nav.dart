@@ -51,6 +51,7 @@ class TravellerBottomNav extends StatelessWidget {
           children: [
             // Home Tab
             GestureDetector(
+              behavior: HitTestBehavior.opaque,
               onTap: () => _selectTab(context, 0),
               child: _buildNavItem(
                 context,
@@ -61,6 +62,7 @@ class TravellerBottomNav extends StatelessWidget {
             ),
             // Trips Tab
             GestureDetector(
+              behavior: HitTestBehavior.opaque,
               onTap: () => _selectTab(context, 1),
               child: _buildNavItem(
                 context,
@@ -71,6 +73,7 @@ class TravellerBottomNav extends StatelessWidget {
             ),
             // Resolution Tab
             GestureDetector(
+              behavior: HitTestBehavior.opaque,
               onTap: () => _selectTab(context, 2),
               child: _buildNavItem(
                 context,
@@ -81,6 +84,7 @@ class TravellerBottomNav extends StatelessWidget {
             ),
             // Assistant Tab
             GestureDetector(
+              behavior: HitTestBehavior.opaque,
               onTap: () => _selectTab(context, 3),
               child: _buildNavItem(
                 context,
@@ -91,6 +95,7 @@ class TravellerBottomNav extends StatelessWidget {
             ),
             // Profile Tab
             GestureDetector(
+              behavior: HitTestBehavior.opaque,
               onTap: () => _selectTab(context, 4),
               child: _buildNavItem(
                 context,

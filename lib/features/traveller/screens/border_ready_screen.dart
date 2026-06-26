@@ -26,6 +26,7 @@ class _BorderReadyScreenState extends State<BorderReadyScreen> {
 
   // Form Field State
   Map<String, String>? _nationality;
+  bool _isChecking = false;
   Map<String, String>? _residence;
   Map<String, String>? _destination;
   List<Map<String, String>> _transitCountries = [];
@@ -364,40 +365,121 @@ class _BorderReadyScreenState extends State<BorderReadyScreen> {
 
             // Run Check Button
             GestureDetector(
-              onTap: () {
-                // Action for Run BorderReady Check
-              },
+              onTap: _isChecking
+                  ? null
+                  : () async {
+                      if (_nationality == null || _destination == null) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Row(
+                              children: [
+                                Icon(Icons.error_outline_rounded, color: Color(0xFFE11D48), size: 20),
+                                SizedBox(width: 12),
+                                Expanded(
+                                  child: Text(
+                                    'Please fill in Nationality and Destination.',
+                                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            backgroundColor: Color(0xFF1E293B),
+                            behavior: SnackBarBehavior.floating,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                            elevation: 6,
+                            margin: EdgeInsets.all(16),
+                          ),
+                        );
+                        return;
+                      }
+
+                      setState(() {
+                        _isChecking = true;
+                      });
+
+                      await Future.delayed(const Duration(seconds: 2));
+
+                      if (mounted) {
+                        setState(() {
+                          _isChecking = false;
+                        });
+                        showDialog(
+                          context: context,
+                          builder: (context) => Dialog(
+                            backgroundColor: Theme.of(context).colorScheme.surface,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(28),
+                              side: BorderSide(color: Theme.of(context).colorScheme.outline),
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(28),
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Container(
+                                    padding: EdgeInsets.all(16),
+                                    decoration: BoxDecoration(color: Theme.of(context).colorScheme.surface, shape: BoxShape.circle),
+                                    child: Icon(Icons.check_circle_outline, color: Color(0xFF10B981), size: 48),
+                                  ),
+                                  SizedBox(height: 24),
+                                  Text(
+                                    'BorderReady™ Check Complete',
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 20, fontWeight: FontWeight.bold),
+                                  ),
+                                  SizedBox(height: 10),
+                                  Text(
+                                    'You have the required documents to travel to ${_destination!['name']}. Have a safe flight!',
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5), fontSize: 13, height: 1.45),
+                                  ),
+                                  SizedBox(height: 28),
+                                  GestureDetector(
+                                    onTap: () => Navigator.pop(context),
+                                    child: Container(
+                                      width: double.infinity,
+                                      padding: EdgeInsets.symmetric(vertical: 14),
+                                      decoration: BoxDecoration(color: Color(0xFFFFC229), borderRadius: BorderRadius.circular(14)),
+                                      alignment: Alignment.center,
+                                      child: Text('Done', style: TextStyle(color: Colors.black, fontSize: 15, fontWeight: FontWeight.bold)),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        );
+                      }
+                    },
               child: Container(
                 width: double.infinity,
                 padding: EdgeInsets.symmetric(vertical: 18),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFFFC229),
+                  color: _isChecking ? Theme.of(context).colorScheme.surface : const Color(0xFFFFC229),
                   borderRadius: BorderRadius.circular(16),
                   boxShadow: [
-                    BoxShadow(
-                      color: Color(0xFFFFC229).withOpacity(0.2),
-                      blurRadius: 20,
-                      offset: const Offset(0, 4),
-                    ),
+                    if (!_isChecking)
+                      BoxShadow(
+                        color: Color(0xFFFFC229).withOpacity(0.2),
+                        blurRadius: 20,
+                        offset: const Offset(0, 4),
+                      ),
                   ],
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(
-                      Icons.search,
-                      color: Colors.black,
-                      size: 20,
-                    ),
-                    SizedBox(width: 8),
-                    Text(
-                      'Run BorderReady™ Check',
-                      style: TextStyle(
-                         color: Colors.black,
-                         fontSize: 16,
-                         fontWeight: FontWeight.bold,
-                      ),
-                    ),
+                    if (_isChecking)
+                      SizedBox(
+                        height: 20,
+                        width: 20,
+                        child: CircularProgressIndicator(strokeWidth: 2, valueColor: AlwaysStoppedAnimation<Color>(Theme.of(context).colorScheme.onSurface)),
+                      )
+                    else ...[
+                      Icon(Icons.search, color: Colors.black, size: 20),
+                      SizedBox(width: 8),
+                      Text('Run BorderReady™ Check', style: TextStyle(color: Colors.black, fontSize: 16, fontWeight: FontWeight.bold)),
+                    ],
                   ],
                 ),
               ),

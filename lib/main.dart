@@ -63,7 +63,7 @@ class SkyRightz360App extends StatelessWidget {
       themeMode: themeController.themeMode,
       debugShowCheckedModeBanner: false,
       initialBinding: AuthBinding(),
-      initialRoute: '/home',
+      initialRoute: '/splash',
       getPages: [
         GetPage(
           name: '/onboarding',

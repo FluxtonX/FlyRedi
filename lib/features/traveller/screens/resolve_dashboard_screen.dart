@@ -172,32 +172,96 @@ class _ResolveDashboardScreenState extends State<ResolveDashboardScreen> {
                 // Submit Button
                 GestureDetector(
                   onTap: _isSubmitting ? null : () async {
-                    if (_flightController.text.trim().isNotEmpty) {
-                      setState(() {
-                        _isSubmitting = true;
-                      });
-                      try {
-                        await ClaimRepository.submitClaim(
-                          flightCode: _flightController.text.trim().toUpperCase(),
-                          airline: 'Pending Airline',
-                          disruptionType: 'Reported Disruption',
+                    if (_flightController.text.trim().isEmpty) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Row(
+                            children: [
+                              Icon(Icons.error_outline_rounded, color: Color(0xFFE11D48), size: 20),
+                              SizedBox(width: 12),
+                              Expanded(
+                                child: Text(
+                                  'Please enter your Flight Number.',
+                                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
+                                ),
+                              ),
+                            ],
+                          ),
+                          backgroundColor: Color(0xFF1E293B),
+                          behavior: SnackBarBehavior.floating,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          elevation: 6,
+                          margin: EdgeInsets.all(16),
+                        ),
+                      );
+                      return;
+                    }
+                    
+                    setState(() {
+                      _isSubmitting = true;
+                    });
+                    
+                    try {
+                      await ClaimRepository.submitClaim(
+                        flightCode: _flightController.text.trim().toUpperCase(),
+                        airline: 'Pending Airline',
+                        disruptionType: 'Reported Disruption',
+                      );
+                      
+                      if (mounted) {
+                        Navigator.pop(context);
+                        _loadClaims();
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Row(
+                              children: [
+                                Icon(Icons.check_circle_outline, color: Color(0xFF10B981), size: 20),
+                                SizedBox(width: 12),
+                                Expanded(
+                                  child: Text(
+                                    'Complaint submitted successfully.',
+                                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            backgroundColor: Color(0xFF1E293B),
+                            behavior: SnackBarBehavior.floating,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                            elevation: 6,
+                            margin: EdgeInsets.all(16),
+                          ),
                         );
-                        if (mounted) {
-                          Navigator.pop(context);
-                          _loadClaims();
-                        }
-                      } catch (e) {
-                        if (mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text('Failed to submit: $e')),
-                          );
-                        }
-                      } finally {
-                        if (mounted) {
-                          setState(() {
-                            _isSubmitting = false;
-                          });
-                        }
+                      }
+                    } catch (e) {
+                      if (mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Row(
+                              children: [
+                                Icon(Icons.error_outline_rounded, color: Color(0xFFE11D48), size: 20),
+                                SizedBox(width: 12),
+                                Expanded(
+                                  child: Text(
+                                    'Failed to submit: $e',
+                                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            backgroundColor: Color(0xFF1E293B),
+                            behavior: SnackBarBehavior.floating,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                            elevation: 6,
+                            margin: EdgeInsets.all(16),
+                          ),
+                        );
+                      }
+                    } finally {
+                      if (mounted) {
+                        setState(() {
+                          _isSubmitting = false;
+                        });
                       }
                     }
                   },
