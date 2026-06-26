@@ -199,7 +199,7 @@ class _UpgradeToProDialogState extends State<UpgradeToProDialog> {
                 child: ElevatedButton(
                   onPressed: _isLoading ? null : _handleUpgrade,
                   style: ElevatedButton.styleFrom(
-                    
+                    backgroundColor: const Color(0xFFFFC229),
                     foregroundColor: Colors.black,
                     elevation: 0,
                     shape: RoundedRectangleBorder(

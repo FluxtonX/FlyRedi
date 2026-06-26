@@ -479,21 +479,25 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
                     return;
                   }
 
-                  final lookupResult = _isManualMode
-                      ? await _lookupFlightDetails()
-                      : null;
-                  final resolvedOrigin =
-                      lookupResult?.origin ?? _originController.text.trim();
-                  final resolvedDestination = lookupResult?.destination ??
-                      _destinationController.text.trim();
+                  // Always fetch flight details from radar to guarantee accuracy
+                  // This prevents user typos or OCR errors from overriding the real route
+                  final lookupResult = await _lookupFlightDetails();
 
-                  if (_isManualMode &&
-                      lookupResult == null &&
-                      (resolvedOrigin.isEmpty || resolvedDestination.isEmpty)) {
+                  if (lookupResult == null) {
                     if (!mounted) return;
-                    _showCustomSnackBar('Flight not found automatically. Please enter origin and destination to save it manually.');
+                    _showCustomSnackBar('Flight record not found on live radar networks. Please verify the flight number.', isError: true);
+                    setState(() {
+                      _isSavingTrip = false;
+                    });
                     return;
                   }
+
+                  final resolvedOrigin = lookupResult.origin.isNotEmpty
+                      ? lookupResult.origin
+                      : _originController.text.trim();
+                  final resolvedDestination = lookupResult.destination.isNotEmpty
+                      ? lookupResult.destination
+                      : _destinationController.text.trim();
 
                   final trip = await _tripRepository.createTrip(
                     flightNumber:

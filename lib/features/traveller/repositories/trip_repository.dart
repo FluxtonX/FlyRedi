@@ -114,6 +114,15 @@ class TripRepository {
     throw Exception(errorBody['message'] ?? 'Flight lookup failed');
   }
 
+  Future<bool> verifyFlightExists(String flightNumber, String? departureDate) async {
+    try {
+      await lookupFlight(flightNumber: flightNumber, departureDate: departureDate);
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
   Future<TripModel> createTrip({
     required String flightNumber,
     required String origin,

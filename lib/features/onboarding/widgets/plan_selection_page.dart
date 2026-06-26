@@ -319,7 +319,7 @@ class _ProPlanCard extends StatelessWidget {
             child: ElevatedButton(
               onPressed: onUpgradeToPro,
               style: ElevatedButton.styleFrom(
-                
+                backgroundColor: const Color(0xFFFFC229),
                 foregroundColor: Colors.black,
                 elevation: 0,
                 shape: RoundedRectangleBorder(
