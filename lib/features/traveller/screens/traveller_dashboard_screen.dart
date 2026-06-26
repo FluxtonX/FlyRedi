@@ -21,7 +21,6 @@ import '../models/alert_model.dart';
 import '../models/user_profile.dart';
 import '../utils/add_flight_navigation.dart';
 import 'plan_usage_screen.dart';
-import 'resolve_dashboard_screen.dart';
 import '../repositories/trip_repository.dart';
 import '../models/trip_model.dart';
 import '../repositories/profile_repository.dart';

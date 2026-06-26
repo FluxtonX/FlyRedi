@@ -868,6 +868,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   // ─── Reusable Widgets ────────────────────────────────────────────────────
 
+  // Evaluates current app global theme mode and seamlessly switches 
+  // between light and dark palettes without breaking active UI states.
   Widget _buildThemeSwitcherTile() {
     final themeController = Get.find<ThemeController>();
     return Obx(() => Container(

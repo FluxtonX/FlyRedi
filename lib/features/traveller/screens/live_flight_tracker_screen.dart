@@ -19,6 +19,7 @@ class LiveFlightTrackerScreen extends StatefulWidget {
 
 class _LiveFlightTrackerScreenState extends State<LiveFlightTrackerScreen>
     with TickerProviderStateMixin {
+  // Controller for the smooth continuous movement of the airplane marker along the path
   late final AnimationController _planeController;
   late final Animation<double> _planeAnimation;
 

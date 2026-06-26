@@ -43,7 +43,7 @@ class PlanSelectionPage extends StatelessWidget {
                     Text(
                       'Choose Your Plan',
                       style: TextStyle(
-                        color: Colors.white,
+                        color: Theme.of(context).colorScheme.onSurface,
                         fontSize: 26,
                         fontWeight: FontWeight.w800,
                       ),
@@ -124,11 +124,11 @@ class _BasicPlanCard extends StatelessWidget {
                 size: 22,
               ),
               SizedBox(width: 10),
-              const Expanded(
+              Expanded(
                 child: Text(
                   'Traveler Basic',
                   style: TextStyle(
-                    color: Colors.white,
+                    color: Theme.of(context).colorScheme.onSurface,
                     fontSize: 19,
                     fontWeight: FontWeight.w800,
                   ),
@@ -152,16 +152,16 @@ class _BasicPlanCard extends StatelessWidget {
             ],
           ),
           SizedBox(height: 16),
-          const Text(
+          Text(
             'Free',
             style: TextStyle(
-              color: Colors.white,
+              color: Theme.of(context).colorScheme.onSurface,
               fontSize: 34,
               fontWeight: FontWeight.w400,
             ),
           ),
           SizedBox(height: 18),
-          Divider(color: Theme.of(context).colorScheme.surface, thickness: 1),
+          Divider(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.1), thickness: 1),
           SizedBox(height: 12),
           const _FeatureRow(text: '2 flights per month'),
           const _FeatureRow(text: 'Basic Sentinel™ monitoring'),
@@ -177,8 +177,8 @@ class _BasicPlanCard extends StatelessWidget {
             child: OutlinedButton(
               onPressed: onContinueFree,
               style: OutlinedButton.styleFrom(
-                foregroundColor: Colors.white,
-                side: BorderSide(color: Theme.of(context).colorScheme.surface, width: 1.2),
+                foregroundColor: Theme.of(context).colorScheme.onSurface,
+                side: BorderSide(color: Theme.of(context).colorScheme.outline.withOpacity(0.5), width: 1.2),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
                 ),
@@ -227,12 +227,12 @@ class _ProPlanCard extends StatelessWidget {
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(Icons.auto_awesome, color: Theme.of(context).colorScheme.surface, size: 14),
+                  Icon(Icons.auto_awesome, color: Colors.black87, size: 14),
                   SizedBox(width: 4),
                   Text(
                     'BEST VALUE',
                     style: TextStyle(
-                      color: Theme.of(context).colorScheme.surface,
+                      color: Colors.black87,
                       fontSize: 12,
                       fontWeight: FontWeight.w800,
                     ),
@@ -250,7 +250,7 @@ class _ProPlanCard extends StatelessWidget {
               Text(
                 'Traveler Pro',
                 style: TextStyle(
-                  color: Colors.white,
+                  color: Theme.of(context).colorScheme.onSurface,
                   fontSize: 20,
                   fontWeight: FontWeight.w800,
                 ),
@@ -264,7 +264,7 @@ class _ProPlanCard extends StatelessWidget {
               Text(
                 'N 3,900',
                 style: TextStyle(
-                  color: Colors.white,
+                  color: Theme.of(context).colorScheme.onSurface,
                   fontSize: 38,
                   fontWeight: FontWeight.w400,
                   letterSpacing: 0,
@@ -291,7 +291,7 @@ class _ProPlanCard extends StatelessWidget {
             ),
           ),
           SizedBox(height: 20),
-          Divider(color: Theme.of(context).colorScheme.surface, thickness: 1),
+          Divider(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.1), thickness: 1),
           SizedBox(height: 12),
           const _FeatureRow(text: 'Unlimited flight monitoring', pro: true),
           const _FeatureRow(text: 'Real-time disruption alerts', pro: true),
@@ -384,7 +384,7 @@ class _FeatureRow extends StatelessWidget {
             child: Text(
               text,
               style: TextStyle(
-                color: pro ? Colors.white : const Color(0xFF9AA5B8),
+                color: pro ? Theme.of(context).colorScheme.onSurface : const Color(0xFF9AA5B8),
                 fontSize: 15,
                 height: 1.35,
               ),

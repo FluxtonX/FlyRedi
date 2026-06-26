@@ -448,54 +448,15 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
                   : () async {
                 if (_isManualMode &&
                     _flightNumberController.text.trim().isEmpty) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        'Please enter a valid Flight Number.',
-                        style: TextStyle(
-                            color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.bold),
-                      ),
-                      
-                      behavior: SnackBarBehavior.floating,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                  );
+                  _showCustomSnackBar('Please enter a valid Flight Number.');
                   return;
                 }
                 if (_isManualMode && _dateController.text.trim().isEmpty) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        'Please select a Departure Date.',
-                        style: TextStyle(
-                            color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.bold),
-                      ),
-                      
-                      behavior: SnackBarBehavior.floating,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                  );
+                  _showCustomSnackBar('Please select a Departure Date.');
                   return;
                 }
                 if (!_isManualMode && _uploadedFileName == null) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        'Please upload your booking confirmation first.',
-                        style: TextStyle(
-                            color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.bold),
-                      ),
-                      
-                      behavior: SnackBarBehavior.floating,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                  );
+                  _showCustomSnackBar('Please upload your booking confirmation first.');
                   return;
                 }
 
@@ -530,21 +491,7 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
                       lookupResult == null &&
                       (resolvedOrigin.isEmpty || resolvedDestination.isEmpty)) {
                     if (!mounted) return;
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(
-                          'Flight not found automatically. Please enter origin and destination to save it manually.',
-                          style: TextStyle(
-                              color: Theme.of(context).colorScheme.onSurface,
-                              fontWeight: FontWeight.bold),
-                        ),
-                        
-                        behavior: SnackBarBehavior.floating,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                    );
+                    _showCustomSnackBar('Flight not found automatically. Please enter origin and destination to save it manually.');
                     return;
                   }
 
@@ -567,20 +514,7 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
                   _showSuccessDialog(trip);
                 } catch (e) {
                   if (!mounted) return;
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        'Failed to save trip: $e',
-                        style: TextStyle(
-                            color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.bold),
-                      ),
-                      
-                      behavior: SnackBarBehavior.floating,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                  );
+                  _showCustomSnackBar('Failed to save trip: $e');
                 } finally {
                   if (mounted) {
                     setState(() {
@@ -775,21 +709,7 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
               : () async {
                   if (_flightNumberController.text.trim().isEmpty ||
                       _dateController.text.trim().isEmpty) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(
-                          'Enter flight number and departure date first.',
-                          style: TextStyle(
-                              color: Theme.of(context).colorScheme.onSurface,
-                              fontWeight: FontWeight.bold),
-                        ),
-                        
-                        behavior: SnackBarBehavior.floating,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                    );
+                    _showCustomSnackBar('Enter flight number and departure date first.');
                     return;
                   }
                   await _lookupFlightDetails(showSuccessSnack: true);
@@ -1041,6 +961,40 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
           ),
         ),
       ],
+    );
+  }
+
+  void _showCustomSnackBar(String message, {bool isError = true}) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            Icon(
+              isError ? Icons.error_outline_rounded : Icons.check_circle_outline,
+              color: isError ? const Color(0xFFE11D48) : const Color(0xFF10B981),
+              size: 20,
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                message,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 14,
+                ),
+              ),
+            ),
+          ],
+        ),
+        backgroundColor: const Color(0xFF1E293B), // Premium dark theme background
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        elevation: 6,
+        margin: const EdgeInsets.all(16),
+      ),
     );
   }
 
