@@ -127,7 +127,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        duration: const Duration(seconds: 3),
+        duration: const Duration(seconds: 1),
       ),
     );
   }
@@ -263,14 +263,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final prev = currentProfile.notificationsEnabled;
     await _authController.updateProfileState(
         currentProfile.copyWith(notificationsEnabled: value));
+    if (mounted) setState(() {});
+
     try {
       await _repository.updateNotifications(enabled: value);
-      _showSnackBar(
-          value ? 'Notifications enabled.' : 'Notifications disabled.');
+      if (mounted) {
+        _showSnackBar(
+            value ? 'Notifications enabled.' : 'Notifications disabled.');
+      }
     } catch (_) {
       await _authController.updateProfileState(
           currentProfile.copyWith(notificationsEnabled: prev));
-      _showSnackBar('Failed to update notifications.', isError: true);
+      if (mounted) {
+        setState(() {});
+        _showSnackBar('Failed to update notifications.', isError: true);
+      }
     }
   }
 
