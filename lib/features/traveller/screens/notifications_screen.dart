@@ -406,11 +406,16 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       width: double.infinity,
       margin: EdgeInsets.only(bottom: 28),
       child: OutlinedButton.icon(
-        onPressed: () {
+        onPressed: () async {
+          // Changed for Demo: Generates test alerts (Critical, High, Info)
+          await _repository.generateTestAlerts();
+          await _loadAlerts();
+          
+          if (!mounted) return;
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
-                'Updates publishing form initiated.',
+                'Test Notifications Generated!',
                 style:
                     TextStyle(color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.bold),
               ),
@@ -418,12 +423,12 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
-                side: BorderSide(color: Theme.of(context).colorScheme.outline),
+                side: BorderSide(color: Color(0xFFFFC229)),
               ),
             ),
           );
         },
-        icon: Icon(Icons.campaign_outlined,
+        icon: Icon(Icons.bug_report_outlined,
             color: Color(0xFFFFC229), size: 18),
         label: Text(
           'Publish New Update',

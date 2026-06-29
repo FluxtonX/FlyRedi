@@ -5,21 +5,21 @@ import 'sentinel_header.dart';
 
 class SentinelMonitoringSection extends StatelessWidget {
   final int alertsCount;
-  final int casesCount;
-  final String totalSavings;
+  final String delayRisk;
+  final int monitoredCount;
   final VoidCallback? onUpgrade;
 
   const SentinelMonitoringSection({
     super.key,
     required this.alertsCount,
-    required this.casesCount,
-    required this.totalSavings,
+    required this.delayRisk,
+    required this.monitoredCount,
     this.onUpgrade,
   });
 
   @override
   Widget build(BuildContext context) {
-    final isEmpty = alertsCount == 0 && casesCount == 0;
+    final isEmpty = alertsCount == 0 && monitoredCount == 0;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -31,8 +31,8 @@ class SentinelMonitoringSection extends StatelessWidget {
         ],
         MonitoringStatsRow(
           alertsCount: alertsCount,
-          casesCount: casesCount,
-          totalSavings: totalSavings,
+          delayRisk: delayRisk,
+          monitoredCount: monitoredCount,
         ),
         SizedBox(height: 14),
         GestureDetector(

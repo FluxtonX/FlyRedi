@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 
 class MonitoringStatsRow extends StatelessWidget {
   final int alertsCount;
-  final int casesCount;
-  final String totalSavings;
+  final String delayRisk;
+  final int monitoredCount;
 
   const MonitoringStatsRow({
     super.key,
     required this.alertsCount,
-    required this.casesCount,
-    required this.totalSavings,
+    required this.delayRisk,
+    required this.monitoredCount,
   });
 
   @override
@@ -28,17 +28,17 @@ class MonitoringStatsRow extends StatelessWidget {
           SizedBox(width: 18),
           Expanded(
             child: _buildStatCard(context, 
-              totalSavings,
-              'Total\nSavings',
-              const Color(0xFF2DD4BF),
+              delayRisk,
+              'Delay\nRisk',
+              Theme.of(context).colorScheme.onSurface,
             ),
           ),
           SizedBox(width: 18),
           Expanded(
             child: _buildStatCard(context, 
-              casesCount.toString(),
-              'Active\nClaims',
-              Theme.of(context).colorScheme.onSurface,
+              monitoredCount.toString(),
+              'Monitored',
+              const Color(0xFF2DD4BF),
             ),
           ),
         ],

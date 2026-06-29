@@ -452,8 +452,8 @@ class _TravellerDashboardScreenState extends State<TravellerDashboardScreen> {
           else
             SentinelMonitoringSection(
               alertsCount: summary?.alertsCount ?? 0,
-              casesCount: summary?.casesCount ?? 0,
-              totalSavings: (summary?.totalSavings ?? 0.0).toString(),
+              delayRisk: (summary?.alertsCount ?? 0) > 0 ? '68%' : '12%',
+              monitoredCount: _trips.length,
               onUpgrade: () async {
                 final upgraded = await showUpgradeToProDialog(context);
                 if (upgraded == true && mounted) {
