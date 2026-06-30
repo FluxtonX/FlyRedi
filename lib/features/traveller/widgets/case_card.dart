@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../screens/resolution_workflow_screen.dart';
-import '../screens/live_flight_tracker_screen.dart';
+import '../screens/resolve_dashboard_screen.dart';
 
 enum CaseStatus { inProgress, pending, completed }
 
@@ -168,10 +168,7 @@ class CaseCard extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => LiveFlightTrackerScreen(
-                      flightCode: flightCode,
-                      airline: airline,
-                    ),
+                    builder: (context) => const ResolveDashboardScreen(),
                   ),
                 );
               },

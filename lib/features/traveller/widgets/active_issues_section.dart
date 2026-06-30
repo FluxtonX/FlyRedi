@@ -7,10 +7,12 @@ import '../screens/trips_overview_screen.dart';
 
 class ActiveIssuesSection extends StatelessWidget {
   final bool isEmpty;
+  final bool showUpgradeCard;
 
   const ActiveIssuesSection({
     super.key,
     this.isEmpty = true,
+    this.showUpgradeCard = true,
   });
 
   @override
@@ -21,43 +23,15 @@ class ActiveIssuesSection extends StatelessWidget {
             _buildTotalExpensesHeader(context),
             SizedBox(height: 14),
             _buildTotalExpensesCard(context, isEmpty),
-            if (!isEmpty) ...[
-              SizedBox(height: 32),
-              Text(
-                'Active Issues',
-                style: TextStyle(
-                  color: Theme.of(context).colorScheme.onSurface,
-                  fontSize: 21,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              SizedBox(height: 24),
-              _buildIssueCard(
-                context: context,
-                flightCode: 'W3 205',
-                severity: 'CRITICAL',
-                severityColor: const Color(0xFFE11D48),
-                timeAgo: '2 hours ago',
-                airline: 'Air Peace',
-                issueDescription: 'Flight Cancelled',
-              ),
-              SizedBox(height: 16),
-              _buildIssueCard(
-                context: context,
-                flightCode: 'AA 301',
-                severity: 'HIGH',
-                severityColor: const Color(0xFFFFC229),
-                timeAgo: '5 hours ago',
-                airline: 'Arik Air',
-                issueDescription: '4 Hour Delay',
-              ),
-            ],
+
             SizedBox(height: 32),
             _buildActiveClaimsHeader(context),
             SizedBox(height: 20),
             _buildActiveClaimsCard(context, isEmpty),
-            SizedBox(height: 24),
-            _buildUpgradeCard(context),
+            if (showUpgradeCard) ...[
+              SizedBox(height: 24),
+              _buildUpgradeCard(context),
+            ],
           ],
         );
   }
@@ -148,122 +122,7 @@ class ActiveIssuesSection extends StatelessWidget {
     );
   }
 
-  Widget _buildIssueCard({
-    required BuildContext context,
-    required String flightCode,
-    required String severity,
-    required Color severityColor,
-    required String timeAgo,
-    required String airline,
-    required String issueDescription,
-  }) {
-    return Container(
-      padding: EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface,
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(
-          color: Theme.of(context).colorScheme.outline,
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Row(
-                children: [
-                  Text(
-                    flightCode,
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.onSurface,
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  SizedBox(width: 12),
-                  Container(
-                    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: severityColor.withOpacity(0.2),
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color: severityColor.withOpacity(0.5),
-                      ),
-                    ),
-                    child: Text(
-                      severity,
-                      style: TextStyle(
-                        color: severityColor,
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              Text(
-                timeAgo,
-                style: TextStyle(
-                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.54),
-                  fontSize: 14,
-                ),
-              ),
-            ],
-          ),
-          SizedBox(height: 8),
-          Text(
-            airline,
-            style: TextStyle(
-              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.54),
-              fontSize: 16,
-            ),
-          ),
-          SizedBox(height: 20),
-          Container(
-            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-            decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.surface,
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: Text(
-              issueDescription,
-              style: TextStyle(
-                color: Theme.of(context).colorScheme.onSurface,
-                fontSize: 16,
-              ),
-            ),
-          ),
-          SizedBox(height: 20),
-          GestureDetector(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const ResolveDashboardScreen()),
-              );
-            },
-            child: Container(
-              padding: EdgeInsets.symmetric(vertical: 16),
-              decoration: BoxDecoration(
-                color: const Color(0xFFFFC229),
-                borderRadius: BorderRadius.circular(20),
-              ),
-              alignment: Alignment.center,
-              child: Text(
-                'Start Resolution',
-                style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+
 
   Widget _buildActiveClaimsHeader(BuildContext context) {
     return Row(

@@ -4,12 +4,10 @@ import '../screens/ai_assistant_screen.dart';
 
 class RecommendedActionsCard extends StatelessWidget {
   final bool isEmpty;
-  final VoidCallback? onUpgrade;
 
   const RecommendedActionsCard({
     super.key,
     this.isEmpty = true,
-    this.onUpgrade,
   });
 
   @override
@@ -229,7 +227,12 @@ class RecommendedActionsCard extends StatelessWidget {
                 ),
                 SizedBox(height: 16),
                 GestureDetector(
-                  onTap: onUpgrade,
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const ResolveDashboardScreen()),
+                    );
+                  },
                   child: Container(
                     padding: EdgeInsets.symmetric(vertical: 14),
                     decoration: BoxDecoration(
@@ -243,7 +246,7 @@ class RecommendedActionsCard extends StatelessWidget {
                         Icon(Icons.arrow_forward, color: Colors.black, size: 18),
                         SizedBox(width: 10),
                         Text(
-                          'Upgrade for More Claims',
+                          'Resolve Now',
                           style: TextStyle(
                             color: Colors.black,
                             fontSize: 16,
@@ -257,40 +260,7 @@ class RecommendedActionsCard extends StatelessWidget {
               ],
             ),
           ),
-          SizedBox(height: 16),
-          GestureDetector(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const AiAssistantScreen()),
-              );
-            },
-            child: Container(
-              padding: EdgeInsets.symmetric(vertical: 18),
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.surface,
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(
-                  color: Theme.of(context).colorScheme.surface,
-                ),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.arrow_forward, color: Theme.of(context).colorScheme.onSurface, size: 20),
-                  SizedBox(width: 12),
-                  Text(
-                    'Get AI Assistance',
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.onSurface,
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
+
         ],
       ),
     );
