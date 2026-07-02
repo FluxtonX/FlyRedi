@@ -18,22 +18,21 @@ class ActiveIssuesSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            _buildTotalExpensesHeader(context),
-            SizedBox(height: 14),
-            _buildTotalExpensesCard(context, isEmpty),
-
-            SizedBox(height: 32),
-            _buildActiveClaimsHeader(context),
-            SizedBox(height: 20),
-            _buildActiveClaimsCard(context, isEmpty),
-            if (showUpgradeCard) ...[
-              SizedBox(height: 24),
-              _buildUpgradeCard(context),
-            ],
-          ],
-        );
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        _buildTotalExpensesHeader(context),
+        SizedBox(height: 14),
+        _buildTotalExpensesCard(context, isEmpty),
+        SizedBox(height: 32),
+        _buildActiveClaimsHeader(context),
+        SizedBox(height: 20),
+        _buildActiveClaimsCard(context, isEmpty),
+        if (showUpgradeCard) ...[
+          SizedBox(height: 24),
+          _buildUpgradeCard(context),
+        ],
+      ],
+    );
   }
 
   Widget _buildTotalExpensesHeader(BuildContext context) {
@@ -52,7 +51,8 @@ class ActiveIssuesSection extends StatelessWidget {
           onTap: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => const ExpenseTrackerScreen()),
+              MaterialPageRoute(
+                  builder: (context) => const ExpenseTrackerScreen()),
             );
           },
           child: Text(
@@ -77,7 +77,7 @@ class ActiveIssuesSection extends StatelessWidget {
         );
       },
       child: Container(
-        padding: EdgeInsets.all(24),
+        padding: EdgeInsets.all(10),
         decoration: BoxDecoration(
           color: Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.circular(24),
@@ -92,21 +92,22 @@ class ActiveIssuesSection extends StatelessWidget {
             Text(
               'Total Expenses',
               style: TextStyle(
-                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.54),
+                color:
+                    Theme.of(context).colorScheme.onSurface.withOpacity(0.54),
                 fontSize: 16,
               ),
             ),
-            SizedBox(height: 8),
+            const SizedBox(height: 5),
             Text(
               isEmpty ? '\$00.00' : '\$290.00',
               style: TextStyle(
                 color: Theme.of(context).colorScheme.onSurface,
-                fontSize: 36,
+                fontSize: 32,
                 fontWeight: FontWeight.w500,
               ),
             ),
-            SizedBox(height: 16),
-            Center(
+            const SizedBox(height: 8),
+            const Center(
               child: Text(
                 'View all',
                 style: TextStyle(
@@ -122,8 +123,6 @@ class ActiveIssuesSection extends StatelessWidget {
     );
   }
 
-
-
   Widget _buildActiveClaimsHeader(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -138,7 +137,8 @@ class ActiveIssuesSection extends StatelessWidget {
               ),
               child: Icon(
                 Icons.task_outlined,
-                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.54),
+                color:
+                    Theme.of(context).colorScheme.onSurface.withOpacity(0.54),
                 size: 20,
               ),
             ),
@@ -157,7 +157,8 @@ class ActiveIssuesSection extends StatelessWidget {
           onTap: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => const TripsOverviewScreen()),
+              MaterialPageRoute(
+                  builder: (context) => const TripsOverviewScreen()),
             );
           },
           child: Text(
@@ -195,7 +196,10 @@ class ActiveIssuesSection extends StatelessWidget {
                 child: Text(
                   'No active claims for now',
                   style: TextStyle(
-                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.38),
+                    color: Theme.of(context)
+                        .colorScheme
+                        .onSurface
+                        .withOpacity(0.38),
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
                   ),
@@ -218,7 +222,10 @@ class ActiveIssuesSection extends StatelessWidget {
                       Text(
                         'Est. \$1,240 compensation',
                         style: TextStyle(
-                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.54),
+                          color: Theme.of(context)
+                              .colorScheme
+                              .onSurface
+                              .withOpacity(0.54),
                           fontSize: 14,
                         ),
                       ),
@@ -228,11 +235,13 @@ class ActiveIssuesSection extends StatelessWidget {
                     onTap: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => const ExpensesScreen()),
+                        MaterialPageRoute(
+                            builder: (context) => const ExpensesScreen()),
                       );
                     },
                     child: Container(
-                      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                       decoration: BoxDecoration(
                         color: Theme.of(context).colorScheme.surface,
                         borderRadius: BorderRadius.circular(20),
@@ -294,7 +303,10 @@ class ActiveIssuesSection extends StatelessWidget {
                       Text(
                         'Unlimited everything for \$9/month',
                         style: TextStyle(
-                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.54),
+                          color: Theme.of(context)
+                              .colorScheme
+                              .onSurface
+                              .withOpacity(0.54),
                           fontSize: 13,
                         ),
                       ),

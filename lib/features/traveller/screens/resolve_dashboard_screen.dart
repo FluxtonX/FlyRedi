@@ -373,7 +373,13 @@ class _ResolveDashboardScreenState extends State<ResolveDashboardScreen> {
                     SizedBox(height: 10),
 
                     if (_isLoading)
-                      const SkeletonBox(height: 140, radius: 24)
+                      Container(
+                        height: 140,
+                        alignment: Alignment.center,
+                        child: const CircularProgressIndicator(
+                          valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFFFC229)),
+                        ),
+                      )
                     else if (isEmptyActive)
                       Container(
                         padding: EdgeInsets.symmetric(vertical: 36),
@@ -418,7 +424,13 @@ class _ResolveDashboardScreenState extends State<ResolveDashboardScreen> {
                     SizedBox(height: 18),
 
                     if (_isLoading)
-                      const SkeletonBox(height: 100, radius: 24)
+                      Container(
+                        height: 100,
+                        alignment: Alignment.center,
+                        child: const CircularProgressIndicator(
+                          valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFFFC229)),
+                        ),
+                      )
                     else if (isEmptyCompleted)
                       Container(
                         padding: EdgeInsets.symmetric(vertical: 36),

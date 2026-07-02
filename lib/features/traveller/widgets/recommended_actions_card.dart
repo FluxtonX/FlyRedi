@@ -15,13 +15,13 @@ class RecommendedActionsCard extends StatelessWidget {
     if (isEmpty) return SizedBox.shrink();
 
     return Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            _buildHeader(context),
-            SizedBox(height: 24),
-            _buildMainCard(context),
-          ],
-        );
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        _buildHeader(context),
+        SizedBox(height: 24),
+        _buildMainCard(context),
+      ],
+    );
   }
 
   Widget _buildHeader(BuildContext context) {
@@ -57,7 +57,8 @@ class RecommendedActionsCard extends StatelessWidget {
               Text(
                 'AI-powered guidance',
                 style: TextStyle(
-                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.54),
+                  color:
+                      Theme.of(context).colorScheme.onSurface.withOpacity(0.54),
                   fontSize: 15,
                 ),
               ),
@@ -70,7 +71,7 @@ class RecommendedActionsCard extends StatelessWidget {
 
   Widget _buildMainCard(BuildContext context) {
     return Container(
-      padding: EdgeInsets.all(24),
+      padding: EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(30),
@@ -114,7 +115,6 @@ class RecommendedActionsCard extends StatelessWidget {
                         SizedBox(width: 8),
                         CircleAvatar(
                           radius: 4,
-                          
                         ),
                       ],
                     ),
@@ -122,7 +122,10 @@ class RecommendedActionsCard extends StatelessWidget {
                     Text(
                       'Flight UA 2847 delayed by 2h 30m',
                       style: TextStyle(
-                        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.54),
+                        color: Theme.of(context)
+                            .colorScheme
+                            .onSurface
+                            .withOpacity(0.54),
                         fontSize: 14,
                       ),
                     ),
@@ -131,7 +134,7 @@ class RecommendedActionsCard extends StatelessWidget {
               ),
             ],
           ),
-          SizedBox(height: 24),
+          SizedBox(height: 10),
           Text(
             'Your flight delay qualifies for compensation under EU261. We recommend contacting the airline desk for immediate rebooking options and filing a compensation claim.',
             style: TextStyle(
@@ -140,7 +143,7 @@ class RecommendedActionsCard extends StatelessWidget {
               height: 1.5,
             ),
           ),
-          SizedBox(height: 20),
+          SizedBox(height: 10),
           Container(
             padding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
             decoration: BoxDecoration(
@@ -181,7 +184,7 @@ class RecommendedActionsCard extends StatelessWidget {
               ],
             ),
           ),
-          SizedBox(height: 24),
+          SizedBox(height: 10),
           Text(
             'Recommended Next Steps:',
             style: TextStyle(
@@ -189,18 +192,20 @@ class RecommendedActionsCard extends StatelessWidget {
               fontSize: 16,
             ),
           ),
-          SizedBox(height: 16),
+          SizedBox(height: 8),
           _buildStepItem(context, '1', 'Contact airline customer service desk'),
-          SizedBox(height: 16),
-          _buildStepItem(context, '2', 'Request meal vouchers if delay exceeds 3 hours'),
-          SizedBox(height: 16),
-          _buildStepItem(context, '3', 'File compensation claim within 6 months'),
-          SizedBox(height: 24),
+          SizedBox(height: 8),
+          _buildStepItem(
+              context, '2', 'Request meal vouchers if delay exceeds 3 hours'),
+          SizedBox(height: 8),
+          _buildStepItem(
+              context, '3', 'File compensation claim within 6 months'),
+          SizedBox(height: 10),
           Container(
-            padding: EdgeInsets.all(20),
+            padding: EdgeInsets.all(10),
             decoration: BoxDecoration(
               color: Theme.of(context).colorScheme.surface,
-              borderRadius: BorderRadius.circular(20),
+              borderRadius: BorderRadius.circular(10),
               border: Border.all(
                 color: Color(0xFFFFC229).withOpacity(0.3),
               ),
@@ -215,22 +220,25 @@ class RecommendedActionsCard extends StatelessWidget {
                       fontSize: 15,
                       height: 1.5,
                     ),
-                    children: [
+                    children: const [
                       TextSpan(text: 'We recommend starting a claim for '),
                       TextSpan(
                         text: 'W3 205',
                         style: TextStyle(color: Color(0xFFFFC229)),
                       ),
-                      TextSpan(text: '. You\'re entitled to ₦45,000 compensation under NCAA regulations.'),
+                      TextSpan(
+                          text:
+                              '. You\'re entitled to ₦45,000 compensation under NCAA regulations.'),
                     ],
                   ),
                 ),
-                SizedBox(height: 16),
+                SizedBox(height: 5),
                 GestureDetector(
                   onTap: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => const ResolveDashboardScreen()),
+                      MaterialPageRoute(
+                          builder: (context) => const ResolveDashboardScreen()),
                     );
                   },
                   child: Container(
@@ -243,7 +251,8 @@ class RecommendedActionsCard extends StatelessWidget {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.arrow_forward, color: Colors.black, size: 18),
+                        Icon(Icons.arrow_forward,
+                            color: Colors.black, size: 18),
                         SizedBox(width: 10),
                         Text(
                           'Resolve Now',
@@ -260,7 +269,6 @@ class RecommendedActionsCard extends StatelessWidget {
               ],
             ),
           ),
-
         ],
       ),
     );
