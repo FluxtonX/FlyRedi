@@ -115,6 +115,7 @@ class RecommendedActionsCard extends StatelessWidget {
                         SizedBox(width: 8),
                         CircleAvatar(
                           radius: 4,
+                          backgroundColor: Color(0xFFE11D48),
                         ),
                       ],
                     ),

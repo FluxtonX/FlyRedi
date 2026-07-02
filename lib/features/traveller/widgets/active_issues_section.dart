@@ -55,7 +55,7 @@ class ActiveIssuesSection extends StatelessWidget {
                   builder: (context) => const ExpenseTrackerScreen()),
             );
           },
-          child: Text(
+          child: const Text(
             'View all',
             style: TextStyle(
               color: Color(0xFFFFC229),
@@ -161,7 +161,7 @@ class ActiveIssuesSection extends StatelessWidget {
                   builder: (context) => const TripsOverviewScreen()),
             );
           },
-          child: Text(
+          child: const Text(
             '1/1 used',
             style: TextStyle(
               color: Color(0xFFFFC229),
@@ -281,7 +281,7 @@ class ActiveIssuesSection extends StatelessWidget {
           children: [
             Row(
               children: [
-                Icon(
+                const Icon(
                   Icons.workspace_premium_outlined,
                   color: Color(0xFFFFC229),
                   size: 30,
@@ -323,7 +323,7 @@ class ActiveIssuesSection extends StatelessWidget {
                 color: const Color(0xFFFFC943),
                 borderRadius: BorderRadius.circular(14),
               ),
-              child: Row(
+              child: const Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(

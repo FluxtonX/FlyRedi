@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import 'package:sky_rightz_360/core/constants/app_colors.dart';
+import 'package:sky_rightz_360/features/auth/presentation/controllers/auth_controller.dart';
 import '../widgets/dashboard_header.dart';
 import '../widgets/add_flight_card.dart';
 import '../widgets/monthly_usage_card.dart';
@@ -40,7 +43,8 @@ class TravellerDashboardProScreen extends StatefulWidget {
       _TravellerDashboardProScreenState();
 }
 
-class _TravellerDashboardProScreenState extends State<TravellerDashboardProScreen> {
+class _TravellerDashboardProScreenState
+    extends State<TravellerDashboardProScreen> {
   final DashboardRepository _repository = DashboardRepository();
   final AlertRepository _alertRepository = AlertRepository();
   final TripRepository _tripRepository = TripRepository();
@@ -77,7 +81,8 @@ class _TravellerDashboardProScreenState extends State<TravellerDashboardProScree
     super.initState();
     // Cache user display name once — avoids FirebaseAuth lookup every rebuild
     final user = FirebaseAuth.instance.currentUser;
-    _displayName = user?.displayName ?? user?.email?.split('@').first ?? 'Traveller';
+    _displayName =
+        user?.displayName ?? user?.email?.split('@').first ?? 'Traveller';
     TripRepository.tripsVersion.addListener(_onTripsChanged);
     _loadDashboardData();
   }
@@ -280,8 +285,8 @@ class _TravellerDashboardProScreenState extends State<TravellerDashboardProScree
     if (_hasLoadedData) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Failed to update dashboard data: ${e.toString().replaceAll('Exception: ', '')}'),
-          
+          content: Text(
+              'Failed to update dashboard data: ${e.toString().replaceAll('Exception: ', '')}'),
           duration: const Duration(seconds: 3),
         ),
       );
@@ -301,7 +306,8 @@ class _TravellerDashboardProScreenState extends State<TravellerDashboardProScree
         _hasLoadedData = true;
         _errorMessage = null;
       } else {
-        _errorMessage = 'Failed to load dashboard data. Please check your connection.';
+        _errorMessage =
+            'Failed to load dashboard data. Please check your connection.';
       }
     }
   }
@@ -363,7 +369,8 @@ class _TravellerDashboardProScreenState extends State<TravellerDashboardProScree
                 _errorMessage!,
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+                  color:
+                      Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
                   fontSize: 14,
                 ),
               ),
@@ -377,9 +384,7 @@ class _TravellerDashboardProScreenState extends State<TravellerDashboardProScree
                       color: Colors.black, fontWeight: FontWeight.bold),
                 ),
                 style: ElevatedButton.styleFrom(
-                  
-                  padding:
-                      EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                  padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16),
                   ),
@@ -399,7 +404,9 @@ class _TravellerDashboardProScreenState extends State<TravellerDashboardProScree
     final maxClaims = stats?.claimsFiledMax ?? 1;
     final usedAiQuestions = stats?.aiAssistantQuestions ?? 0;
     final maxAiQuestions = stats?.aiAssistantQuestionsMax ?? 5;
-    final planLabel = _planLabel(_profile?.plan);
+
+    final authController = Get.find<AuthController>();
+    final planLabel = _planLabel(authController.userProfile.value?.plan);
 
     return SingleChildScrollView(
       physics: const AlwaysScrollableScrollPhysics(),
@@ -410,11 +417,16 @@ class _TravellerDashboardProScreenState extends State<TravellerDashboardProScree
           DashboardHeader(
             displayName: displayName,
             planLabel: _isProfileLoading ? 'Free Plan' : planLabel,
-            notificationCount: _isSummaryLoading ? 0 : (summary?.alertsCount ?? 0),
+            notificationCount:
+                _isSummaryLoading ? 0 : (summary?.alertsCount ?? 0),
           ),
-          _buildAlertBanner(usedClaims >= maxClaims && planLabel.contains('Free')),
+          _buildAlertBanner(
+              usedClaims >= maxClaims && planLabel.contains('Free')),
           SizedBox(height: 18),
-          if (_isStatsLoading || _isProfileLoading || _isTripsLoading || _isSummaryLoading)
+          if (_isStatsLoading ||
+              _isProfileLoading ||
+              _isTripsLoading ||
+              _isSummaryLoading)
             const SkeletonBox(height: 128, radius: 22)
           else
             TravelerProActiveCard(
@@ -434,6 +446,7 @@ class _TravellerDashboardProScreenState extends State<TravellerDashboardProScree
             AddFlightCard(
               usedFlights: _trips.length,
               maxFlights: freeFlightLimit,
+              isPro: true,
               onTap: _handleAddFlightTap,
             ),
           SizedBox(height: 24),
@@ -464,23 +477,23 @@ class _TravellerDashboardProScreenState extends State<TravellerDashboardProScree
             const SkeletonBox(height: 220, radius: 28),
           ] else ...[
             BorderReadySection(isEmpty: _activities.isEmpty),
-
           ],
           SizedBox(height: 24),
           if (_isSummaryLoading)
             const SkeletonBox(height: 140, radius: 24)
           else ...[
             RecommendedActionsCard(
-              isEmpty: (summary?.alertsCount ?? 0) == 0 && (summary?.casesCount ?? 0) == 0,
+              isEmpty: (summary?.alertsCount ?? 0) == 0 &&
+                  (summary?.casesCount ?? 0) == 0,
             ),
             SizedBox(height: 24),
             ActiveIssuesSection(
-              isEmpty: (summary?.alertsCount ?? 0) == 0 && (summary?.casesCount ?? 0) == 0,
+              isEmpty: (summary?.alertsCount ?? 0) == 0 &&
+                  (summary?.casesCount ?? 0) == 0,
               showUpgradeCard: false,
             ),
           ],
           SizedBox(height: 24),
-
         ],
       ),
     );
@@ -503,24 +516,31 @@ class _TravellerDashboardProScreenState extends State<TravellerDashboardProScree
               decoration: BoxDecoration(
                 color: Theme.of(context).colorScheme.error.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: Theme.of(context).colorScheme.error.withOpacity(0.3)),
+                border: Border.all(
+                    color:
+                        Theme.of(context).colorScheme.error.withOpacity(0.3)),
               ),
               child: Row(
                 children: [
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.error.withOpacity(0.2),
+                      color:
+                          Theme.of(context).colorScheme.error.withOpacity(0.2),
                       shape: BoxShape.circle,
                       boxShadow: [
                         BoxShadow(
-                          color: Theme.of(context).colorScheme.error.withOpacity(0.3),
+                          color: Theme.of(context)
+                              .colorScheme
+                              .error
+                              .withOpacity(0.3),
                           blurRadius: 8,
                           spreadRadius: 2,
                         ),
                       ],
                     ),
-                    child: Icon(Icons.warning_amber_rounded, color: Theme.of(context).colorScheme.error, size: 24),
+                    child: Icon(Icons.warning_amber_rounded,
+                        color: Theme.of(context).colorScheme.error, size: 24),
                   ),
                   const SizedBox(width: 16),
                   Expanded(
@@ -546,9 +566,12 @@ class _TravellerDashboardProScreenState extends State<TravellerDashboardProScree
                       decoration: BoxDecoration(
                         color: Theme.of(context).colorScheme.surface,
                         shape: BoxShape.circle,
-                        border: Border.all(color: Theme.of(context).colorScheme.outline),
+                        border: Border.all(
+                            color: Theme.of(context).colorScheme.outline),
                       ),
-                      child: Icon(Icons.arrow_forward_rounded, color: Theme.of(context).colorScheme.onSurface, size: 18),
+                      child: Icon(Icons.arrow_forward_rounded,
+                          color: Theme.of(context).colorScheme.onSurface,
+                          size: 18),
                     ),
                   ),
                 ],

@@ -4,12 +4,14 @@ class AddFlightCard extends StatelessWidget {
   final VoidCallback onTap;
   final int usedFlights;
   final int maxFlights;
+  final bool isPro;
 
   const AddFlightCard({
     super.key,
     required this.onTap,
     required this.usedFlights,
     required this.maxFlights,
+    this.isPro = false,
   });
 
   @override
@@ -54,21 +56,43 @@ class AddFlightCard extends StatelessWidget {
                     ),
                   ),
                   SizedBox(height: 5),
-                  Text(
-                    '$usedFlights/$maxFlights used this month',
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.54),
-                      fontSize: 12,
-                    ),
-                  ),
+                  isPro
+                      ? Row(
+                          children: [
+                            const Text(
+                              '∞ ',
+                              style: TextStyle(
+                                color: Color(0xFFFFC229),
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const Text(
+                              'Unlimited flights',
+                              style: TextStyle(
+                                color: Color(0xFFFFC229),
+                                fontSize: 12,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        )
+                      : Text(
+                          '$usedFlights/$maxFlights used this month',
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.54),
+                            fontSize: 12,
+                          ),
+                        ),
                 ],
               ),
             ),
-            Icon(
-              Icons.workspace_premium_outlined,
-              color: Color(0xFFFFC229),
-              size: 18,
-            ),
+            if (!isPro)
+              Icon(
+                Icons.workspace_premium_outlined,
+                color: Color(0xFFFFC229),
+                size: 18,
+              ),
           ],
         ),
       ),

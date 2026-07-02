@@ -163,8 +163,9 @@ class _SignInScreenState extends State<SignInScreen> {
 
                 // Sign In button
                 Obx(() => CustomButton(
-                      title: _authController.isLoading.value ? 'Signing In...' : 'Sign In',
+                      title: 'Sign In',
                       onTap: _authController.isLoading.value ? () {} : _handleLogin,
+                      isLoading: _authController.isLoading.value,
                     )),
                 SizedBox(height: 30),
 
