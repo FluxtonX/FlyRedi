@@ -402,7 +402,7 @@ class _TripsOverviewScreenState extends State<TripsOverviewScreen> {
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: EdgeInsets.all(24),
+          padding: EdgeInsets.only(left: 24, right: 24, top: 24, bottom: 100),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
@@ -974,11 +974,16 @@ class _TripsOverviewScreenState extends State<TripsOverviewScreen> {
               ),
             ),
             SizedBox(height: 4),
-            Text(
-              label,
-              style: TextStyle(
-                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
-                fontSize: 11,
+            FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Text(
+                label,
+                maxLines: 1,
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
           ],

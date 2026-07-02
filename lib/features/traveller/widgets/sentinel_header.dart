@@ -30,8 +30,9 @@ class SentinelHeader extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+
                   Text(
-                    'Sentinel™ Monitoring',
+                    'Sentinel™',
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
@@ -43,7 +44,7 @@ class SentinelHeader extends StatelessWidget {
                   SizedBox(height: 4),
                   Text(
                     'Real-time flight intelligence',
-                    maxLines: 1,
+                    maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                       color: Theme.of(context).colorScheme.onSurface.withOpacity(0.54),

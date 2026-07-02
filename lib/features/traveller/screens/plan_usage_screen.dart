@@ -63,6 +63,22 @@ class _PlanUsageScreenState extends State<PlanUsageScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final plan = _authController.userProfile.value?.plan;
+    final isFree = plan == null || plan.trim().isEmpty || plan.contains('Free');
+    final planName = isFree ? 'Free Plan' : (plan.endsWith('Plan') || plan.endsWith('Pass') ? plan : '$plan Plan');
+
+    final maxFlights = isFree ? freeFlightLimit : (_stats?.flightsMonitoredMax ?? freeFlightLimit);
+    final maxClaims = isFree ? 1 : (_stats?.claimsFiledMax ?? 1);
+    final maxAiComplaintLetters = isFree ? 1 : (_stats?.aiComplaintLettersMax ?? 1);
+    final maxAiAssistantQuestions = isFree ? 5 : (_stats?.aiAssistantQuestionsMax ?? 5);
+    final maxDocumentUploads = isFree ? 5 : (_stats?.documentUploadsMax ?? 5);
+
+    final usedFlights = _stats?.flightsMonitored ?? _usedFlights;
+    final usedClaims = _stats?.claimsFiled ?? 0;
+    final usedAiComplaintLetters = _stats?.aiComplaintLetters ?? 0;
+    final usedAiAssistantQuestions = _stats?.aiAssistantQuestions ?? 0;
+    final usedDocumentUploads = _stats?.documentUploads ?? 0;
+
     return Scaffold(
       
       bottomNavigationBar: const TravellerBottomNav(activeIndex: 0),
@@ -116,7 +132,7 @@ class _PlanUsageScreenState extends State<PlanUsageScreen> {
                           ),
                           SizedBox(height: 8),
                           Text(
-                            'Traveler Basic',
+                            planName,
                             style: TextStyle(
                               color: Theme.of(context).colorScheme.onSurface,
                               fontSize: 25,
@@ -138,15 +154,15 @@ class _PlanUsageScreenState extends State<PlanUsageScreen> {
                       child: Row(
                         children: [
                           Icon(
-                            Icons.bolt_outlined,
-                            color: Color(0xFF9AA5B8),
+                            isFree ? Icons.bolt_outlined : Icons.workspace_premium_outlined,
+                            color: isFree ? Color(0xFF9AA5B8) : Color(0xFFFFC229),
                             size: 16,
                           ),
                           SizedBox(width: 6),
                           Text(
-                            'FREE',
+                            isFree ? 'FREE' : 'PRO',
                             style: TextStyle(
-                              color: Color(0xFF9AA5B8),
+                              color: isFree ? Color(0xFF9AA5B8) : Color(0xFFFFC229),
                               fontSize: 13,
                             ),
                           ),
@@ -169,11 +185,9 @@ class _PlanUsageScreenState extends State<PlanUsageScreen> {
               _PlanUsageRow(
                 icon: Icons.flight_takeoff,
                 label: 'Flights Monitored',
-                value: '${_stats?.flightsMonitored ?? _usedFlights}/${_stats?.flightsMonitoredMax ?? freeFlightLimit}',
-                progress: _stats != null
-                    ? (_stats!.flightsMonitored / _stats!.flightsMonitoredMax).clamp(0.0, 1.0)
-                    : _flightProgress,
-                warning: (_stats?.flightsMonitored ?? _usedFlights) >= (_stats?.flightsMonitoredMax ?? freeFlightLimit),
+                value: '$usedFlights/$maxFlights',
+                progress: maxFlights > 0 ? (usedFlights / maxFlights).clamp(0.0, 1.0) : 0,
+                warning: usedFlights >= maxFlights,
                 onTap: () async {
                   final upgraded = await showUpgradeToProDialog(context);
                   if (upgraded == true && mounted) {
@@ -184,11 +198,9 @@ class _PlanUsageScreenState extends State<PlanUsageScreen> {
               _PlanUsageRow(
                 icon: Icons.fact_check_outlined,
                 label: 'Claims Filed',
-                value: '${_stats?.claimsFiled ?? 0}/${_stats?.claimsFiledMax ?? 1}',
-                progress: _stats != null && _stats!.claimsFiledMax > 0
-                    ? (_stats!.claimsFiled / _stats!.claimsFiledMax).clamp(0.0, 1.0)
-                    : 0,
-                warning: (_stats?.claimsFiled ?? 0) >= (_stats?.claimsFiledMax ?? 1),
+                value: '$usedClaims/$maxClaims',
+                progress: maxClaims > 0 ? (usedClaims / maxClaims).clamp(0.0, 1.0) : 0,
+                warning: usedClaims >= maxClaims,
                 onTap: () async {
                   final upgraded = await showUpgradeToProDialog(context);
                   if (upgraded == true && mounted) {
@@ -199,11 +211,9 @@ class _PlanUsageScreenState extends State<PlanUsageScreen> {
               _PlanUsageRow(
                 icon: Icons.auto_awesome,
                 label: 'AI Complaint Letters',
-                value: '${_stats?.aiComplaintLetters ?? 0}/${_stats?.aiComplaintLettersMax ?? 1}',
-                progress: _stats != null && _stats!.aiComplaintLettersMax > 0
-                    ? (_stats!.aiComplaintLetters / _stats!.aiComplaintLettersMax).clamp(0.0, 1.0)
-                    : 0,
-                warning: (_stats?.aiComplaintLetters ?? 0) >= (_stats?.aiComplaintLettersMax ?? 1),
+                value: '$usedAiComplaintLetters/$maxAiComplaintLetters',
+                progress: maxAiComplaintLetters > 0 ? (usedAiComplaintLetters / maxAiComplaintLetters).clamp(0.0, 1.0) : 0,
+                warning: usedAiComplaintLetters >= maxAiComplaintLetters,
                 onTap: () async {
                   final upgraded = await showUpgradeToProDialog(context);
                   if (upgraded == true && mounted) {
@@ -214,11 +224,9 @@ class _PlanUsageScreenState extends State<PlanUsageScreen> {
               _PlanUsageRow(
                 icon: Icons.chat_bubble_outline,
                 label: 'AI Assistant Questions',
-                value: '${_stats?.aiAssistantQuestions ?? 0}/${_stats?.aiAssistantQuestionsMax ?? 5}',
-                progress: _stats != null && _stats!.aiAssistantQuestionsMax > 0
-                    ? (_stats!.aiAssistantQuestions / _stats!.aiAssistantQuestionsMax).clamp(0.0, 1.0)
-                    : 0,
-                warning: (_stats?.aiAssistantQuestions ?? 0) >= (_stats?.aiAssistantQuestionsMax ?? 5),
+                value: '$usedAiAssistantQuestions/$maxAiAssistantQuestions',
+                progress: maxAiAssistantQuestions > 0 ? (usedAiAssistantQuestions / maxAiAssistantQuestions).clamp(0.0, 1.0) : 0,
+                warning: usedAiAssistantQuestions >= maxAiAssistantQuestions,
                 onTap: () async {
                   final upgraded = await showUpgradeToProDialog(context);
                   if (upgraded == true && mounted) {
@@ -229,10 +237,8 @@ class _PlanUsageScreenState extends State<PlanUsageScreen> {
               _PlanUsageRow(
                 icon: Icons.upload_outlined,
                 label: 'Document Uploads',
-                value: '${_stats?.documentUploads ?? 0}/${_stats?.documentUploadsMax ?? 5}',
-                progress: _stats != null && _stats!.documentUploadsMax > 0
-                    ? (_stats!.documentUploads / _stats!.documentUploadsMax).clamp(0.0, 1.0)
-                    : 0,
+                value: '$usedDocumentUploads/$maxDocumentUploads',
+                progress: maxDocumentUploads > 0 ? (usedDocumentUploads / maxDocumentUploads).clamp(0.0, 1.0) : 0,
                 warning: false,
                 onTap: () {},
               ),

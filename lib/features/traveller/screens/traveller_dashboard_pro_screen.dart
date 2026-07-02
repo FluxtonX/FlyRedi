@@ -410,7 +410,7 @@ class _TravellerDashboardProScreenState
 
     return SingleChildScrollView(
       physics: const AlwaysScrollableScrollPhysics(),
-      padding: EdgeInsets.all(24),
+      padding: const EdgeInsets.only(left: 24, right: 24, top: 24, bottom: 100),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [

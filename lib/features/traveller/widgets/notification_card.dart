@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../screens/resolve_dashboard_screen.dart';
+import '../screens/resolution_workflow_screen.dart';
 
 class NotificationCard extends StatelessWidget {
   final IconData mainIcon;
@@ -204,7 +204,7 @@ class NotificationCard extends StatelessWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => const ResolveDashboardScreen()),
+                          builder: (context) => const ResolutionWorkflowScreen()),
                     );
                   },
                   child: Container(

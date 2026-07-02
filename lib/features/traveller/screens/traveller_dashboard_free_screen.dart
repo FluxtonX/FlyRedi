@@ -394,21 +394,22 @@ class _TravellerDashboardFreeScreenState
       );
     }
 
+    final authController = Get.find<AuthController>();
+    final planLabel = _planLabel(authController.userProfile.value?.plan);
+    final isFree = planLabel.contains('Free');
+
     final summary = _summary;
     final stats = _stats;
     final usedFlights = stats?.flightsMonitored ?? _trips.length;
-    final maxFlights = stats?.flightsMonitoredMax ?? freeFlightLimit;
+    final maxFlights = isFree ? freeFlightLimit : (stats?.flightsMonitoredMax ?? freeFlightLimit);
     final usedClaims = stats?.claimsFiled ?? (summary?.casesCount ?? 0);
-    final maxClaims = stats?.claimsFiledMax ?? 1;
+    final maxClaims = isFree ? 1 : (stats?.claimsFiledMax ?? 1);
     final usedAiQuestions = stats?.aiAssistantQuestions ?? 0;
-    final maxAiQuestions = stats?.aiAssistantQuestionsMax ?? 5;
-
-    final authController = Get.find<AuthController>();
-    final planLabel = _planLabel(authController.userProfile.value?.plan);
+    final maxAiQuestions = isFree ? 5 : (stats?.aiAssistantQuestionsMax ?? 5);
 
     return SingleChildScrollView(
       physics: const AlwaysScrollableScrollPhysics(),
-      padding: EdgeInsets.all(24),
+      padding: const EdgeInsets.only(left: 24, right: 24, top: 24, bottom: 100),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [

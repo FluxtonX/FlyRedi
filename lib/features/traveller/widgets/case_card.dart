@@ -168,7 +168,7 @@ class CaseCard extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const ResolveDashboardScreen(),
+                    builder: (context) => const ResolutionWorkflowScreen(),
                   ),
                 );
               },

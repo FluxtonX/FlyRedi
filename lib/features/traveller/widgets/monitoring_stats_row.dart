@@ -53,7 +53,7 @@ class MonitoringStatsRow extends StatelessWidget {
   ) {
     return Container(
       padding: EdgeInsets.symmetric(
-        vertical: 26,
+        vertical: 16,
       ),
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
@@ -69,7 +69,7 @@ class MonitoringStatsRow extends StatelessWidget {
             number,
             style: TextStyle(
               color: numberColor,
-              fontSize: 16,
+              fontSize: 24,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -79,8 +79,8 @@ class MonitoringStatsRow extends StatelessWidget {
             textAlign: TextAlign.center,
             style: TextStyle(
               color: Theme.of(context).colorScheme.onSurface.withOpacity(0.54),
-              fontSize: 18,
-              height: 1.5,
+              fontSize: 13,
+              height: 1.3,
             ),
           ),
         ],

@@ -25,11 +25,11 @@ class DashboardHeader extends StatelessWidget {
             children: [
               Text(
                 'Welcome back, $displayName',
-                maxLines: 1,
+                maxLines: 2,
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
                   color: Theme.of(context).colorScheme.onSurface,
-                  fontSize: 21,
+                  fontSize: 20,
                   fontWeight: FontWeight.bold,
                 ),
               ),
