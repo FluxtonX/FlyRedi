@@ -505,6 +505,7 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
                     origin: resolvedOrigin,
                     destination: resolvedDestination,
                     departureDate: _dateController.text.trim(),
+                    status: lookupResult.status,
                     bookingReference:
                         _bookingRefController.text.trim().isEmpty
                             ? null

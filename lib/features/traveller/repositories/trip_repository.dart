@@ -129,6 +129,7 @@ class TripRepository {
     required String destination,
     required String departureDate,
     String? bookingReference,
+    String? status,
     int stops = 0,
     List<TripTimelineItem> timeline = const [],
   }) async {
@@ -141,6 +142,7 @@ class TripRepository {
         'destination': destination,
         'departureDate': departureDate,
         'bookingReference': bookingReference,
+        'status': status ?? 'scheduled',
         'totalDuration': departureDate,
         'stops': stops,
         'timeline': timeline.map((e) => e.toJson()).toList(),

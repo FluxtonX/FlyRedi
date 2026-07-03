@@ -331,13 +331,23 @@ class _TripsOverviewScreenState extends State<TripsOverviewScreen> {
   /// time component directly.
   String _timeLabel(String? isoLike, String fallback) {
     if (isoLike == null || isoLike.trim().isEmpty) return fallback;
+    
+    String _to12Hour(String hh, String mm) {
+      int hour = int.parse(hh);
+      String amPm = hour >= 12 ? 'PM' : 'AM';
+      hour = hour % 12;
+      if (hour == 0) hour = 12;
+      return '${hour.toString().padLeft(2, '0')}:$mm $amPm';
+    }
+
     // ISO string with a 'T' separator — extract the HH:mm after the T.
     final isoMatch = RegExp(r'T(\d{2}):(\d{2})').firstMatch(isoLike);
-    if (isoMatch != null) return '${isoMatch.group(1)}:${isoMatch.group(2)}';
+    if (isoMatch != null) return _to12Hour(isoMatch.group(1)!, isoMatch.group(2)!);
+    
     // Plain HH:mm (no date prefix) — return as-is after validation.
     final plainMatch = RegExp(r'^(\d{2}):(\d{2})').firstMatch(isoLike.trim());
-    if (plainMatch != null)
-      return '${plainMatch.group(1)}:${plainMatch.group(2)}';
+    if (plainMatch != null) return _to12Hour(plainMatch.group(1)!, plainMatch.group(2)!);
+    
     // Unrecognised format — show the raw string so no data is lost.
     return isoLike;
   }
