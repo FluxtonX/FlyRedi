@@ -13,6 +13,8 @@ import 'features/auth/presentation/screens/reset_password_screen.dart';
 import 'features/splash/screens/splash_screen.dart';
 import 'features/traveller/screens/traveller_tabs_screen.dart';
 import 'features/onboarding/screens/onboarding_screen.dart';
+import 'package:device_preview/device_preview.dart';
+import 'package:flutter/foundation.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -46,7 +48,12 @@ void main() async {
     }
   });
 
-  runApp(const SkyRightz360App());
+  runApp(
+    DevicePreview(
+      enabled: !kReleaseMode,
+      builder: (context) => const SkyRightz360App(),
+    ),
+  );
 }
 
 class SkyRightz360App extends StatelessWidget {
@@ -57,6 +64,9 @@ class SkyRightz360App extends StatelessWidget {
     final themeController = Get.find<ThemeController>();
     
     return Obx(() => GetMaterialApp(
+      useInheritedMediaQuery: true,
+      locale: DevicePreview.locale(context),
+      builder: DevicePreview.appBuilder,
       title: 'SkyRightz360',
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,

@@ -456,7 +456,7 @@ class _TravellerDashboardProScreenState
             SentinelMonitoringSection(
               alertsCount: summary?.alertsCount ?? 0,
               delayRisk: (summary?.alertsCount ?? 0) > 0 ? '68%' : '12%',
-              monitoredCount: _trips.length,
+              monitoredCount: _trips.where((t) => t.trackingEnabled).length,
               onUpgrade: () async {
                 final upgraded = await showUpgradeToProDialog(context);
                 if (upgraded == true && mounted) {
