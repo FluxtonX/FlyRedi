@@ -53,11 +53,11 @@ class MonitoringStatsRow extends StatelessWidget {
   ) {
     return Container(
       padding: EdgeInsets.symmetric(
-        vertical: 16,
+        vertical: 12,
       ),
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
-        borderRadius: BorderRadius.circular(28),
+        borderRadius: BorderRadius.circular(24),
         border: Border.all(
           color: Theme.of(context).colorScheme.outline,
         ),
@@ -73,7 +73,7 @@ class MonitoringStatsRow extends StatelessWidget {
               fontWeight: FontWeight.bold,
             ),
           ),
-          SizedBox(height: 16),
+          SizedBox(height: 8),
           Text(
             title,
             textAlign: TextAlign.center,

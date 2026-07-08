@@ -4,19 +4,20 @@ import '../models/trip_model.dart';
 
 class FlightMonitorCard extends StatelessWidget {
   final TripModel? activeTrip;
-  
+
   const FlightMonitorCard({super.key, this.activeTrip});
 
   @override
   Widget build(BuildContext context) {
     if (activeTrip == null) return const SizedBox.shrink();
 
-    final timelineFirst = activeTrip!.timeline.isNotEmpty ? activeTrip!.timeline.first : null;
+    final timelineFirst =
+        activeTrip!.timeline.isNotEmpty ? activeTrip!.timeline.first : null;
     final riskLevel = timelineFirst?.riskLevel?.toUpperCase() ?? 'LOW RISK';
-    final riskColor = riskLevel.contains('HIGH') 
-        ? const Color(0xFFEF4444) 
-        : riskLevel.contains('MEDIUM') 
-            ? const Color(0xFFFFC229) 
+    final riskColor = riskLevel.contains('HIGH')
+        ? const Color(0xFFEF4444)
+        : riskLevel.contains('MEDIUM')
+            ? const Color(0xFFFFC229)
             : const Color(0xFF10B981);
     final delayProb = timelineFirst?.delayProb ?? '0%';
     final activeAlerts = timelineFirst?.activeAlerts?.toString() ?? '0';
@@ -28,10 +29,10 @@ class FlightMonitorCard extends StatelessWidget {
         );
       },
       child: Container(
-        padding: EdgeInsets.all(22),
+        padding: EdgeInsets.all(12),
         decoration: BoxDecoration(
           color: Theme.of(context).colorScheme.surface,
-          borderRadius: BorderRadius.circular(30),
+          borderRadius: BorderRadius.circular(24),
           border: Border.all(
             color: Theme.of(context).colorScheme.outline,
           ),
@@ -52,13 +53,18 @@ class FlightMonitorCard extends StatelessWidget {
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
-                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.38),
+                          color: Theme.of(context)
+                              .colorScheme
+                              .onSurface
+                              .withOpacity(0.38),
                           fontSize: 16,
                         ),
                       ),
                       SizedBox(height: 8),
                       Text(
-                        activeTrip!.flightNumber.isEmpty ? 'Flight' : activeTrip!.flightNumber,
+                        activeTrip!.flightNumber.isEmpty
+                            ? 'Flight'
+                            : activeTrip!.flightNumber,
                         style: TextStyle(
                           color: Theme.of(context).colorScheme.onSurface,
                           fontSize: 22,
@@ -97,12 +103,12 @@ class FlightMonitorCard extends StatelessWidget {
               ],
             ),
 
-            SizedBox(height: 26),
+            SizedBox(height: 12),
 
             /// FLIGHT ROUTE
             Container(
               padding: EdgeInsets.symmetric(
-                vertical: 24,
+                vertical: 10,
               ),
               decoration: BoxDecoration(
                 color: Theme.of(context).scaffoldBackgroundColor,
@@ -117,14 +123,17 @@ class FlightMonitorCard extends StatelessWidget {
                         activeTrip!.origin.isEmpty ? 'N/A' : activeTrip!.origin,
                         style: TextStyle(
                           color: Theme.of(context).colorScheme.onSurface,
-                          fontSize: 28,
+                          fontSize: 25,
                         ),
                       ),
                       SizedBox(height: 8),
                       Text(
                         'Departure',
                         style: TextStyle(
-                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.54),
+                          color: Theme.of(context)
+                              .colorScheme
+                              .onSurface
+                              .withOpacity(0.54),
                           fontSize: 16,
                         ),
                       ),
@@ -132,7 +141,7 @@ class FlightMonitorCard extends StatelessWidget {
                   ),
                   Transform.rotate(
                     angle: -0.8,
-                    child: Icon(
+                    child: const Icon(
                       Icons.flight,
                       color: Color(0xFFFFC229),
                       size: 34,
@@ -141,17 +150,22 @@ class FlightMonitorCard extends StatelessWidget {
                   Column(
                     children: [
                       Text(
-                        activeTrip!.destination.isEmpty ? 'N/A' : activeTrip!.destination,
+                        activeTrip!.destination.isEmpty
+                            ? 'N/A'
+                            : activeTrip!.destination,
                         style: TextStyle(
                           color: Theme.of(context).colorScheme.onSurface,
-                          fontSize: 28,
+                          fontSize: 25,
                         ),
                       ),
                       SizedBox(height: 8),
                       Text(
                         'Arrival',
                         style: TextStyle(
-                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.54),
+                          color: Theme.of(context)
+                              .colorScheme
+                              .onSurface
+                              .withOpacity(0.54),
                           fontSize: 16,
                         ),
                       ),
@@ -161,7 +175,7 @@ class FlightMonitorCard extends StatelessWidget {
               ),
             ),
 
-            SizedBox(height: 28),
+            SizedBox(height: 8),
 
             /// STATS
             Row(
@@ -173,11 +187,14 @@ class FlightMonitorCard extends StatelessWidget {
                     Text(
                       'Delay Probability',
                       style: TextStyle(
-                        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.54),
+                        color: Theme.of(context)
+                            .colorScheme
+                            .onSurface
+                            .withOpacity(0.54),
                         fontSize: 16,
                       ),
                     ),
-                    SizedBox(height: 14),
+                    SizedBox(height: 10),
                     Row(
                       children: [
                         Container(
@@ -221,16 +238,19 @@ class FlightMonitorCard extends StatelessWidget {
                     Text(
                       'Active Alerts',
                       style: TextStyle(
-                        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.54),
+                        color: Theme.of(context)
+                            .colorScheme
+                            .onSurface
+                            .withOpacity(0.54),
                         fontSize: 16,
                       ),
                     ),
-                    SizedBox(height: 14),
+                    SizedBox(height: 10),
                     Text(
                       activeAlerts,
                       style: TextStyle(
                         color: Theme.of(context).colorScheme.onSurface,
-                        fontSize: 34,
+                        fontSize: 30,
                       ),
                     ),
                   ],
@@ -238,12 +258,15 @@ class FlightMonitorCard extends StatelessWidget {
               ],
             ),
 
-            SizedBox(height: 28),
+            SizedBox(height: 2),
 
             Text(
-              activeTrip!.departureDate.isEmpty ? 'Date not set' : activeTrip!.departureDate,
+              activeTrip!.departureDate.isEmpty
+                  ? 'Date not set'
+                  : activeTrip!.departureDate,
               style: TextStyle(
-                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.54),
+                color:
+                    Theme.of(context).colorScheme.onSurface.withOpacity(0.54),
                 fontSize: 16,
               ),
             ),
