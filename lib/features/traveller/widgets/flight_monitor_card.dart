@@ -1,11 +1,25 @@
 import 'package:flutter/material.dart';
 import '../screens/flight_detail_screen.dart';
+import '../models/trip_model.dart';
 
 class FlightMonitorCard extends StatelessWidget {
-  const FlightMonitorCard({super.key});
+  final TripModel? activeTrip;
+  
+  const FlightMonitorCard({super.key, this.activeTrip});
 
   @override
   Widget build(BuildContext context) {
+    if (activeTrip == null) return const SizedBox.shrink();
+
+    final timelineFirst = activeTrip!.timeline.isNotEmpty ? activeTrip!.timeline.first : null;
+    final riskLevel = timelineFirst?.riskLevel?.toUpperCase() ?? 'LOW RISK';
+    final riskColor = riskLevel.contains('HIGH') 
+        ? const Color(0xFFEF4444) 
+        : riskLevel.contains('MEDIUM') 
+            ? const Color(0xFFFFC229) 
+            : const Color(0xFF10B981);
+    final delayProb = timelineFirst?.delayProb ?? '0%';
+    final activeAlerts = timelineFirst?.activeAlerts?.toString() ?? '0';
     return GestureDetector(
       onTap: () {
         Navigator.push(
@@ -44,7 +58,7 @@ class FlightMonitorCard extends StatelessWidget {
                       ),
                       SizedBox(height: 8),
                       Text(
-                        'UA 2847',
+                        activeTrip!.flightNumber.isEmpty ? 'Flight' : activeTrip!.flightNumber,
                         style: TextStyle(
                           color: Theme.of(context).colorScheme.onSurface,
                           fontSize: 22,
@@ -71,9 +85,9 @@ class FlightMonitorCard extends StatelessWidget {
                       ),
                       SizedBox(width: 6),
                       Text(
-                        'MEDIUM RISK',
+                        activeTrip!.status.toUpperCase(),
                         style: TextStyle(
-                          color: Color(0xFFFFC229),
+                          color: riskColor,
                           fontSize: 14,
                         ),
                       ),
@@ -100,7 +114,7 @@ class FlightMonitorCard extends StatelessWidget {
                   Column(
                     children: [
                       Text(
-                        'SFO',
+                        activeTrip!.origin.isEmpty ? 'N/A' : activeTrip!.origin,
                         style: TextStyle(
                           color: Theme.of(context).colorScheme.onSurface,
                           fontSize: 28,
@@ -108,7 +122,7 @@ class FlightMonitorCard extends StatelessWidget {
                       ),
                       SizedBox(height: 8),
                       Text(
-                        '10:45 AM',
+                        'Departure',
                         style: TextStyle(
                           color: Theme.of(context).colorScheme.onSurface.withOpacity(0.54),
                           fontSize: 16,
@@ -127,7 +141,7 @@ class FlightMonitorCard extends StatelessWidget {
                   Column(
                     children: [
                       Text(
-                        'JFK',
+                        activeTrip!.destination.isEmpty ? 'N/A' : activeTrip!.destination,
                         style: TextStyle(
                           color: Theme.of(context).colorScheme.onSurface,
                           fontSize: 28,
@@ -135,7 +149,7 @@ class FlightMonitorCard extends StatelessWidget {
                       ),
                       SizedBox(height: 8),
                       Text(
-                        'Monitoring',
+                        'Arrival',
                         style: TextStyle(
                           color: Theme.of(context).colorScheme.onSurface.withOpacity(0.54),
                           fontSize: 16,
@@ -192,7 +206,7 @@ class FlightMonitorCard extends StatelessWidget {
                         ),
                         SizedBox(width: 14),
                         Text(
-                          '68%',
+                          delayProb,
                           style: TextStyle(
                             color: Theme.of(context).colorScheme.onSurface,
                             fontSize: 18,
@@ -213,7 +227,7 @@ class FlightMonitorCard extends StatelessWidget {
                     ),
                     SizedBox(height: 14),
                     Text(
-                      '2',
+                      activeAlerts,
                       style: TextStyle(
                         color: Theme.of(context).colorScheme.onSurface,
                         fontSize: 34,
@@ -227,7 +241,7 @@ class FlightMonitorCard extends StatelessWidget {
             SizedBox(height: 28),
 
             Text(
-              'May 15, 2026',
+              activeTrip!.departureDate.isEmpty ? 'Date not set' : activeTrip!.departureDate,
               style: TextStyle(
                 color: Theme.of(context).colorScheme.onSurface.withOpacity(0.54),
                 fontSize: 16,

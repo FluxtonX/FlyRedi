@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import 'flight_monitor_card.dart';
 import 'monitoring_stats_row.dart';
 import 'sentinel_header.dart';
+import '../models/trip_model.dart';
 
 class SentinelMonitoringSection extends StatelessWidget {
   final int alertsCount;
   final String delayRisk;
   final int monitoredCount;
   final VoidCallback? onUpgrade;
+  final TripModel? activeTrip;
 
   const SentinelMonitoringSection({
     super.key,
@@ -15,6 +17,7 @@ class SentinelMonitoringSection extends StatelessWidget {
     required this.delayRisk,
     required this.monitoredCount,
     this.onUpgrade,
+    this.activeTrip,
   });
 
   @override
@@ -26,7 +29,7 @@ class SentinelMonitoringSection extends StatelessWidget {
         SentinelHeader(isEmpty: isEmpty),
         SizedBox(height: 16),
         if (!isEmpty) ...[
-          const FlightMonitorCard(),
+          FlightMonitorCard(activeTrip: activeTrip),
           SizedBox(height: 16),
         ],
         MonitoringStatsRow(

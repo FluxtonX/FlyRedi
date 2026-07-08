@@ -17,7 +17,6 @@ class AddFlightScreen extends StatefulWidget {
 }
 
 class _AddFlightScreenState extends State<AddFlightScreen> {
-  bool _isManualMode = true; // true: Manual Entry, false: Upload Booking
   final TextEditingController _flightNumberController = TextEditingController();
   final TextEditingController _originController = TextEditingController();
   final TextEditingController _destinationController = TextEditingController();
@@ -25,11 +24,8 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
   final TextEditingController _bookingRefController = TextEditingController();
   final TripRepository _tripRepository = TripRepository();
   final ProfileRepository _profileRepository = ProfileRepository();
-  bool _isUploading = false;
   bool _isSavingTrip = false;
   bool _isLookingUpFlight = false;
-  double _uploadProgress = 0.0;
-  String? _uploadedFileName;
   FlightLookupResult? _flightLookup;
   String? _flightLookupMessage;
 
@@ -96,10 +92,10 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
           SnackBar(
             content: Text(
               'Flight details found and added.',
-              style:
-                  TextStyle(color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurface,
+                  fontWeight: FontWeight.bold),
             ),
-            
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
@@ -125,32 +121,6 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
         });
       }
     }
-  }
-
-  void _simulateUpload() {
-    setState(() {
-      _isUploading = true;
-      _uploadProgress = 0.0;
-      _uploadedFileName = null;
-    });
-
-    // Simulate progress updates
-    Future.doWhile(() async {
-      await Future.delayed(const Duration(milliseconds: 150));
-      if (!mounted) return false;
-      setState(() {
-        _uploadProgress += 0.2;
-      });
-      if (_uploadProgress >= 1.0) {
-        setState(() {
-          _uploadProgress = 1.0;
-          _isUploading = false;
-          _uploadedFileName = "Booking_Confirmation_BA112.pdf";
-        });
-        return false;
-      }
-      return true;
-    });
   }
 
   Future<void> _selectDate(BuildContext context) async {
@@ -196,12 +166,12 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Theme.of(context).colorScheme.onSurface),
+          icon: Icon(Icons.arrow_back,
+              color: Theme.of(context).colorScheme.onSurface),
           onPressed: () => Navigator.pop(context),
         ),
         title: Column(
@@ -219,7 +189,8 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
             Text(
               'Start Sentinel™ monitoring',
               style: TextStyle(
-                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.54),
+                color:
+                    Theme.of(context).colorScheme.onSurface.withOpacity(0.54),
                 fontSize: 12,
                 fontWeight: FontWeight.normal,
               ),
@@ -274,7 +245,10 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
                         Text(
                           'Real-time monitoring for delays, cancellations, gate changes, and disruptions',
                           style: TextStyle(
-                            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onSurface
+                                .withOpacity(0.4),
                             fontSize: 11,
                             height: 1.35,
                           ),
@@ -288,115 +262,8 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
 
             SizedBox(height: 24),
 
-            // Segmented Switcher Tab
-            Container(
-              padding: EdgeInsets.all(4),
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.surface,
-                borderRadius: BorderRadius.circular(14),
-              ),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          _isManualMode = true;
-                        });
-                      },
-                      child: Container(
-                        padding: EdgeInsets.symmetric(vertical: 12),
-                        decoration: BoxDecoration(
-                          color: _isManualMode
-                              ? Theme.of(context).colorScheme.surface
-                              : Colors.transparent,
-                          borderRadius: BorderRadius.circular(10),
-                          border: Border.all(
-                            color: _isManualMode
-                                ? Theme.of(context).colorScheme.outline
-                                : Colors.transparent,
-                          ),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              Icons.flight_takeoff,
-                              color: _isManualMode
-                                  ? const Color(0xFFFFC229)
-                                  : Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
-                              size: 16,
-                            ),
-                            SizedBox(width: 8),
-                            Text(
-                              'Manual Entry',
-                              style: TextStyle(
-                                color: _isManualMode
-                                    ? Colors.white
-                                    : Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
-                                fontSize: 13,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          _isManualMode = false;
-                        });
-                      },
-                      child: Container(
-                        padding: EdgeInsets.symmetric(vertical: 12),
-                        decoration: BoxDecoration(
-                          color: !_isManualMode
-                              ? Theme.of(context).colorScheme.surface
-                              : Colors.transparent,
-                          borderRadius: BorderRadius.circular(10),
-                          border: Border.all(
-                            color: !_isManualMode
-                                ? Theme.of(context).colorScheme.outline
-                                : Colors.transparent,
-                          ),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              Icons.upload_file_outlined,
-                              color: !_isManualMode
-                                  ? const Color(0xFFFFC229)
-                                  : Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
-                              size: 16,
-                            ),
-                            SizedBox(width: 8),
-                            Text(
-                              'Upload Booking',
-                              style: TextStyle(
-                                color: !_isManualMode
-                                    ? Colors.white
-                                    : Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
-                                fontSize: 13,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            SizedBox(height: 24),
-
-            // Form container depending on selection
-            _isManualMode ? _buildManualForm() : _buildUploadForm(),
+            // Form container
+            _buildManualForm(),
 
             SizedBox(height: 28),
 
@@ -446,88 +313,88 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
               onTap: _isSavingTrip
                   ? null
                   : () async {
-                if (_isManualMode &&
-                    _flightNumberController.text.trim().isEmpty) {
-                  _showCustomSnackBar('Please enter a valid Flight Number.');
-                  return;
-                }
-                if (_isManualMode && _dateController.text.trim().isEmpty) {
-                  _showCustomSnackBar('Please select a Departure Date.');
-                  return;
-                }
-                if (!_isManualMode && _uploadedFileName == null) {
-                  _showCustomSnackBar('Please upload your booking confirmation first.');
-                  return;
-                }
+                      if (_flightNumberController.text.trim().isEmpty) {
+                        _showCustomSnackBar(
+                            'Please enter a valid Flight Number.');
+                        return;
+                      }
+                      if (_dateController.text.trim().isEmpty) {
+                        _showCustomSnackBar('Please select a Departure Date.');
+                        return;
+                      }
 
-                setState(() {
-                  _isSavingTrip = true;
-                });
+                      setState(() {
+                        _isSavingTrip = true;
+                      });
 
-                try {
-                  final results = await Future.wait([
-                    _tripRepository.fetchUserTrips(),
-                    _profileRepository.getProfile(),
-                  ]);
-                  final trips = results[0] as List;
-                  final profile = results[1] as UserProfile;
+                      try {
+                        final results = await Future.wait([
+                          _tripRepository.fetchUserTrips(),
+                          _profileRepository.getProfile(),
+                        ]);
+                        final trips = results[0] as List;
+                        final profile = results[1] as UserProfile;
 
-                  if (!profile.hasUnlimitedFlightMonitoring &&
-                      trips.length >= freeFlightLimit) {
-                    if (!mounted) return;
-                    showUpgradeToProDialog(context);
-                    return;
-                  }
+                        if (!profile.hasUnlimitedFlightMonitoring &&
+                            trips.length >= freeFlightLimit) {
+                          if (!mounted) return;
+                          showUpgradeToProDialog(context);
+                          return;
+                        }
 
-                  // Always fetch flight details from radar to guarantee accuracy
-                  // This prevents user typos or OCR errors from overriding the real route
-                  final lookupResult = await _lookupFlightDetails();
+                        // Always fetch flight details from radar to guarantee accuracy
+                        // This prevents user typos or OCR errors from overriding the real route
+                        final lookupResult = await _lookupFlightDetails();
 
-                  if (lookupResult == null) {
-                    if (!mounted) return;
-                    _showCustomSnackBar('Flight record not found on live radar networks. Please verify the flight number.', isError: true);
-                    setState(() {
-                      _isSavingTrip = false;
-                    });
-                    return;
-                  }
+                        if (lookupResult == null) {
+                          if (!mounted) return;
+                          _showCustomSnackBar(
+                              'Flight record not found on live radar networks. Please verify the flight number.',
+                              isError: true);
+                          setState(() {
+                            _isSavingTrip = false;
+                          });
+                          return;
+                        }
 
-                  final resolvedOrigin = lookupResult.origin.isNotEmpty
-                      ? lookupResult.origin
-                      : _originController.text.trim();
-                  final resolvedDestination = lookupResult.destination.isNotEmpty
-                      ? lookupResult.destination
-                      : _destinationController.text.trim();
+                        final resolvedOrigin = lookupResult.origin.isNotEmpty
+                            ? lookupResult.origin
+                            : _originController.text.trim();
+                        final resolvedDestination =
+                            lookupResult.destination.isNotEmpty
+                                ? lookupResult.destination
+                                : _destinationController.text.trim();
 
-                  final trip = await _tripRepository.createTrip(
-                    flightNumber:
-                        _normalizeFlightNumber(_flightNumberController.text),
-                    origin: resolvedOrigin,
-                    destination: resolvedDestination,
-                    departureDate: _dateController.text.trim(),
-                    status: lookupResult.status,
-                    bookingReference:
-                        _bookingRefController.text.trim().isEmpty
-                            ? null
-                            : _bookingRefController.text.trim(),
-                    stops: 0,
-                    timeline: const [],
-                  );
-                  await _tripRepository.enableTripLiveTracking(trip.id, true);
+                        final trip = await _tripRepository.createTrip(
+                          flightNumber: _normalizeFlightNumber(
+                              _flightNumberController.text),
+                          origin: resolvedOrigin,
+                          destination: resolvedDestination,
+                          departureDate: _dateController.text.trim(),
+                          status: lookupResult.status,
+                          bookingReference:
+                              _bookingRefController.text.trim().isEmpty
+                                  ? null
+                                  : _bookingRefController.text.trim(),
+                          stops: 0,
+                          timeline: const [],
+                        );
+                        await _tripRepository.enableTripLiveTracking(
+                            trip.id, true);
 
-                  if (!mounted) return;
-                  _showSuccessDialog(trip);
-                } catch (e) {
-                  if (!mounted) return;
-                  _showCustomSnackBar('Failed to save trip: $e');
-                } finally {
-                  if (mounted) {
-                    setState(() {
-                      _isSavingTrip = false;
-                    });
-                  }
-                }
-              },
+                        if (!mounted) return;
+                        _showSuccessDialog(trip);
+                      } catch (e) {
+                        if (!mounted) return;
+                        _showCustomSnackBar('Failed to save trip: $e');
+                      } finally {
+                        if (mounted) {
+                          setState(() {
+                            _isSavingTrip = false;
+                          });
+                        }
+                      }
+                    },
               child: Container(
                 width: double.infinity,
                 padding: EdgeInsets.symmetric(vertical: 18),
@@ -546,7 +413,7 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
                                 AlwaysStoppedAnimation<Color>(Colors.black),
                           ),
                         ),
-                    )
+                      )
                     : Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -598,18 +465,20 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
               _flightLookupMessage = null;
             });
           },
-          style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 14),
+          style: TextStyle(
+              color: Theme.of(context).colorScheme.onSurface, fontSize: 14),
           decoration: InputDecoration(
             hintText: 'e.g., UA 2847',
-            hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3), fontSize: 14),
+            hintStyle: TextStyle(
+                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3),
+                fontSize: 14),
             fillColor: Theme.of(context).colorScheme.surface,
             filled: true,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(14),
               borderSide: BorderSide.none,
             ),
-            contentPadding:
-                EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+            contentPadding: EdgeInsets.symmetric(horizontal: 18, vertical: 16),
           ),
         ),
 
@@ -628,18 +497,20 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
         TextField(
           controller: _originController,
           textCapitalization: TextCapitalization.characters,
-          style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 14),
+          style: TextStyle(
+              color: Theme.of(context).colorScheme.onSurface, fontSize: 14),
           decoration: InputDecoration(
             hintText: 'e.g., SFO',
-            hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3), fontSize: 14),
+            hintStyle: TextStyle(
+                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3),
+                fontSize: 14),
             fillColor: Theme.of(context).colorScheme.surface,
             filled: true,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(14),
               borderSide: BorderSide.none,
             ),
-            contentPadding:
-                EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+            contentPadding: EdgeInsets.symmetric(horizontal: 18, vertical: 16),
           ),
         ),
 
@@ -658,18 +529,20 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
         TextField(
           controller: _destinationController,
           textCapitalization: TextCapitalization.characters,
-          style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 14),
+          style: TextStyle(
+              color: Theme.of(context).colorScheme.onSurface, fontSize: 14),
           decoration: InputDecoration(
             hintText: 'e.g., JFK',
-            hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3), fontSize: 14),
+            hintStyle: TextStyle(
+                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3),
+                fontSize: 14),
             fillColor: Theme.of(context).colorScheme.surface,
             filled: true,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(14),
               borderSide: BorderSide.none,
             ),
-            contentPadding:
-                EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+            contentPadding: EdgeInsets.symmetric(horizontal: 18, vertical: 16),
           ),
         ),
 
@@ -689,20 +562,23 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
           controller: _dateController,
           readOnly: true,
           onTap: () => _selectDate(context),
-          style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 14),
+          style: TextStyle(
+              color: Theme.of(context).colorScheme.onSurface, fontSize: 14),
           decoration: InputDecoration(
             hintText: 'Select Date',
-            hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3), fontSize: 14),
+            hintStyle: TextStyle(
+                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3),
+                fontSize: 14),
             fillColor: Theme.of(context).colorScheme.surface,
             filled: true,
             suffixIcon: Icon(Icons.calendar_today_outlined,
-                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3), size: 18),
+                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3),
+                size: 18),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(14),
               borderSide: BorderSide.none,
             ),
-            contentPadding:
-                EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+            contentPadding: EdgeInsets.symmetric(horizontal: 18, vertical: 16),
           ),
         ),
 
@@ -714,7 +590,8 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
               : () async {
                   if (_flightNumberController.text.trim().isEmpty ||
                       _dateController.text.trim().isEmpty) {
-                    _showCustomSnackBar('Enter flight number and departure date first.');
+                    _showCustomSnackBar(
+                        'Enter flight number and departure date first.');
                     return;
                   }
                   await _lookupFlightDetails(showSuccessSnack: true);
@@ -760,7 +637,10 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
                     style: TextStyle(
                       color: _flightLookup != null
                           ? const Color(0xFF10B981)
-                          : Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                          : Theme.of(context)
+                              .colorScheme
+                              .onSurface
+                              .withOpacity(0.7),
                       fontSize: 12,
                       fontWeight: FontWeight.w700,
                       height: 1.35,
@@ -786,18 +666,20 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
         SizedBox(height: 8),
         TextField(
           controller: _bookingRefController,
-          style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 14),
+          style: TextStyle(
+              color: Theme.of(context).colorScheme.onSurface, fontSize: 14),
           decoration: InputDecoration(
             hintText: 'e.g., ABC123',
-            hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3), fontSize: 14),
+            hintStyle: TextStyle(
+                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3),
+                fontSize: 14),
             fillColor: Theme.of(context).colorScheme.surface,
             filled: true,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(14),
               borderSide: BorderSide.none,
             ),
-            contentPadding:
-                EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+            contentPadding: EdgeInsets.symmetric(horizontal: 18, vertical: 16),
           ),
         ),
 
@@ -826,7 +708,10 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
                 child: Text(
                   'Tip: Flight number and date let us find route details automatically. Add origin and destination if the provider cannot resolve the flight.',
                   style: TextStyle(
-                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
+                    color: Theme.of(context)
+                        .colorScheme
+                        .onSurface
+                        .withOpacity(0.4),
                     fontSize: 11,
                     height: 1.4,
                   ),
@@ -839,108 +724,6 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
     );
   }
 
-  Widget _buildUploadForm() {
-    return GestureDetector(
-      onTap: _isUploading ? null : _simulateUpload,
-      child: Container(
-        padding: EdgeInsets.symmetric(vertical: 36, horizontal: 24),
-        decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.surface,
-          borderRadius: BorderRadius.circular(24),
-          border: Border.all(
-            color: _uploadedFileName != null
-                ? const Color(0xFF10B981)
-                : Theme.of(context).colorScheme.outline,
-            style: BorderStyle.solid,
-          ),
-        ),
-        child: Column(
-          children: [
-            if (_isUploading) ...[
-              SizedBox(
-                width: 36,
-                height: 36,
-                child: CircularProgressIndicator(
-                  valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFFFC229)),
-                  strokeWidth: 3,
-                ),
-              ),
-              SizedBox(height: 16),
-              Text(
-                'Uploading... ${(_uploadProgress * 100).toInt()}%',
-                style: TextStyle(
-                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ] else if (_uploadedFileName != null) ...[
-              Container(
-                padding: EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.surface,
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(
-                  Icons.check,
-                  color: Color(0xFF10B981),
-                  size: 24,
-                ),
-              ),
-              SizedBox(height: 14),
-              Text(
-                _uploadedFileName!,
-                style: TextStyle(
-                  color: Theme.of(context).colorScheme.onSurface,
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              SizedBox(height: 6),
-              Text(
-                'Tap to upload a different file',
-                style: TextStyle(
-                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.38),
-                  fontSize: 11,
-                ),
-              ),
-            ] else ...[
-              Container(
-                padding: EdgeInsets.all(14),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.outline,
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(
-                  Icons.cloud_upload_outlined,
-                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
-                  size: 28,
-                ),
-              ),
-              SizedBox(height: 16),
-              Text(
-                'Upload your booking confirmation',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: Theme.of(context).colorScheme.onSurface,
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              SizedBox(height: 6),
-              Text(
-                'PDF, email, or screenshot',
-                style: TextStyle(
-                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.38),
-                  fontSize: 12,
-                ),
-              ),
-            ],
-          ],
-        ),
-      ),
-    );
-  }
 
   Widget _buildCheckItem(String label) {
     return Row(
@@ -975,8 +758,11 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
         content: Row(
           children: [
             Icon(
-              isError ? Icons.error_outline_rounded : Icons.check_circle_outline,
-              color: isError ? const Color(0xFFE11D48) : const Color(0xFF10B981),
+              isError
+                  ? Icons.error_outline_rounded
+                  : Icons.check_circle_outline,
+              color:
+                  isError ? const Color(0xFFE11D48) : const Color(0xFF10B981),
               size: 20,
             ),
             const SizedBox(width: 12),
@@ -992,7 +778,8 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
             ),
           ],
         ),
-        backgroundColor: const Color(0xFF1E293B), // Premium dark theme background
+        backgroundColor:
+            const Color(0xFF1E293B), // Premium dark theme background
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
@@ -1046,7 +833,10 @@ class _AddFlightScreenState extends State<AddFlightScreen> {
                   'We are now actively monitoring your flight for delays, cancellations, and disruptions 24/7.',
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+                    color: Theme.of(context)
+                        .colorScheme
+                        .onSurface
+                        .withOpacity(0.5),
                     fontSize: 13,
                     height: 1.45,
                   ),

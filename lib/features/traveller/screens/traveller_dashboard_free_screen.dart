@@ -467,6 +467,7 @@ class _TravellerDashboardFreeScreenState
               alertsCount: summary?.alertsCount ?? 0,
               delayRisk: (summary?.alertsCount ?? 0) > 0 ? '68%' : '12%',
               monitoredCount: _trips.where((t) => t.trackingEnabled).length,
+              activeTrip: _trips.firstWhereOrNull((t) => t.trackingEnabled),
               onUpgrade: () async {
                 final upgraded = await showUpgradeToProDialog(context);
                 if (upgraded == true && mounted) {
