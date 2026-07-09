@@ -665,7 +665,9 @@ class _TripsOverviewScreenState extends State<TripsOverviewScreen> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => const LiveFlightTrackerScreen(),
+                      builder: (context) => LiveFlightTrackerScreen(
+                        trip: _trips.isNotEmpty ? _trips.first : null,
+                      ),
                     ),
                   );
                 },

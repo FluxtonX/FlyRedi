@@ -203,4 +203,110 @@ class FlightApiService {
 
     throw Exception(errorMessage);
   }
+
+  /// Fetch real-time live flight position (lat/lng/speed/altitude) from the Flyredi backend.
+  static Future<LiveFlightPositionModel> fetchLiveFlightPosition(
+    String flightNumber, {
+    String flightDate = '',
+  }) async {
+    final queryParams = <String, String>{
+      'flightNumber': flightNumber.trim().toUpperCase(),
+      if (flightDate.isNotEmpty) 'flightDate': flightDate.trim(),
+    };
+
+    final uri = Uri.parse('$_baseUrl${ApiConstants.flightLivePosition}')
+        .replace(queryParameters: queryParams);
+
+    debugPrint('[FlightApiService] GET $uri');
+
+    late final http.Response response;
+    try {
+      response = await http
+          .get(uri, headers: {'Accept': 'application/json'})
+          .timeout(const Duration(seconds: 15));
+    } catch (e) {
+      throw Exception(
+        'Could not reach the server. Check your internet connection.',
+      );
+    }
+
+    debugPrint('[FlightApiService] status=${response.statusCode}');
+
+    if (response.statusCode == 200) {
+      final json = jsonDecode(response.body) as Map<String, dynamic>;
+      return LiveFlightPositionModel.fromJson(json);
+    }
+
+    String errorMessage = 'Failed to fetch live flight position';
+    try {
+      final body = jsonDecode(response.body) as Map<String, dynamic>;
+      errorMessage = body['message'] as String? ?? errorMessage;
+    } catch (_) {}
+
+    throw Exception(errorMessage);
+  }
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// LiveFlightPositionModel — mirrors the backend LiveFlightPosition interface
+// ─────────────────────────────────────────────────────────────────────────────
+
+class LiveFlightPositionModel {
+  final String flightNumber;
+  final String status;
+  final double? latitude;
+  final double? longitude;
+  final int? altitude;
+  final int? speed;
+  final double? direction;
+  final bool isGround;
+  final String? updated;
+  final String origin;
+  final String destination;
+  final String originAirport;
+  final String destinationAirport;
+  final String departureTime;
+  final String arrivalTime;
+  final String airline;
+
+  const LiveFlightPositionModel({
+    required this.flightNumber,
+    required this.status,
+    this.latitude,
+    this.longitude,
+    this.altitude,
+    this.speed,
+    this.direction,
+    required this.isGround,
+    this.updated,
+    required this.origin,
+    required this.destination,
+    required this.originAirport,
+    required this.destinationAirport,
+    required this.departureTime,
+    required this.arrivalTime,
+    required this.airline,
+  });
+
+  factory LiveFlightPositionModel.fromJson(Map<String, dynamic> json) {
+    return LiveFlightPositionModel(
+      flightNumber: json['flightNumber'] as String? ?? '',
+      status: json['status'] as String? ?? '',
+      latitude: (json['latitude'] as num?)?.toDouble(),
+      longitude: (json['longitude'] as num?)?.toDouble(),
+      altitude: (json['altitude'] as num?)?.toInt(),
+      speed: (json['speed'] as num?)?.toInt(),
+      direction: (json['direction'] as num?)?.toDouble(),
+      isGround: json['isGround'] as bool? ?? true,
+      updated: json['updated'] as String?,
+      origin: json['origin'] as String? ?? '',
+      destination: json['destination'] as String? ?? '',
+      originAirport: json['originAirport'] as String? ?? '',
+      destinationAirport: json['destinationAirport'] as String? ?? '',
+      departureTime: json['departureTime'] as String? ?? '',
+      arrivalTime: json['arrivalTime'] as String? ?? '',
+      airline: json['airline'] as String? ?? '',
+    );
+  }
+}
+

@@ -25,7 +25,7 @@ class FlightMonitorCard extends StatelessWidget {
       onTap: () {
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => const FlightDetailScreen()),
+          MaterialPageRoute(builder: (context) => FlightDetailScreen(trip: activeTrip!)),
         );
       },
       child: Container(

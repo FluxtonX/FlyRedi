@@ -16,5 +16,6 @@ class ApiConstants {
 
   // Flight Endpoints
   static const String flightStatus = '/api/flights/status';
+  static const String flightLivePosition = '/api/flights/live-position';
 }
 

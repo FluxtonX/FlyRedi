@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:sky_rightz_360/core/constants/app_colors.dart';
 import '../widgets/traveller_bottom_nav.dart';
+import '../models/trip_model.dart';
 import 'flight_details_screen.dart';
 import 'border_ready_screen.dart';
 import 'sentinel_monitor_screen.dart';
@@ -8,7 +9,9 @@ import 'ai_assistant_screen.dart';
 import 'live_flight_tracker_screen.dart';
 
 class FlightDetailScreen extends StatelessWidget {
-  const FlightDetailScreen({super.key});
+  final TripModel trip;
+
+  const FlightDetailScreen({super.key, required this.trip});
 
   @override
   Widget build(BuildContext context) {
@@ -84,7 +87,7 @@ class FlightDetailScreen extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'United Airlines',
+                            trip.timeline.isNotEmpty ? (trip.timeline.first.airlineCode ?? 'Airline') : 'Airline',
                             style: TextStyle(
                               color: Theme.of(context).colorScheme.onSurface.withOpacity(0.54),
                               fontSize: 12,
@@ -92,7 +95,7 @@ class FlightDetailScreen extends StatelessWidget {
                           ),
                           SizedBox(height: 4),
                           Text(
-                            'UA 2847',
+                            trip.flightNumber.isEmpty ? 'N/A' : trip.flightNumber,
                             style: TextStyle(
                               color: Theme.of(context).colorScheme.onSurface,
                               fontSize: 20,
@@ -104,13 +107,13 @@ class FlightDetailScreen extends StatelessWidget {
                       Container(
                         padding: EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                         decoration: BoxDecoration(
-                          color: Color(0xFFFFC229).withOpacity(0.1),
+                          color: trip.status.toLowerCase() == 'delayed' ? Color(0xFFFFC229).withOpacity(0.1) : Color(0xFF10B981).withOpacity(0.1),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Text(
-                          'Delayed',
+                          trip.status.toUpperCase(),
                           style: TextStyle(
-                            color: Color(0xFFFFC229),
+                            color: trip.status.toLowerCase() == 'delayed' ? Color(0xFFFFC229) : Color(0xFF10B981),
                             fontSize: 10,
                             fontWeight: FontWeight.bold,
                           ),
@@ -126,7 +129,7 @@ class FlightDetailScreen extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'SFO',
+                            trip.origin.isEmpty ? 'N/A' : trip.origin,
                             style: TextStyle(
                               color: Theme.of(context).colorScheme.onSurface,
                               fontSize: 28,
@@ -135,7 +138,7 @@ class FlightDetailScreen extends StatelessWidget {
                           ),
                           SizedBox(height: 4),
                           Text(
-                            'San Francisco',
+                            'Departure',
                             style: TextStyle(
                               color: Theme.of(context).colorScheme.onSurface.withOpacity(0.38),
                               fontSize: 11,
@@ -152,7 +155,7 @@ class FlightDetailScreen extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
                           Text(
-                            'JFK',
+                            trip.destination.isEmpty ? 'N/A' : trip.destination,
                             style: TextStyle(
                               color: Theme.of(context).colorScheme.onSurface,
                               fontSize: 28,
@@ -161,7 +164,7 @@ class FlightDetailScreen extends StatelessWidget {
                           ),
                           SizedBox(height: 4),
                           Text(
-                            'New York',
+                            'Arrival',
                             style: TextStyle(
                               color: Theme.of(context).colorScheme.onSurface.withOpacity(0.38),
                               fontSize: 11,
@@ -174,13 +177,13 @@ class FlightDetailScreen extends StatelessWidget {
                   SizedBox(height: 24),
                   Divider(color: Theme.of(context).colorScheme.outline),
                   SizedBox(height: 16),
-                  _buildFlightDetailRow(context, Icons.calendar_today_outlined, 'Date', 'May 15, 2026'),
+                  _buildFlightDetailRow(context, Icons.calendar_today_outlined, 'Date', trip.departureDate.isEmpty ? 'TBD' : trip.departureDate),
                   SizedBox(height: 12),
-                  _buildFlightDetailRow(context, Icons.access_time_outlined, 'Duration', '5h 30m'),
+                  _buildFlightDetailRow(context, Icons.access_time_outlined, 'Duration', trip.timeline.isNotEmpty ? (trip.timeline.first.duration ?? '—') : '—'),
                   SizedBox(height: 12),
-                  _buildFlightDetailRow(context, Icons.domain_outlined, 'Terminal', 'Terminal 3'),
+                  _buildFlightDetailRow(context, Icons.domain_outlined, 'Terminal', '—'),
                   SizedBox(height: 12),
-                  _buildFlightDetailRow(context, Icons.door_sliding_outlined, 'Gate', 'Gate B24'),
+                  _buildFlightDetailRow(context, Icons.door_sliding_outlined, 'Gate', '—'),
                 ],
               ),
             ),
@@ -192,7 +195,7 @@ class FlightDetailScreen extends StatelessWidget {
               onTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const LiveFlightTrackerScreen()),
+                  MaterialPageRoute(builder: (context) => LiveFlightTrackerScreen(trip: trip)),
                 );
               },
               child: Container(
@@ -310,7 +313,8 @@ class FlightDetailScreen extends StatelessWidget {
 
             SizedBox(height: 16),
 
-            // Flight Delayed Box
+            if (trip.status.toLowerCase() == 'delayed' || trip.status.toLowerCase() == 'cancelled') ...[
+              // Flight Delayed Box
             Container(
               padding: EdgeInsets.all(20),
               decoration: BoxDecoration(
@@ -343,7 +347,7 @@ class FlightDetailScreen extends StatelessWidget {
                         ),
                         SizedBox(height: 4),
                         Text(
-                          'Your flight has been delayed by 2h 30m',
+                          'Your flight status has changed',
                           style: TextStyle(
                             color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
                             fontSize: 11,
@@ -352,11 +356,11 @@ class FlightDetailScreen extends StatelessWidget {
                         SizedBox(height: 16),
                         Divider(color: Theme.of(context).colorScheme.outline),
                         SizedBox(height: 12),
-                        _buildDelayRow(context, 'Original Departure', '8:15 AM'),
+                        _buildDelayRow(context, 'Departure', trip.timeline.isNotEmpty ? (trip.timeline.first.fromTime ?? 'TBD') : 'TBD'),
                         SizedBox(height: 8),
-                        _buildDelayRow(context, 'New Departure', '10:45 AM', valueColor: const Color(0xFFFFC229)),
+                        _buildDelayRow(context, 'Arrival', trip.timeline.isNotEmpty ? (trip.timeline.first.toTime ?? 'TBD') : 'TBD'),
                         SizedBox(height: 8),
-                        _buildDelayRow(context, 'Reason', 'Air traffic congestion'),
+                        _buildDelayRow(context, 'Status', trip.status.toUpperCase(), valueColor: const Color(0xFFFFC229)),
                       ],
                     ),
                   ),
@@ -415,7 +419,7 @@ class FlightDetailScreen extends StatelessWidget {
                             ),
                             SizedBox(height: 4),
                             Text(
-                              'Flight UA 2847 delayed by 2h 30m',
+                              'Flight ${trip.flightNumber} ${trip.status.toLowerCase()}',
                               style: TextStyle(
                                 color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
                                 fontSize: 11,
@@ -573,6 +577,8 @@ class FlightDetailScreen extends StatelessWidget {
                 ],
               ),
             ),
+
+            ],
 
             SizedBox(height: 16),
 
