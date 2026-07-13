@@ -1,3 +1,5 @@
+// ignore_for_file: prefer_const_constructors
+
 import 'package:flutter/material.dart';
 import '../screens/resolve_dashboard_screen.dart';
 import '../screens/ai_assistant_screen.dart';
@@ -34,13 +36,13 @@ class RecommendedActionsCard extends StatelessWidget {
             color: Theme.of(context).colorScheme.surface,
             borderRadius: BorderRadius.circular(18),
           ),
-          child: Icon(
+          child: const Icon(
             Icons.auto_awesome,
             color: Color(0xFFFFC229),
             size: 28,
           ),
         ),
-        SizedBox(width: 16),
+        const SizedBox(width: 16),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -53,7 +55,7 @@ class RecommendedActionsCard extends StatelessWidget {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              SizedBox(height: 4),
+              const SizedBox(height: 4),
               Text(
                 'AI-powered guidance',
                 style: TextStyle(
@@ -71,12 +73,12 @@ class RecommendedActionsCard extends StatelessWidget {
 
   Widget _buildMainCard(BuildContext context) {
     return Container(
-      padding: EdgeInsets.all(20),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(30),
         border: Border.all(
-          color: Color(0xFFE11D48).withOpacity(0.3),
+          color: const Color(0xFFE11D48).withOpacity(0.3),
           width: 1,
         ),
       ),
@@ -86,18 +88,18 @@ class RecommendedActionsCard extends StatelessWidget {
           Row(
             children: [
               Container(
-                padding: EdgeInsets.all(12),
+                padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
                   color: Theme.of(context).colorScheme.surface,
                   borderRadius: BorderRadius.circular(16),
                 ),
-                child: Icon(
+                child: const Icon(
                   Icons.auto_awesome,
                   color: Color(0xFFFFC229),
                   size: 20,
                 ),
               ),
-              SizedBox(width: 16),
+              const SizedBox(width: 16),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -112,14 +114,14 @@ class RecommendedActionsCard extends StatelessWidget {
                             fontWeight: FontWeight.w600,
                           ),
                         ),
-                        SizedBox(width: 8),
-                        CircleAvatar(
+                        const SizedBox(width: 8),
+                        const CircleAvatar(
                           radius: 4,
                           backgroundColor: Color(0xFFE11D48),
                         ),
                       ],
                     ),
-                    SizedBox(height: 6),
+                    const SizedBox(height: 6),
                     Text(
                       'Flight UA 2847 delayed by 2h 30m',
                       style: TextStyle(
@@ -135,7 +137,7 @@ class RecommendedActionsCard extends StatelessWidget {
               ),
             ],
           ),
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
           Text(
             'Your flight delay qualifies for compensation under EU261. We recommend contacting the airline desk for immediate rebooking options and filing a compensation claim.',
             style: TextStyle(
@@ -144,9 +146,9 @@ class RecommendedActionsCard extends StatelessWidget {
               height: 1.5,
             ),
           ),
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
           Container(
-            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
             decoration: BoxDecoration(
               color: Theme.of(context).colorScheme.surface,
               borderRadius: BorderRadius.circular(20),
@@ -159,12 +161,12 @@ class RecommendedActionsCard extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    Icon(
+                    const Icon(
                       Icons.description_outlined,
                       color: Color(0xFFFFC229),
                       size: 20,
                     ),
-                    SizedBox(width: 12),
+                    const SizedBox(width: 12),
                     Text(
                       'Compensation Eligible',
                       style: TextStyle(
@@ -174,7 +176,7 @@ class RecommendedActionsCard extends StatelessWidget {
                     ),
                   ],
                 ),
-                Text(
+                const Text(
                   '\$600',
                   style: TextStyle(
                     color: Color(0xFFFFC229),
@@ -185,7 +187,7 @@ class RecommendedActionsCard extends StatelessWidget {
               ],
             ),
           ),
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
           Text(
             'Recommended Next Steps:',
             style: TextStyle(
@@ -251,7 +253,7 @@ class RecommendedActionsCard extends StatelessWidget {
                     alignment: Alignment.center,
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
+                      children: const [
                         Icon(Icons.arrow_forward,
                             color: Colors.black, size: 18),
                         SizedBox(width: 10),

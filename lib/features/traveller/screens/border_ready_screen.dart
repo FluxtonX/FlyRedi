@@ -15,35 +15,17 @@ class BorderReadyScreen extends StatefulWidget {
 class _BorderReadyScreenState extends State<BorderReadyScreen> {
   // Existing Documents switches
   bool _hasReturnTicket = false;
-  bool _hasProofOfFunds = false;
-  bool _travellingWithMinor = false;
   bool _alreadyHasVisa = false;
-
-  // Pet Travel switch
-  bool _travellingWithPet = false;
-  bool _hasRequiredVaccinations = false;
-  bool _hasMicrochip = false;
 
   // Form Field State
   Map<String, String>? _nationality;
   bool _isChecking = false;
   Map<String, String>? _residence;
   Map<String, String>? _destination;
-  List<Map<String, String>> _transitCountries = [];
-  Map<String, String>? _airline;
   DateTime? _passportExpiry;
-
-  final TextEditingController _stayDurationController = TextEditingController();
-  final TextEditingController _petTypeController = TextEditingController();
-  final TextEditingController _breedController = TextEditingController();
-  final TextEditingController _petAgeController = TextEditingController();
 
   @override
   void dispose() {
-    _stayDurationController.dispose();
-    _petTypeController.dispose();
-    _breedController.dispose();
-    _petAgeController.dispose();
     super.dispose();
   }
 
@@ -61,45 +43,7 @@ class _BorderReadyScreenState extends State<BorderReadyScreen> {
     );
   }
 
-  void _showAirlineSelection() {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) => SearchableBottomSheet(
-        title: 'Select Airline',
-        hintText: 'Search airlines...',
-        items: AirlinesData.airlines,
-        onSelected: (item) {
-          setState(() {
-            _airline = item;
-          });
-        },
-      ),
-    );
-  }
 
-  void _showTransitCountriesSelection() {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) => SearchableBottomSheet(
-        title: 'Select Transit Countries',
-        hintText: 'Search countries...',
-        items: CountriesData.countries,
-        isMultiSelect: true,
-        initialSelectedItems: _transitCountries,
-        onSelected: (_) {}, // Handled on pop
-      ),
-    ).then((selected) {
-      if (selected != null && selected is List<Map<String, String>>) {
-        setState(() {
-          _transitCountries = selected;
-        });
-      }
-    });
-  }
 
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
@@ -204,9 +148,9 @@ class _BorderReadyScreenState extends State<BorderReadyScreen> {
                     children: [
                       Expanded(
                         child: _buildGridItem(
-                          icon: Icons.shield_outlined,
-                          title: 'Health Checks',
-                          subtitle: 'COVID & vaccination',
+                          icon: Icons.receipt_long_outlined,
+                          title: 'Ticket Validation',
+                          subtitle: 'Return ticket check',
                         ),
                       ),
                       SizedBox(width: 16),
@@ -225,22 +169,6 @@ class _BorderReadyScreenState extends State<BorderReadyScreen> {
 
             SizedBox(height: 24),
 
-            // Action Cards
-            _buildActionCard(
-              icon: Icons.mail_outline,
-              title: 'Forward confirmation email to\nauto-fill',
-              subtitle: 'Send booking to ai@borderready.app',
-              onTap: () => _showEmailDialog(context),
-            ),
-            SizedBox(height: 12),
-            _buildActionCard(
-              icon: Icons.document_scanner_outlined,
-              title: 'Scan passport or visa',
-              subtitle: 'Instant OCR extraction',
-              onTap: () => _showScanDialog(context),
-            ),
-
-            SizedBox(height: 32),
 
             // TRIP DETAILS SECTION
             _buildSectionTitle('TRIP DETAILS'),
@@ -269,27 +197,7 @@ class _BorderReadyScreenState extends State<BorderReadyScreen> {
               onTap: () => _showCountrySelection('Select Destination', (val) => setState(() => _destination = val)),
             ),
             SizedBox(height: 16),
-            _buildMultiSelectDropdownField(
-              label: 'TRANSIT COUNTRIES',
-              hint: 'Add layover countries',
-              icon: Icons.flight_takeoff,
-              selectedItems: _transitCountries,
-              onTap: _showTransitCountriesSelection,
-              onRemove: (item) {
-                setState(() {
-                  _transitCountries.removeWhere((e) => e['code'] == item['code']);
-                });
-              },
-            ),
-            SizedBox(height: 16),
-            _buildDropdownField(
-              label: 'AIRLINE / CARRIER',
-              hint: 'e.g., Emirates, Lufthansa',
-              icon: Icons.flight_takeoff,
-              value: _airline?['name'],
-              onTap: _showAirlineSelection,
-            ),
-            SizedBox(height: 16),
+
             _buildDropdownField(
               label: 'PASSPORT EXPIRY',
               hint: 'MM/YYYY',
@@ -299,14 +207,7 @@ class _BorderReadyScreenState extends State<BorderReadyScreen> {
                   : null,
               onTap: () => _selectDate(context),
             ),
-            SizedBox(height: 16),
-            _buildTextField(
-              label: 'STAY DURATION',
-              hint: 'Number of days',
-              icon: Icons.calendar_today_outlined,
-              controller: _stayDurationController,
-              keyboardType: TextInputType.number,
-            ),
+
 
             SizedBox(height: 32),
 
@@ -314,52 +215,11 @@ class _BorderReadyScreenState extends State<BorderReadyScreen> {
             _buildSectionTitle('EXISTING DOCUMENTS'),
             SizedBox(height: 16),
             _buildSwitchRow('Has return ticket', _hasReturnTicket, (val) => setState(() => _hasReturnTicket = val)),
-            SizedBox(height: 12),
-            _buildSwitchRow('Has proof of funds', _hasProofOfFunds, (val) => setState(() => _hasProofOfFunds = val)),
-            SizedBox(height: 12),
-            _buildSwitchRow('Travelling with a minor', _travellingWithMinor, (val) => setState(() => _travellingWithMinor = val)),
+
             SizedBox(height: 12),
             _buildSwitchRow('Already has visa', _alreadyHasVisa, (val) => setState(() => _alreadyHasVisa = val)),
 
-            SizedBox(height: 32),
 
-            // PET TRAVEL SECTION
-            _buildSectionTitle('PET TRAVEL'),
-            SizedBox(height: 16),
-            _buildSwitchRow(
-              'Travelling with pet',
-              _travellingWithPet,
-              (val) => setState(() => _travellingWithPet = val),
-              activeTrackColor: const Color(0xFF10B981), // Green track
-            ),
-            if (_travellingWithPet) ...[
-              SizedBox(height: 16),
-              _buildTextField(
-                label: 'PET TYPE',
-                hint: 'Dog, Cat, etc.',
-                icon: Icons.favorite_border,
-                controller: _petTypeController,
-              ),
-              SizedBox(height: 16),
-              _buildTextField(
-                label: 'BREED',
-                hint: 'Breed name',
-                icon: Icons.favorite_border,
-                controller: _breedController,
-              ),
-              SizedBox(height: 16),
-              _buildTextField(
-                label: 'PET AGE',
-                hint: 'Age in years',
-                icon: Icons.calendar_today_outlined,
-                controller: _petAgeController,
-                keyboardType: TextInputType.number,
-              ),
-              SizedBox(height: 16),
-              _buildSwitchRow('Has required vaccinations', _hasRequiredVaccinations, (val) => setState(() => _hasRequiredVaccinations = val)),
-              SizedBox(height: 12),
-              _buildSwitchRow('Has microchip', _hasMicrochip, (val) => setState(() => _hasMicrochip = val)),
-            ],
 
             SizedBox(height: 40),
 
@@ -515,60 +375,6 @@ class _BorderReadyScreenState extends State<BorderReadyScreen> {
           ),
         ),
       ],
-    );
-  }
-
-  Widget _buildActionCard({required IconData icon, required String title, required String subtitle, VoidCallback? onTap}) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: Color(0xFFFFC229).withOpacity(0.15),
-        ),
-      ),
-      child: Row(
-        children: [
-          Container(
-            padding: EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.05),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(icon, color: const Color(0xFFFFC229), size: 20),
-          ),
-          SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: TextStyle(
-                    color: Theme.of(context).colorScheme.onSurface,
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                SizedBox(height: 4),
-                Text(
-                  subtitle,
-                  style: TextStyle(
-                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
-                    fontSize: 12,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          SizedBox(width: 8),
-          Icon(Icons.auto_awesome, color: Color(0xFFFFC229), size: 16),
-        ],
-      ),
-    ),
     );
   }
 
@@ -776,232 +582,4 @@ class _BorderReadyScreenState extends State<BorderReadyScreen> {
     );
   }
 
-  void _showEmailDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return Dialog(
-          backgroundColor: Theme.of(context).colorScheme.surface,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(24),
-            side: BorderSide(color: Theme.of(context).colorScheme.outline),
-          ),
-          insetPadding: EdgeInsets.symmetric(horizontal: 24),
-          child: Padding(
-            padding: EdgeInsets.all(24),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'Paste flight confirmation email',
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.onSurface,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    GestureDetector(
-                      onTap: () => Navigator.pop(context),
-                      child: Icon(Icons.close, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.54), size: 20),
-                    ),
-                  ],
-                ),
-                SizedBox(height: 20),
-                Container(
-                  height: 160,
-                  padding: EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.surface,
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: Theme.of(context).colorScheme.outline),
-                  ),
-                  child: TextFormField(
-                    maxLines: null,
-                    style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 14),
-                    decoration: InputDecoration(
-                      hintText: 'Copy and paste your airline confirmation\nemail here (subject line + full body)...',
-                      hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3), fontSize: 14, height: 1.4),
-                      border: InputBorder.none,
-                      isDense: true,
-                    ),
-                  ),
-                ),
-                SizedBox(height: 24),
-                Row(
-                  children: [
-                    Expanded(
-                      child: GestureDetector(
-                        onTap: () => Navigator.pop(context),
-                        child: Container(
-                          padding: EdgeInsets.symmetric(vertical: 14),
-                          decoration: BoxDecoration(
-                            color: Colors.transparent,
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.2)),
-                          ),
-                          alignment: Alignment.center,
-                          child: Text(
-                            'Cancel',
-                            style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.bold),
-                          ),
-                        ),
-                      ),
-                    ),
-                    SizedBox(width: 12),
-                    Expanded(
-                      flex: 2,
-                      child: GestureDetector(
-                        onTap: () {
-                          Navigator.pop(context);
-                        },
-                        child: Container(
-                          padding: EdgeInsets.symmetric(vertical: 14),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFFFC229),
-                            borderRadius: BorderRadius.circular(12),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Color(0xFFFFC229).withOpacity(0.2),
-                                blurRadius: 12,
-                                offset: const Offset(0, 4),
-                              ),
-                            ],
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(Icons.auto_awesome, color: Colors.black, size: 16),
-                              SizedBox(width: 8),
-                              Text(
-                                'Extract & Auto-Fill',
-                                style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  void _showScanDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return Dialog(
-          backgroundColor: Theme.of(context).colorScheme.surface,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(24),
-            side: BorderSide(color: Theme.of(context).colorScheme.outline),
-          ),
-          insetPadding: EdgeInsets.symmetric(horizontal: 24),
-          child: Padding(
-            padding: EdgeInsets.all(24),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'SCAN TRAVEL DOCUMENT',
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.54),
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: 1.2,
-                      ),
-                    ),
-                    GestureDetector(
-                      onTap: () => Navigator.pop(context),
-                      child: Icon(Icons.close, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.54), size: 20),
-                    ),
-                  ],
-                ),
-                SizedBox(height: 20),
-                Container(
-                  padding: EdgeInsets.symmetric(vertical: 32, horizontal: 16),
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.surface,
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(
-                      color: Color(0xFFFFC229).withOpacity(0.3),
-                    ),
-                  ),
-                  child: Column(
-                    children: [
-                      Container(
-                        padding: EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.05),
-                          shape: BoxShape.circle,
-                        ),
-                        child: Icon(Icons.upload_file, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.54), size: 24),
-                      ),
-                      SizedBox(height: 16),
-                      Text(
-                        'Tap or drag passport/visa image',
-                        style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 14, fontWeight: FontWeight.bold),
-                      ),
-                      SizedBox(height: 8),
-                      Text(
-                        'JPG, PNG, or PDF — max 10MB',
-                        style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4), fontSize: 11),
-                      ),
-                    ],
-                  ),
-                ),
-                SizedBox(height: 24),
-                GestureDetector(
-                  onTap: () {
-                    Navigator.pop(context);
-                  },
-                  child: Container(
-                    padding: EdgeInsets.symmetric(vertical: 16),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFFFC229),
-                      borderRadius: BorderRadius.circular(12),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Color(0xFFFFC229).withOpacity(0.2),
-                          blurRadius: 12,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
-                    ),
-                    alignment: Alignment.center,
-                    child: Text(
-                      'Scan & Auto-Fill',
-                      style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 15),
-                    ),
-                  ),
-                ),
-                SizedBox(height: 16),
-                Text(
-                  'Uses AI to extract name, dates, and passport info — data is not stored',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
-                    fontSize: 10,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
 }

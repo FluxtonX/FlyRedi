@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
 import '../screens/border_ready_screen.dart';
+import '../models/trip_model.dart';
 
 class BorderReadySection extends StatelessWidget {
-  final bool isEmpty;
+  final TripModel? activeTrip;
 
-  BorderReadySection({
+  const BorderReadySection({
     super.key,
-    this.isEmpty = true,
+    this.activeTrip,
   });
 
   @override
   Widget build(BuildContext context) {
+    final isEmpty = activeTrip == null;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -97,14 +99,14 @@ class BorderReadySection extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    isEmpty ? 'No Destination Active' : 'United Kingdom',
+                    isEmpty ? 'No Destination Active' : activeTrip!.destination,
                     style: TextStyle(
                       color: Theme.of(context).colorScheme.onSurface,
                       fontSize: 22,
                     ),
                   ),
                   Text(
-                    isEmpty ? '--' : 'May 15, 2026',
+                    isEmpty ? '--' : activeTrip!.departureDate,
                     style: TextStyle(
                       color: Theme.of(context)
                           .colorScheme

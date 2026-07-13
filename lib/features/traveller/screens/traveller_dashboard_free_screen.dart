@@ -487,7 +487,7 @@ class _TravellerDashboardFreeScreenState
             SizedBox(height: 24),
             const SkeletonBox(height: 220, radius: 28),
           ] else ...[
-            BorderReadySection(isEmpty: _activities.isEmpty),
+            BorderReadySection(activeTrip: _trips.firstWhereOrNull((t) => t.trackingEnabled) ?? (_trips.isNotEmpty ? _trips.first : null)),
           ],
           SizedBox(height: 24),
           if (_isSummaryLoading)
