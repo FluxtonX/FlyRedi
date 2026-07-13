@@ -143,7 +143,8 @@ class _AiAssistantScreenState extends State<AiAssistantScreen> {
         _isTyping = false;
         _messages.add(
           ChatMessage(
-            text: 'Sorry, I could not reach the AI assistant right now. Please check your connection and try again.',
+            text:
+                'Sorry, I could not reach the AI assistant right now. Please check your connection and try again.',
             isUser: false,
             timestamp: DateTime.now(),
           ),
@@ -158,7 +159,8 @@ class _AiAssistantScreenState extends State<AiAssistantScreen> {
       _messages.clear();
       _messages.add(
         ChatMessage(
-          text: "Hello! I'm your AI travel assistant. How can I help you today?",
+          text:
+              "Hello! I'm your AI travel assistant. How can I help you today?",
           isUser: false,
           timestamp: DateTime.now(),
         ),
@@ -170,7 +172,7 @@ class _AiAssistantScreenState extends State<AiAssistantScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-       // Premium dark theme matching screenshot
+      // Premium dark theme matching screenshot
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(90),
         child: Container(
@@ -218,7 +220,10 @@ class _AiAssistantScreenState extends State<AiAssistantScreen> {
                     Text(
                       'Always here to help',
                       style: TextStyle(
-                        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.54),
+                        color: Theme.of(context)
+                            .colorScheme
+                            .onSurface
+                            .withOpacity(0.54),
                         fontSize: 13,
                       ),
                     ),
@@ -226,17 +231,26 @@ class _AiAssistantScreenState extends State<AiAssistantScreen> {
                 ),
               ),
               IconButton(
-                icon: Icon(Icons.refresh, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6)),
+                icon: Icon(Icons.refresh,
+                    color: Theme.of(context)
+                        .colorScheme
+                        .onSurface
+                        .withOpacity(0.6)),
                 tooltip: 'Reset Conversation',
                 onPressed: _resetChat,
               ),
               IconButton(
-                icon: Icon(Icons.folder_outlined, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6)),
+                icon: Icon(Icons.folder_outlined,
+                    color: Theme.of(context)
+                        .colorScheme
+                        .onSurface
+                        .withOpacity(0.6)),
                 tooltip: 'View Claims',
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => const ResolveDashboardScreen()),
+                    MaterialPageRoute(
+                        builder: (context) => const ResolveDashboardScreen()),
                   );
                 },
               ),
@@ -277,11 +291,13 @@ class _AiAssistantScreenState extends State<AiAssistantScreen> {
                         ),
                         SizedBox(width: 12),
                         Container(
-                          padding: EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 18, vertical: 14),
                           decoration: BoxDecoration(
                             color: Theme.of(context).colorScheme.surface,
                             borderRadius: BorderRadius.circular(20),
-                            border: Border.all(color: Theme.of(context).colorScheme.outline),
+                            border: Border.all(
+                                color: Theme.of(context).colorScheme.outline),
                           ),
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
@@ -291,14 +307,18 @@ class _AiAssistantScreenState extends State<AiAssistantScreen> {
                                 height: 12,
                                 child: CircularProgressIndicator(
                                   strokeWidth: 2,
-                                  valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFFFC229)),
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                      Color(0xFFFFC229)),
                                 ),
                               ),
                               SizedBox(width: 12),
                               Text(
                                 'Assistant is typing...',
                                 style: TextStyle(
-                                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .onSurface
+                                      .withOpacity(0.5),
                                   fontSize: 14,
                                 ),
                               ),
@@ -315,7 +335,10 @@ class _AiAssistantScreenState extends State<AiAssistantScreen> {
                   Text(
                     'Quick questions:',
                     style: TextStyle(
-                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                      color: Theme.of(context)
+                          .colorScheme
+                          .onSurface
+                          .withOpacity(0.6),
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
                     ),
@@ -327,7 +350,8 @@ class _AiAssistantScreenState extends State<AiAssistantScreen> {
                           onTap: () => _handleSubmitted(question),
                           child: Container(
                             width: double.infinity,
-                            padding: EdgeInsets.symmetric(vertical: 20, horizontal: 24),
+                            padding: EdgeInsets.symmetric(
+                                vertical: 20, horizontal: 24),
                             decoration: BoxDecoration(
                               color: Theme.of(context).colorScheme.surface,
                               borderRadius: BorderRadius.circular(20),
@@ -360,8 +384,12 @@ class _AiAssistantScreenState extends State<AiAssistantScreen> {
 
           // Input Bar Area
           Container(
-            padding: EdgeInsets.symmetric(horizontal: 24, vertical: 20),
-            color: Theme.of(context).colorScheme.surface,
+            margin: const EdgeInsets.only(bottom: 16, left: 16, right: 16),
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.surface,
+              borderRadius: BorderRadius.circular(24),
+            ),
             child: SafeArea(
               top: false,
               child: Row(
@@ -378,11 +406,19 @@ class _AiAssistantScreenState extends State<AiAssistantScreen> {
                       ),
                       child: TextField(
                         controller: _textController,
-                        style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 15),
+                        style: TextStyle(
+                            color: Theme.of(context).colorScheme.onSurface,
+                            fontSize: 15),
                         decoration: InputDecoration(
                           hintText: 'Ask a question...',
-                          hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3), fontSize: 15),
-                          contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                          hintStyle: TextStyle(
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSurface
+                                  .withOpacity(0.3),
+                              fontSize: 15),
+                          contentPadding:
+                              EdgeInsets.symmetric(horizontal: 5, vertical: 14),
                           border: InputBorder.none,
                         ),
                         onSubmitted: (value) => _handleSubmitted(value),
@@ -411,8 +447,9 @@ class _AiAssistantScreenState extends State<AiAssistantScreen> {
           ),
         ],
       ),
-      bottomNavigationBar:
-          widget.showBottomNav ? const TravellerBottomNav(activeIndex: 3) : null,
+      bottomNavigationBar: widget.showBottomNav
+          ? const TravellerBottomNav(activeIndex: 3)
+          : null,
     );
   }
 
@@ -421,7 +458,8 @@ class _AiAssistantScreenState extends State<AiAssistantScreen> {
     return Padding(
       padding: EdgeInsets.only(bottom: 20),
       child: Row(
-        mainAxisAlignment: msg.isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
+        mainAxisAlignment:
+            msg.isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           if (isAI) ...[
@@ -443,12 +481,16 @@ class _AiAssistantScreenState extends State<AiAssistantScreen> {
             child: Container(
               padding: EdgeInsets.symmetric(horizontal: 18, vertical: 14),
               decoration: BoxDecoration(
-                color: msg.isUser ? const Color(0xFFFFC229) : Theme.of(context).colorScheme.surface,
+                color: msg.isUser
+                    ? const Color(0xFFFFC229)
+                    : Theme.of(context).colorScheme.surface,
                 borderRadius: BorderRadius.only(
                   topLeft: const Radius.circular(20),
                   topRight: const Radius.circular(20),
-                  bottomLeft: msg.isUser ? const Radius.circular(20) : Radius.zero,
-                  bottomRight: msg.isUser ? Radius.zero : const Radius.circular(20),
+                  bottomLeft:
+                      msg.isUser ? const Radius.circular(20) : Radius.zero,
+                  bottomRight:
+                      msg.isUser ? Radius.zero : const Radius.circular(20),
                 ),
                 border: msg.isUser
                     ? null
@@ -457,7 +499,9 @@ class _AiAssistantScreenState extends State<AiAssistantScreen> {
               child: Text(
                 msg.text,
                 style: TextStyle(
-                  color: msg.isUser ? Colors.black : Theme.of(context).colorScheme.onSurface,
+                  color: msg.isUser
+                      ? Colors.black
+                      : Theme.of(context).colorScheme.onSurface,
                   fontSize: 15,
                   height: 1.45,
                 ),

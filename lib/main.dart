@@ -26,7 +26,7 @@ void main() async {
 
   // Initialize SharedPreferences wrapper service before runApp starts
   await Get.putAsync(() => StorageService().init());
-  
+
   // Initialize ThemeController
   Get.put(ThemeController());
 
@@ -62,44 +62,44 @@ class SkyRightz360App extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final themeController = Get.find<ThemeController>();
-    
+
     return Obx(() => GetMaterialApp(
-      useInheritedMediaQuery: true,
-      locale: DevicePreview.locale(context),
-      builder: DevicePreview.appBuilder,
-      title: 'SkyRightz360',
-      theme: AppTheme.lightTheme,
-      darkTheme: AppTheme.darkTheme,
-      themeMode: themeController.themeMode,
-      debugShowCheckedModeBanner: false,
-      initialBinding: AuthBinding(),
-      initialRoute: '/splash',
-      getPages: [
-        GetPage(
-          name: '/onboarding',
-          page: () => const OnboardingScreen(),
-        ),
-        GetPage(
-          name: '/splash',
-          page: () => const SplashScreen(),
-        ),
-        GetPage(
-          name: '/login',
-          page: () => const SignInScreen(),
-        ),
-        GetPage(
-          name: '/register',
-          page: () => const SignUpScreen(),
-        ),
-        GetPage(
-          name: '/forgot-password',
-          page: () => const ResetPasswordScreen(),
-        ),
-        GetPage(
-          name: '/home',
-          page: () => const TravellerTabsScreen(),
-        ),
-      ],
-    ));
+          useInheritedMediaQuery: true,
+          locale: DevicePreview.locale(context),
+          builder: DevicePreview.appBuilder,
+          title: 'SkyRightz360',
+          theme: AppTheme.lightTheme,
+          darkTheme: AppTheme.darkTheme,
+          themeMode: themeController.themeMode,
+          debugShowCheckedModeBanner: false,
+          initialBinding: AuthBinding(),
+          initialRoute: '/splash',
+          getPages: [
+            GetPage(
+              name: '/onboarding',
+              page: () => const OnboardingScreen(),
+            ),
+            GetPage(
+              name: '/splash',
+              page: () => const SplashScreen(),
+            ),
+            GetPage(
+              name: '/login',
+              page: () => const SignInScreen(),
+            ),
+            GetPage(
+              name: '/register',
+              page: () => const SignUpScreen(),
+            ),
+            GetPage(
+              name: '/forgot-password',
+              page: () => const ResetPasswordScreen(),
+            ),
+            GetPage(
+              name: '/home',
+              page: () => const TravellerTabsScreen(),
+            ),
+          ],
+        ));
   }
 }

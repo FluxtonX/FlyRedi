@@ -190,52 +190,7 @@ class FlightDetailScreen extends StatelessWidget {
 
             SizedBox(height: 16),
 
-            // Live Flight Tracker Button
-            GestureDetector(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => LiveFlightTrackerScreen(trip: trip)),
-                );
-              },
-              child: Container(
-                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.surface,
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: Color(0xFFFFC229).withOpacity(0.3)),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Color(0xFFFFC229).withOpacity(0.05),
-                      blurRadius: 10,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
-                      children: [
-                        Icon(Icons.map_outlined, color: Color(0xFFFFC229), size: 22),
-                        SizedBox(width: 14),
-                        Text(
-                          'Live Flight Tracker',
-                          style: TextStyle(
-                            color: Theme.of(context).colorScheme.onSurface,
-                            fontSize: 15,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                    Icon(Icons.chevron_right, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5), size: 20),
-                  ],
-                ),
-              ),
-            ),
 
-            SizedBox(height: 16),
 
             // Sentinel™ Active Status Box
             Container(
