@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
+import 'package:provider/provider.dart';
 import 'package:sky_rightz_360/core/constants/app_colors.dart';
-import 'package:sky_rightz_360/features/auth/presentation/controllers/auth_controller.dart';
+import '../../auth/presentation/providers/auth_provider.dart';
 import '../widgets/dashboard_header.dart';
 import '../widgets/add_flight_card.dart';
 import '../widgets/monthly_usage_card.dart';
@@ -18,17 +16,14 @@ import '../widgets/dashboard_activity_list.dart';
 import '../widgets/dashboard_notifications_section.dart';
 import '../widgets/upgrade_to_pro_dialog.dart';
 import '../widgets/skeleton_box.dart';
-import '../repositories/dashboard_repository.dart';
-import '../repositories/alert_repository.dart';
-import '../models/dashboard_summary.dart';
-import '../models/dashboard_activity.dart';
-import '../models/alert_model.dart';
-import '../models/user_profile.dart';
+import '../presentation/providers/trips_provider.dart';
+import '../presentation/providers/alert_provider.dart';
+import '../presentation/providers/claim_provider.dart';
+import '../presentation/providers/dashboard_provider.dart';
+import '../presentation/providers/profile_provider.dart';
 import '../utils/add_flight_navigation.dart';
 import 'plan_usage_screen.dart';
-import '../repositories/trip_repository.dart';
 import '../models/trip_model.dart';
-import '../repositories/profile_repository.dart';
 
 class TravellerDashboardProScreen extends StatefulWidget {
   final bool showBottomNav;
@@ -45,278 +40,54 @@ class TravellerDashboardProScreen extends StatefulWidget {
 
 class _TravellerDashboardProScreenState
     extends State<TravellerDashboardProScreen> {
-  final DashboardRepository _repository = DashboardRepository();
-  final AlertRepository _alertRepository = AlertRepository();
-  final TripRepository _tripRepository = TripRepository();
-  final ProfileRepository _profileRepository = ProfileRepository();
-
-  bool _isSummaryLoading = true;
-  bool _isActivitiesLoading = true;
-  bool _isAlertsLoading = true;
-  bool _isTripsLoading = true;
-  bool _isProfileLoading = true;
-  bool _isStatsLoading = true;
-
-  bool _hasLoadedData = false;
-  String? _errorMessage;
-  late final String _displayName;
-
-  DashboardSummary? _summary;
-  List<DashboardActivity> _activities = [];
-  List<AlertModel> _alerts = [];
-  List<TripModel> _trips = [];
-  UserProfile? _profile;
-  ProfileStats? _stats;
-
-  bool get _anyDataLoaded =>
-      _summary != null ||
-      _activities.isNotEmpty ||
-      _alerts.isNotEmpty ||
-      _trips.isNotEmpty ||
-      _profile != null ||
-      _stats != null;
+  bool _isFirstLoad = true;
 
   @override
   void initState() {
     super.initState();
-    // Cache user display name once — avoids FirebaseAuth lookup every rebuild
-    final user = FirebaseAuth.instance.currentUser;
-    _displayName =
-        user?.displayName ?? user?.email?.split('@').first ?? 'Traveller';
-    TripRepository.tripsVersion.addListener(_onTripsChanged);
-    _loadDashboardData();
-  }
-
-  @override
-  void dispose() {
-    TripRepository.tripsVersion.removeListener(_onTripsChanged);
-    super.dispose();
-  }
-
-  void _onTripsChanged() {
-    _loadDashboardData();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadDashboardData();
+    });
   }
 
   Future<void> _loadDashboardData() async {
     if (!mounted) return;
+    final auth = context.read<AuthProvider>();
+    final uid = auth.user?.id;
+    if (uid == null) return;
 
-    setState(() {
-      _errorMessage = null;
-      if (!_hasLoadedData) {
-        _isSummaryLoading = true;
-        _isActivitiesLoading = true;
-        _isAlertsLoading = true;
-        _isTripsLoading = true;
-        _isProfileLoading = true;
-        _isStatsLoading = true;
-      }
-    });
-
-    // Load components progressively in parallel
-    _loadSummary();
-    _loadActivities();
-    _loadAlerts();
-    _loadTrips();
-    _loadProfileAndStats();
-  }
-
-  Future<void> _loadSummary() async {
     try {
-      final summary = await _repository.getSummary(
-        onCachedData: (cachedData) {
-          if (mounted) {
-            setState(() {
-              _summary = cachedData;
-              _isSummaryLoading = false;
-              _checkAllLoaded();
-            });
-          }
-        },
-      );
-      if (mounted) {
-        setState(() {
-          _summary = summary;
-          _isSummaryLoading = false;
-          _checkAllLoaded();
-        });
-      }
-    } catch (e) {
-      _handleLoadError(e);
-      if (mounted) {
-        setState(() {
-          _isSummaryLoading = false;
-          _checkAllLoaded();
-        });
-      }
-    }
-  }
-
-  Future<void> _loadActivities() async {
-    try {
-      final activities = await _repository.getActivities(
-        onCachedData: (cachedData) {
-          if (mounted) {
-            setState(() {
-              _activities = cachedData;
-              _isActivitiesLoading = false;
-              _checkAllLoaded();
-            });
-          }
-        },
-      );
-      if (mounted) {
-        setState(() {
-          _activities = activities;
-          _isActivitiesLoading = false;
-          _checkAllLoaded();
-        });
-      }
-    } catch (e) {
-      _handleLoadError(e);
-      if (mounted) {
-        setState(() {
-          _isActivitiesLoading = false;
-          _checkAllLoaded();
-        });
-      }
-    }
-  }
-
-  Future<void> _loadAlerts() async {
-    try {
-      final response = await _alertRepository.fetchAlerts(limit: 5);
-      if (mounted) {
-        setState(() {
-          _alerts = response.alerts;
-          _isAlertsLoading = false;
-          _checkAllLoaded();
-        });
-      }
-    } catch (e) {
-      _handleLoadError(e);
-      if (mounted) {
-        setState(() {
-          _isAlertsLoading = false;
-          _checkAllLoaded();
-        });
-      }
-    }
-  }
-
-  Future<void> _loadTrips() async {
-    try {
-      final trips = await _tripRepository.fetchUserTrips(
-        onCachedData: (cachedData) {
-          if (mounted) {
-            setState(() {
-              _trips = cachedData;
-              _isTripsLoading = false;
-              _checkAllLoaded();
-            });
-          }
-        },
-      );
-      if (mounted) {
-        setState(() {
-          _trips = trips;
-          _isTripsLoading = false;
-          _checkAllLoaded();
-        });
-      }
-    } catch (e) {
-      _handleLoadError(e);
-      if (mounted) {
-        setState(() {
-          _isTripsLoading = false;
-          _checkAllLoaded();
-        });
-      }
-    }
-  }
-
-  Future<void> _loadProfileAndStats() async {
-    try {
-      final results = await Future.wait([
-        _profileRepository.getProfile(
-          onCachedData: (cachedData) {
-            if (mounted) {
-              setState(() {
-                _profile = cachedData;
-                _isProfileLoading = false;
-                _checkAllLoaded();
-              });
-            }
-          },
-        ),
-        _profileRepository.getStats(
-          onCachedData: (cachedData) {
-            if (mounted) {
-              setState(() {
-                _stats = cachedData;
-                _isStatsLoading = false;
-                _checkAllLoaded();
-              });
-            }
-          },
-        ),
+      await Future.wait([
+        context.read<DashboardProvider>().loadDashboard(),
+        context.read<TripsProvider>().loadTrips(),
+        context.read<ProfileProvider>().loadStats(uid),
       ]);
-      if (mounted) {
-        setState(() {
-          _profile = results[0] as UserProfile;
-          _stats = results[1] as ProfileStats;
-          _isProfileLoading = false;
-          _isStatsLoading = false;
-          _checkAllLoaded();
-        });
-      }
     } catch (e) {
-      _handleLoadError(e);
+      if (mounted && !_isFirstLoad) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to update dashboard: ${e.toString()}'),
+            duration: const Duration(seconds: 3),
+          ),
+        );
+      }
+    } finally {
       if (mounted) {
         setState(() {
-          _isProfileLoading = false;
-          _isStatsLoading = false;
-          _checkAllLoaded();
+          _isFirstLoad = false;
         });
-      }
-    }
-  }
-
-  void _handleLoadError(dynamic e) {
-    if (_hasLoadedData) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-              'Failed to update dashboard data: ${e.toString().replaceAll('Exception: ', '')}'),
-          duration: const Duration(seconds: 3),
-        ),
-      );
-    }
-  }
-
-  /// Called inside setState closures — must NOT call setState itself.
-  /// Just mutates fields; the enclosing setState handles the rebuild.
-  void _checkAllLoaded() {
-    if (!_isSummaryLoading &&
-        !_isActivitiesLoading &&
-        !_isAlertsLoading &&
-        !_isTripsLoading &&
-        !_isProfileLoading &&
-        !_isStatsLoading) {
-      if (_anyDataLoaded) {
-        _hasLoadedData = true;
-        _errorMessage = null;
-      } else {
-        _errorMessage =
-            'Failed to load dashboard data. Please check your connection.';
       }
     }
   }
 
   Future<void> _handleAddFlightTap() async {
+    final tripsProvider = context.read<TripsProvider>();
+    final auth = context.read<AuthProvider>();
+
     await openAddFlightWithLimit(
       context: context,
-      currentTrips: _trips.length,
-      hasUnlimitedFlights: _profile?.hasUnlimitedFlightMonitoring ?? false,
+      currentTrips: tripsProvider.trips.length,
+      hasUnlimitedFlights: auth.user?.hasUnlimitedFlightMonitoring ?? false,
       onReturn: () async {
         if (!mounted) return;
         await _loadDashboardData();
@@ -326,6 +97,9 @@ class _TravellerDashboardProScreenState
 
   @override
   Widget build(BuildContext context) {
+    final auth = context.watch<AuthProvider>();
+    final displayName = auth.user?.displayName ?? 'Traveller';
+
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
@@ -333,7 +107,7 @@ class _TravellerDashboardProScreenState
           onRefresh: _loadDashboardData,
           color: const Color(0xFFFFC229),
           backgroundColor: Theme.of(context).colorScheme.surface,
-          child: _buildBody(_displayName),
+          child: _buildBody(displayName),
         ),
       ),
       bottomNavigationBar: widget.showBottomNav
@@ -343,19 +117,38 @@ class _TravellerDashboardProScreenState
   }
 
   Widget _buildBody(String displayName) {
-    if (_errorMessage != null && !_hasLoadedData) {
+    final dashboard = context.watch<DashboardProvider>();
+    final tripsProvider = context.watch<TripsProvider>();
+    final alertProvider = context.watch<AlertProvider>();
+    final profile = context.watch<ProfileProvider>();
+    final auth = context.watch<AuthProvider>();
+
+    final planLabel = _planLabel(auth.user?.plan);
+    final isFree = planLabel.contains('Free');
+
+    final summary = dashboard.summary;
+    final stats = profile.stats;
+    final trips = tripsProvider.trips;
+
+    // Check loading states
+    final isSummaryLoading = dashboard.isLoading && _isFirstLoad;
+    final isTripsLoading = tripsProvider.isLoading && _isFirstLoad;
+    final isProfileLoading = auth.isLoading && _isFirstLoad;
+    final isStatsLoading = profile.isLoading && _isFirstLoad;
+
+    if (dashboard.state == DashboardState.error && _isFirstLoad) {
       return Center(
         child: Padding(
-          padding: EdgeInsets.all(24.0),
+          padding: const EdgeInsets.all(24.0),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(
+              const Icon(
                 Icons.error_outline_rounded,
                 color: Color(0xFFE11D48),
                 size: 60,
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
               Text(
                 'Something went wrong',
                 style: TextStyle(
@@ -364,27 +157,26 @@ class _TravellerDashboardProScreenState
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              SizedBox(height: 8),
+              const SizedBox(height: 8),
               Text(
-                _errorMessage!,
+                dashboard.errorMessage ?? 'Failed to load dashboard data.',
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  color:
-                      Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
                   fontSize: 14,
                 ),
               ),
-              SizedBox(height: 24),
+              const SizedBox(height: 24),
               ElevatedButton.icon(
                 onPressed: _loadDashboardData,
-                icon: Icon(Icons.refresh_rounded, color: Colors.black),
-                label: Text(
+                icon: const Icon(Icons.refresh_rounded, color: Colors.black),
+                label: const Text(
                   'Try Again',
                   style: TextStyle(
                       color: Colors.black, fontWeight: FontWeight.bold),
                 ),
                 style: ElevatedButton.styleFrom(
-                  padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16),
                   ),
@@ -396,17 +188,8 @@ class _TravellerDashboardProScreenState
       );
     }
 
-    final summary = _summary;
-    final stats = _stats;
-    final usedFlights = stats?.flightsMonitored ?? _trips.length;
-    final maxFlights = stats?.flightsMonitoredMax ?? freeFlightLimit;
     final usedClaims = stats?.claimsFiled ?? (summary?.casesCount ?? 0);
-    final maxClaims = stats?.claimsFiledMax ?? 1;
-    final usedAiQuestions = stats?.aiAssistantQuestions ?? 0;
-    final maxAiQuestions = stats?.aiAssistantQuestionsMax ?? 5;
-
-    final authController = Get.find<AuthController>();
-    final planLabel = _planLabel(authController.userProfile.value?.plan);
+    final maxClaims = isFree ? 1 : (stats?.claimsFiledMax ?? 1);
 
     return SingleChildScrollView(
       physics: const AlwaysScrollableScrollPhysics(),
@@ -416,17 +199,12 @@ class _TravellerDashboardProScreenState
         children: [
           DashboardHeader(
             displayName: displayName,
-            planLabel: _isProfileLoading ? 'Free Plan' : planLabel,
-            notificationCount:
-                _isSummaryLoading ? 0 : (summary?.alertsCount ?? 0),
+            planLabel: isProfileLoading ? 'Free Plan' : planLabel,
+            notificationCount: alertProvider.unreadCount,
           ),
-          _buildAlertBanner(
-              usedClaims >= maxClaims && planLabel.contains('Free')),
-          SizedBox(height: 18),
-          if (_isStatsLoading ||
-              _isProfileLoading ||
-              _isTripsLoading ||
-              _isSummaryLoading)
+          _buildAlertBanner(usedClaims >= maxClaims && planLabel.contains('Free')),
+          const SizedBox(height: 18),
+          if (isStatsLoading || isProfileLoading || isTripsLoading || isSummaryLoading)
             const SkeletonBox(height: 128, radius: 22)
           else
             TravelerProActiveCard(
@@ -439,25 +217,25 @@ class _TravellerDashboardProScreenState
                 );
               },
             ),
-          SizedBox(height: 18),
-          if (_isTripsLoading)
+          const SizedBox(height: 18),
+          if (isTripsLoading)
             const SkeletonBox(height: 82, radius: 20)
           else
             AddFlightCard(
-              usedFlights: _trips.length,
+              usedFlights: trips.length,
               maxFlights: freeFlightLimit,
               isPro: true,
               onTap: _handleAddFlightTap,
             ),
-          SizedBox(height: 24),
-          if (_isSummaryLoading)
+          const SizedBox(height: 24),
+          if (isSummaryLoading)
             const SkeletonBox(height: 190, radius: 28)
           else
             SentinelMonitoringSection(
               alertsCount: summary?.alertsCount ?? 0,
               delayRisk: (summary?.alertsCount ?? 0) > 0 ? '68%' : '12%',
-              monitoredCount: _trips.where((t) => t.trackingEnabled).length,
-              activeTrip: _trips.firstWhereOrNull((t) => t.trackingEnabled),
+              monitoredCount: trips.where((t) => t.trackingEnabled).length,
+              activeTrip: trips.cast<TripModel?>().firstWhere((t) => t != null && t.trackingEnabled, orElse: () => null),
               onUpgrade: () async {
                 final upgraded = await showUpgradeToProDialog(context);
                 if (upgraded == true && mounted) {
@@ -465,36 +243,37 @@ class _TravellerDashboardProScreenState
                 }
               },
             ),
-          SizedBox(height: 24),
-          if (_isActivitiesLoading) ...[
+          const SizedBox(height: 24),
+          if (dashboard.isLoading && _isFirstLoad) ...[
             Row(
               children: [
-                SkeletonBox(width: 54, height: 54, radius: 18),
-                SizedBox(width: 16),
-                Expanded(child: SkeletonBox(height: 42, radius: 14)),
+                const SkeletonBox(width: 54, height: 54, radius: 18),
+                const SizedBox(width: 16),
+                Expanded(child: const SkeletonBox(height: 42, radius: 14)),
               ],
             ),
-            SizedBox(height: 24),
+            const SizedBox(height: 24),
             const SkeletonBox(height: 220, radius: 28),
           ] else ...[
-            BorderReadySection(activeTrip: _trips.firstWhereOrNull((t) => t.trackingEnabled) ?? (_trips.isNotEmpty ? _trips.first : null)),
+            BorderReadySection(
+              activeTrip: trips.cast<TripModel?>().firstWhere((t) => t != null && t.trackingEnabled, orElse: () => null) ?? 
+                  (trips.isNotEmpty ? trips.first : null),
+            ),
           ],
-          SizedBox(height: 24),
-          if (_isSummaryLoading)
+          const SizedBox(height: 24),
+          if (isSummaryLoading)
             const SkeletonBox(height: 140, radius: 24)
           else ...[
             RecommendedActionsCard(
-              isEmpty: (summary?.alertsCount ?? 0) == 0 &&
-                  (summary?.casesCount ?? 0) == 0,
+              isEmpty: (summary?.alertsCount ?? 0) == 0 && (summary?.casesCount ?? 0) == 0,
             ),
-            SizedBox(height: 24),
+            const SizedBox(height: 24),
             ActiveIssuesSection(
-              isEmpty: (summary?.alertsCount ?? 0) == 0 &&
-                  (summary?.casesCount ?? 0) == 0,
+              isEmpty: (summary?.alertsCount ?? 0) == 0 && (summary?.casesCount ?? 0) == 0,
               showUpgradeCard: false,
             ),
           ],
-          SizedBox(height: 24),
+          const SizedBox(height: 24),
         ],
       ),
     );
@@ -518,23 +297,18 @@ class _TravellerDashboardProScreenState
                 color: Theme.of(context).colorScheme.error.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(
-                    color:
-                        Theme.of(context).colorScheme.error.withOpacity(0.3)),
+                    color: Theme.of(context).colorScheme.error.withOpacity(0.3)),
               ),
               child: Row(
                 children: [
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color:
-                          Theme.of(context).colorScheme.error.withOpacity(0.2),
+                      color: Theme.of(context).colorScheme.error.withOpacity(0.2),
                       shape: BoxShape.circle,
                       boxShadow: [
                         BoxShadow(
-                          color: Theme.of(context)
-                              .colorScheme
-                              .error
-                              .withOpacity(0.3),
+                          color: Theme.of(context).colorScheme.error.withOpacity(0.3),
                           blurRadius: 8,
                           spreadRadius: 2,
                         ),
@@ -567,8 +341,7 @@ class _TravellerDashboardProScreenState
                       decoration: BoxDecoration(
                         color: Theme.of(context).colorScheme.surface,
                         shape: BoxShape.circle,
-                        border: Border.all(
-                            color: Theme.of(context).colorScheme.outline),
+                        border: Border.all(color: Theme.of(context).colorScheme.outline),
                       ),
                       child: Icon(Icons.arrow_forward_rounded,
                           color: Theme.of(context).colorScheme.onSurface,

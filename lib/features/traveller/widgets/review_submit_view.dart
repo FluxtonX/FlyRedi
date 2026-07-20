@@ -1,15 +1,60 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../../auth/presentation/providers/auth_provider.dart';
+import '../models/alert_model.dart';
 
 class ReviewSubmitView extends StatelessWidget {
   final VoidCallback onSubmit;
+  final AlertModel? alert;
 
   const ReviewSubmitView({
     super.key,
     required this.onSubmit,
+    this.alert,
   });
 
   @override
   Widget build(BuildContext context) {
+    final auth = context.watch<AuthProvider>();
+    final user = auth.user;
+    final userEmail = user != null && user.email.isNotEmpty ? user.email : 'rahmat@skyrightz360.com';
+    final userPhone = user != null && user.phoneNumber.isNotEmpty ? user.phoneNumber : '+234 801 234 5678';
+
+    final flightCode = alert != null && alert!.flightCode.isNotEmpty
+        ? alert!.flightCode
+        : 'W3 205';
+
+    String route = 'LOS → ABV';
+    if (alert != null && alert!.message.contains('(') && alert!.message.contains(')')) {
+      final startIndex = alert!.message.indexOf('(');
+      final endIndex = alert!.message.indexOf(')');
+      if (endIndex > startIndex) {
+        final content = alert!.message.substring(startIndex + 1, endIndex);
+        if (content.isNotEmpty) {
+          route = content;
+        }
+      }
+    }
+
+    String dateStr = 'April 27, 2026';
+    if (alert != null && alert!.createdAt.isNotEmpty) {
+      try {
+        final dt = DateTime.parse(alert!.createdAt).toLocal();
+        final months = [
+          'January', 'February', 'March', 'April', 'May', 'June',
+          'July', 'August', 'September', 'October', 'November', 'December'
+        ];
+        dateStr = '${months[dt.month - 1]} ${dt.day}, ${dt.year}';
+      } catch (_) {}
+    }
+
+    final issue = alert != null && alert!.eventType.isNotEmpty
+        ? alert!.eventType
+        : 'Flight Cancellation';
+
+    final isDelay = issue.toLowerCase().contains('delay');
+    final claimAmount = isDelay ? '₦45,000' : '₦130,000';
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -107,25 +152,25 @@ class ReviewSubmitView extends StatelessWidget {
               _buildSummaryRow(context, 
                 icon: Icons.flight_takeoff,
                 label: 'Flight',
-                value: 'W3 205 (LOS → ABV)',
+                value: '$flightCode ($route)',
               ),
               _buildDivider(context),
               _buildSummaryRow(context, 
                 icon: Icons.calendar_today_outlined,
                 label: 'Date',
-                value: 'April 27, 2026',
+                value: dateStr,
               ),
               _buildDivider(context),
               _buildSummaryRow(context, 
                 icon: Icons.description_outlined,
                 label: 'Issue',
-                value: 'Flight Cancellation',
+                value: issue,
               ),
               _buildDivider(context),
               _buildSummaryRow(context, 
                 icon: Icons.attach_money,
                 label: 'Claim Amount',
-                value: '₦130,000',
+                value: claimAmount,
                 isAmount: true,
               ),
             ],
@@ -167,12 +212,12 @@ class ReviewSubmitView extends StatelessWidget {
             children: [
               _buildContactItem(context, 
                 icon: Icons.email_outlined,
-                text: 'rahmat@skyrightz360.com',
+                text: userEmail,
               ),
               SizedBox(height: 14),
               _buildContactItem(context, 
                 icon: Icons.phone_outlined,
-                text: '+234 801 234 5678',
+                text: userPhone,
               ),
             ],
           ),

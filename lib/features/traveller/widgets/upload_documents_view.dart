@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class UploadDocumentsView extends StatefulWidget {
   final VoidCallback onContinue;
@@ -82,7 +83,7 @@ class _UploadDocumentsViewState extends State<UploadDocumentsView> {
           title: 'Flight Ticket / Booking Confirmation',
           subtitle: _isTicketUploaded ? 'Uploaded' : 'PDF, JPG, PNG (Max 5MB)',
           isUploaded: _isTicketUploaded,
-          icon: Icons.flight_takeoff,
+          svgPath: 'assets/icons/flight.svg',
           iconColor: const Color(0xFF10B981),
           onUploadPressed: () {
             setState(() {
@@ -231,107 +232,126 @@ class _UploadDocumentsViewState extends State<UploadDocumentsView> {
     required String title,
     required String subtitle,
     required bool isUploaded,
-    required IconData icon,
+    IconData? icon,
+    String? svgPath,
     required Color iconColor,
     required VoidCallback onUploadPressed,
   }) {
-    return Container(
-      padding: EdgeInsets.all(20),
-      margin: EdgeInsets.only(bottom: 16),
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface, // Dark blue
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: isUploaded ? Color(0xFF10B981).withOpacity(0.3) : Theme.of(context).colorScheme.onSurface.withOpacity(0.05),
-          width: 1,
+    return GestureDetector(
+      onTap: onUploadPressed,
+      child: Container(
+        padding: const EdgeInsets.all(20),
+        margin: const EdgeInsets.only(bottom: 16),
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.surface, // Dark blue
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: isUploaded 
+                ? const Color(0xFF10B981).withOpacity(0.3) 
+                : Theme.of(context).colorScheme.onSurface.withOpacity(0.05),
+            width: 1,
+          ),
         ),
-      ),
-      child: Row(
-        children: [
-          Container(
-            padding: EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: isUploaded 
-                  ? Color(0xFF10B981).withOpacity(0.12)
-                  : iconColor.withOpacity(0.1),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(
-              icon,
-              color: isUploaded ? const Color(0xFF10B981) : iconColor,
-              size: 20,
-            ),
-          ),
-          SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: TextStyle(
-                    color: Theme.of(context).colorScheme.onSurface,
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                SizedBox(height: 6),
-                Row(
-                  children: [
-                    if (isUploaded) ...[
-                      Icon(
-                        Icons.check_circle_outline,
-                        color: Color(0xFF10B981),
-                        size: 14,
-                      ),
-                      SizedBox(width: 6),
-                    ],
-                    Text(
-                      subtitle,
-                      style: TextStyle(
-                        color: isUploaded ? const Color(0xFF10B981) : Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
-                        fontSize: 13,
-                        fontWeight: isUploaded ? FontWeight.w500 : FontWeight.normal,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-          SizedBox(width: 12),
-          GestureDetector(
-            onTap: onUploadPressed,
-            child: Container(
-              padding: EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: isUploaded ? Theme.of(context).colorScheme.onSurface.withOpacity(0.05) : Theme.of(context).colorScheme.surface,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(
-                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.1),
-                ),
+                color: isUploaded 
+                    ? const Color(0xFF10B981).withOpacity(0.12)
+                    : iconColor.withOpacity(0.1),
+                shape: BoxShape.circle,
               ),
-              child: Row(
+              child: svgPath != null
+                  ? SvgPicture.asset(
+                      svgPath,
+                      colorFilter: ColorFilter.mode(
+                        isUploaded ? const Color(0xFF10B981) : iconColor,
+                        BlendMode.srcIn,
+                      ),
+                      width: 20,
+                      height: 20,
+                    )
+                  : Icon(
+                      icon,
+                      color: isUploaded ? const Color(0xFF10B981) : iconColor,
+                      size: 20,
+                    ),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Icon(
-                    isUploaded ? Icons.cached_outlined : Icons.upload_outlined,
-                    color: Theme.of(context).colorScheme.onSurface,
-                    size: 16,
-                  ),
-                  SizedBox(width: 6),
                   Text(
-                    isUploaded ? 'Re-upload' : 'Upload',
+                    title,
                     style: TextStyle(
                       color: Theme.of(context).colorScheme.onSurface,
-                      fontSize: 12,
+                      fontSize: 14,
                       fontWeight: FontWeight.bold,
                     ),
+                  ),
+                  const SizedBox(height: 6),
+                  Row(
+                    children: [
+                      if (isUploaded) ...[
+                        const Icon(
+                          Icons.check_circle_outline,
+                          color: Color(0xFF10B981),
+                          size: 14,
+                        ),
+                        const SizedBox(width: 6),
+                      ],
+                      Expanded(
+                        child: Text(
+                          subtitle,
+                          style: TextStyle(
+                            color: isUploaded ? const Color(0xFF10B981) : Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
+                            fontSize: 13,
+                            fontWeight: isUploaded ? FontWeight.w500 : FontWeight.normal,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
             ),
-          ),
-        ],
+            if (!isUploaded) ...[
+              const SizedBox(width: 12),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.surface,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.1),
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.upload_outlined,
+                      color: Theme.of(context).colorScheme.onSurface,
+                      size: 16,
+                    ),
+                    const SizedBox(width: 6),
+                    Text(
+                      'Upload',
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onSurface,
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ],
+        ),
       ),
     );
   }

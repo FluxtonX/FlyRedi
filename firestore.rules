@@ -1,0 +1,19 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Config collection is read-only for authenticated users
+    match /config/{document} {
+      allow read: if request.auth != null;
+      allow write: if false;
+    }
+
+    // Users collection and all subcollections (trips, alerts, claims, activity, etc.)
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+
+      match /{document=**} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+    }
+  }
+}

@@ -1,56 +1,106 @@
-import 'package:dio/dio.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
+/// Typed exception hierarchy for the app.
+/// Throw these from repositories; catch and map them in [ErrorHandler].
+sealed class AppException implements Exception {
+  final String message;
+  const AppException(this.message);
+
+  @override
+  String toString() => message;
+}
+
+/// Authentication-related errors (sign-in, sign-up, token expiry).
+class AuthException extends AppException {
+  const AuthException(super.message);
+}
+
+/// Network connectivity errors (no internet, timeout).
+class NetworkException extends AppException {
+  const NetworkException(super.message);
+}
+
+/// Server / backend errors (Firestore permission, Functions error).
+class ServerException extends AppException {
+  const ServerException(super.message);
+}
+
+/// Requested resource was not found.
+class NotFoundException extends AppException {
+  const NotFoundException(super.message);
+}
+
+/// Validation / bad input errors.
+class ValidationException extends AppException {
+  const ValidationException(super.message);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Centralised error handler
+// ─────────────────────────────────────────────────────────────────────────────
 
 class ErrorHandler {
+  ErrorHandler._();
+
+  /// Maps any thrown object to a human-readable error string.
   static String handle(dynamic error) {
-    if (error is DioException) {
-      return _handleDioError(error);
-    } else if (error is Exception) {
-      return error.toString().replaceAll('Exception: ', '');
-    } else {
-      return 'An unexpected error occurred. Please try again.';
+    if (error is FirebaseAuthException) return _handleFirebaseAuth(error);
+    if (error is FirebaseException) return _handleFirebase(error);
+    if (error is AppException) return error.message;
+    if (error is Exception) {
+      final msg = error.toString().replaceAll('Exception: ', '');
+      if (msg.toLowerCase().contains('socketexception') ||
+          msg.toLowerCase().contains('no internet')) {
+        return 'No internet connection. Please check your network.';
+      }
+      if (msg.toLowerCase().contains('timeout')) {
+        return 'Request timed out. Please try again.';
+      }
+      return msg;
     }
+    return 'An unexpected error occurred. Please try again.';
   }
 
-  static String _handleDioError(DioException error) {
-    switch (error.type) {
-      case DioExceptionType.connectionTimeout:
-        return 'Connection timeout. Please check your internet connection.';
-      case DioExceptionType.sendTimeout:
-        return 'Send timeout. Please try again.';
-      case DioExceptionType.receiveTimeout:
-        return 'Receive timeout. Please try again.';
-      case DioExceptionType.badResponse:
-        final response = error.response;
-        if (response != null) {
-          final statusCode = response.statusCode;
-          final data = response.data;
-          if (data is Map && data.containsKey('message')) {
-            return data['message'].toString();
-          }
-          if (statusCode == 400) {
-            return 'Invalid request. Please check your inputs.';
-          } else if (statusCode == 401) {
-            return 'Unauthorized. Please log in again.';
-          } else if (statusCode == 403) {
-            return 'Forbidden request.';
-          } else if (statusCode == 404) {
-            return 'Resource not found on server.';
-          } else if (statusCode == 500) {
-            return 'Internal server error. Please try again later.';
-          }
-        }
-        return 'Received invalid response from server (${response?.statusCode ?? "unknown"}).';
-      case DioExceptionType.cancel:
-        return 'Request was cancelled.';
-      case DioExceptionType.connectionError:
-        return 'Network connection error. Please verify your connection.';
-      case DioExceptionType.badCertificate:
-        return 'Secure connection failed due to an invalid server certificate.';
-      case DioExceptionType.unknown:
-        if (error.message != null && error.message!.contains('SocketException')) {
-          return 'No internet connection. Please verify your connection.';
-        }
-        return error.message ?? 'An unknown network error occurred.';
-    }
+  // ── Firebase Auth ──────────────────────────────────────────────────────────
+  static String _handleFirebaseAuth(FirebaseAuthException e) {
+    return switch (e.code) {
+      'wrong-password' || 'invalid-credential' =>
+        'Invalid email or password. Please try again.',
+      'user-not-found' => 'No account found with this email address.',
+      'email-already-in-use' =>
+        'This email is already registered. Please sign in instead.',
+      'weak-password' => 'Password must be at least 6 characters.',
+      'invalid-email' => 'Please enter a valid email address.',
+      'network-request-failed' =>
+        'Network error. Please check your internet connection.',
+      'too-many-requests' =>
+        'Too many failed attempts. Please try again later.',
+      'user-disabled' =>
+        'This account has been disabled. Please contact support.',
+      'requires-recent-login' =>
+        'This action requires recent authentication. Please sign in again.',
+      'operation-not-allowed' =>
+        'This sign-in method is not enabled. Please contact support.',
+      _ => e.message ?? 'An authentication error occurred.',
+    };
+  }
+
+  // ── Firestore / Firebase Core ─────────────────────────────────────────────
+  static String _handleFirebase(FirebaseException e) {
+    return switch (e.code) {
+      'permission-denied' =>
+        'You do not have permission to perform this action.',
+      'unavailable' =>
+        'Service is temporarily unavailable. Please try again.',
+      'not-found' => 'The requested data was not found.',
+      'already-exists' => 'This record already exists.',
+      'resource-exhausted' => 'Quota exceeded. Please try again later.',
+      'cancelled' => 'The operation was cancelled.',
+      'deadline-exceeded' => 'Request timed out. Please try again.',
+      'unauthenticated' => 'You are not signed in. Please sign in again.',
+      'data-loss' => 'Data error occurred. Please try again.',
+      _ => e.message ?? 'A service error occurred. Please try again.',
+    };
   }
 }

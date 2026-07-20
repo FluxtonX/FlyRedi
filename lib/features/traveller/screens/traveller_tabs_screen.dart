@@ -49,24 +49,28 @@ class _TravellerTabsScreenState extends State<TravellerTabsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isKeyboardOpen = MediaQuery.of(context).viewInsets.bottom > 0;
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       body: IndexedStack(
         index: _activeIndex,
         children: List.generate(
           _tabs.length,
-          (index) => _tabs[index] ?? SizedBox.shrink(),
+          (index) => _tabs[index] ?? const SizedBox.shrink(),
         ),
       ),
-      bottomNavigationBar: TravellerBottomNav(
-        activeIndex: _activeIndex,
-        onTabSelected: (index) {
-          if (index == _activeIndex) return;
-          setState(() {
-            _tabs[index] ??= _buildTab(index);
-            _activeIndex = index;
-          });
-        },
-      ),
+      bottomNavigationBar: isKeyboardOpen
+          ? null
+          : TravellerBottomNav(
+              activeIndex: _activeIndex,
+              onTabSelected: (index) {
+                if (index == _activeIndex) return;
+                setState(() {
+                  _tabs[index] ??= _buildTab(index);
+                  _activeIndex = index;
+                });
+              },
+            ),
     );
   }
 }

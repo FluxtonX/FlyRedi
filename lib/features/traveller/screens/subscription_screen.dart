@@ -1,16 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import '../../auth/presentation/controllers/auth_controller.dart';
+import 'package:provider/provider.dart';
+import '../../auth/presentation/providers/auth_provider.dart';
+import '../presentation/providers/profile_provider.dart';
 
 class SubscriptionScreen extends StatelessWidget {
   const SubscriptionScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final AuthController authController = Get.find<AuthController>();
+    final auth = context.watch<AuthProvider>();
+    final profile = auth.user;
+    final isPro = profile?.plan == 'Pro';
 
     return Scaffold(
-      backgroundColor: const Color(0xFF0F172A), // Dark blue background
+      backgroundColor: const Color(0xFF0F172A),
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -36,126 +39,123 @@ class SubscriptionScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             // ── Current Plan Card ──
-            Obx(() {
-              final profile = authController.userProfile.value;
-              final isPro = profile?.plan == 'Pro';
-
-              return Container(
-                padding: const EdgeInsets.all(24),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.surface,
-                  borderRadius: BorderRadius.circular(24),
-                  border: Border.all(
-                    color: isPro
-                        ? const Color(0xFFFFC229).withOpacity(0.3)
-                        : Theme.of(context).colorScheme.onSurface.withOpacity(0.1),
-                    width: 1,
-                  ),
+            Container(
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.surface,
+                borderRadius: BorderRadius.circular(24),
+                border: Border.all(
+                  color: isPro
+                      ? const Color(0xFFFFC229).withOpacity(0.3)
+                      : Theme.of(context).colorScheme.onSurface.withOpacity(0.1),
+                  width: 1,
                 ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Current Plan',
-                              style: TextStyle(
-                                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.54),
-                                fontSize: 14,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Current Plan',
+                            style: TextStyle(
+                              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.54),
+                              fontSize: 14,
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+                          Text(
+                            isPro ? 'Traveler Pro' : 'Free Plan',
+                            style: TextStyle(
+                              color: Theme.of(context).colorScheme.onSurface,
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                      if (isPro)
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                          decoration: BoxDecoration(
+                            color: Colors.transparent,
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(color: const Color(0xFFFFC229)),
+                          ),
+                          child: const Row(
+                            children: [
+                              Icon(
+                                Icons.workspace_premium_outlined,
+                                color: Color(0xFFFFC229),
+                                size: 16,
                               ),
-                            ),
-                            const SizedBox(height: 6),
-                            Text(
-                              isPro ? 'Traveler Pro' : 'Free Plan',
-                              style: TextStyle(
-                                color: Theme.of(context).colorScheme.onSurface,
-                                fontSize: 24,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
-                        ),
-                        if (isPro)
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                            decoration: BoxDecoration(
-                              color: Colors.transparent,
-                              borderRadius: BorderRadius.circular(20),
-                              border: Border.all(color: const Color(0xFFFFC229)),
-                            ),
-                            child: Row(
-                              children: [
-                                const Icon(
-                                  Icons.workspace_premium_outlined,
+                              SizedBox(width: 6),
+                              Text(
+                                'PRO',
+                                style: TextStyle(
                                   color: Color(0xFFFFC229),
-                                  size: 16,
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.bold,
                                 ),
-                                const SizedBox(width: 6),
-                                const Text(
-                                  'PRO',
-                                  style: TextStyle(
-                                    color: Color(0xFFFFC229),
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                      ],
-                    ),
-                    const SizedBox(height: 24),
-                    Divider(
-                      color: Theme.of(context).colorScheme.outline.withOpacity(0.5),
-                      height: 1,
-                    ),
-                    const SizedBox(height: 24),
-                    _buildDetailRow(context, 'Price', isPro ? '\$9/month' : '\$0/month', valueBold: true),
-                    const SizedBox(height: 16),
-                    _buildDetailRow(context, isPro ? 'Next billing date' : 'Status', isPro ? 'June 15, 2026' : 'Active'),
-                    if (isPro) ...[
-                      const SizedBox(height: 16),
-                      _buildDetailRow(context, 'Payment method', '•••• 4242'),
-                    ],
-                    const SizedBox(height: 24),
-                    GestureDetector(
-                      onTap: () async {
-                        if (profile != null) {
-                          // Mocking the plan switch
-                          final updatedProfile = profile.copyWith(plan: isPro ? 'Free' : 'Pro');
-                          await authController.updateProfileState(updatedProfile);
-                          Navigator.pop(context); // Go back to dashboard to see changes
-                        }
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        decoration: BoxDecoration(
-                          color: isPro ? Theme.of(context).colorScheme.surface : const Color(0xFFFFC229),
-                          borderRadius: BorderRadius.circular(16),
-                          border: Border.all(
-                            color: isPro ? Theme.of(context).colorScheme.onSurface.withOpacity(0.1) : Colors.transparent,
+                              ),
+                            ],
                           ),
                         ),
-                        alignment: Alignment.center,
-                        child: Text(
-                          isPro ? 'Cancel Subscription' : 'Upgrade to Pro',
-                          style: TextStyle(
-                            color: isPro ? Theme.of(context).colorScheme.onSurface : Colors.black87,
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
+                    ],
+                  ),
+                  const SizedBox(height: 24),
+                  Divider(
+                    color: Theme.of(context).colorScheme.outline.withOpacity(0.5),
+                    height: 1,
+                  ),
+                  const SizedBox(height: 24),
+                  _buildDetailRow(context, 'Price', isPro ? '\$9/month' : '\$0/month', valueBold: true),
+                  const SizedBox(height: 16),
+                  _buildDetailRow(context, isPro ? 'Next billing date' : 'Status', isPro ? 'June 15, 2026' : 'Active'),
+                  if (isPro) ...[
+                    const SizedBox(height: 16),
+                    _buildDetailRow(context, 'Payment method', '•••• 4242'),
+                  ],
+                  const SizedBox(height: 24),
+                  GestureDetector(
+                    onTap: () async {
+                      if (profile != null) {
+                        final targetPlan = isPro ? 'Free' : 'Pro';
+                        final profileProvider = context.read<ProfileProvider>();
+                        final success = await profileProvider.updateProfile(plan: targetPlan);
+                        if (success && context.mounted) {
+                          Navigator.pop(context);
+                        }
+                      }
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      decoration: BoxDecoration(
+                        color: isPro ? Theme.of(context).colorScheme.surface : const Color(0xFFFFC229),
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(
+                          color: isPro ? Theme.of(context).colorScheme.onSurface.withOpacity(0.1) : Colors.transparent,
+                        ),
+                      ),
+                      alignment: Alignment.center,
+                      child: Text(
+                        isPro ? 'Cancel Subscription' : 'Upgrade to Pro',
+                        style: TextStyle(
+                          color: isPro ? Theme.of(context).colorScheme.onSurface : Colors.black87,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
                     ),
-                  ],
-                ),
-              );
-            }),
+                  ),
+                ],
+              ),
+            ),
             const SizedBox(height: 32),
 
             // ── Pro Benefits ──
@@ -178,42 +178,37 @@ class SubscriptionScreen extends StatelessWidget {
             const SizedBox(height: 32),
 
             // ── Billing Management ──
-            Obx(() {
-              final isPro = authController.userProfile.value?.plan == 'Pro';
-              if (!isPro) return const SizedBox.shrink();
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Text(
-                    'Billing Management',
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.onSurface,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  _buildMenuItem(context, Icons.credit_card_outlined, 'Payment Methods'),
-                  _buildMenuItem(context, Icons.receipt_long_outlined, 'Billing History'),
-                  GestureDetector(
-                    onTap: () async {
-                      final profile = authController.userProfile.value;
-                      if (profile != null) {
-                        await authController.updateProfileState(profile.copyWith(plan: 'Free'));
-                        Navigator.pop(context);
-                      }
-                    },
-                    child: _buildMenuItem(
-                      context,
-                      Icons.event_busy_outlined,
-                      'Cancel Subscription',
-                      isDestructive: true,
-                    ),
-                  ),
-                  const SizedBox(height: 32),
-                ],
-              );
-            }),
+            if (isPro) ...[
+              Text(
+                'Billing Management',
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurface,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 16),
+              _buildMenuItem(context, Icons.credit_card_outlined, 'Payment Methods'),
+              _buildMenuItem(context, Icons.receipt_long_outlined, 'Billing History'),
+              GestureDetector(
+                onTap: () async {
+                  if (profile != null) {
+                    final profileProvider = context.read<ProfileProvider>();
+                    final success = await profileProvider.updateProfile(plan: 'Free');
+                    if (success && context.mounted) {
+                      Navigator.pop(context);
+                    }
+                  }
+                },
+                child: _buildMenuItem(
+                  context,
+                  Icons.event_busy_outlined,
+                  'Cancel Subscription',
+                  isDestructive: true,
+                ),
+              ),
+              const SizedBox(height: 32),
+            ],
 
             // ── Need Help ──
             Container(

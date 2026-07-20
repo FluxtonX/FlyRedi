@@ -42,7 +42,7 @@ class AppTheme {
       onSurface: Colors.white,
       onBackground: Colors.white,
       error: const Color(0xFFF43F5E),
-      outline: const Color(0xFF2B3B68), // borders
+      outline: const Color(0xFF1A263B), // borders
     ),
     appBarTheme: const AppBarTheme(
       backgroundColor: AppColors.background,
@@ -50,6 +50,6 @@ class AppTheme {
       elevation: 0,
       iconTheme: IconThemeData(color: Colors.white),
     ),
-    dividerColor: const Color(0xFF2B3B68),
+    dividerColor: const Color(0xFF1A263B),
   );
 }

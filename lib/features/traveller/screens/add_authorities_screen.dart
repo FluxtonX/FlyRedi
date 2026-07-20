@@ -5,7 +5,16 @@ import 'email_preview_screen.dart';
 import 'send_complaint_screen.dart';
 
 class AddAuthoritiesScreen extends StatefulWidget {
-  const AddAuthoritiesScreen({super.key});
+  final String emailBody;
+  final String emailTo;
+  final String emailSubject;
+
+  const AddAuthoritiesScreen({
+    super.key,
+    required this.emailBody,
+    required this.emailTo,
+    required this.emailSubject,
+  });
 
   @override
   State<AddAuthoritiesScreen> createState() => _AddAuthoritiesScreenState();
@@ -163,7 +172,11 @@ class _AddAuthoritiesScreenState extends State<AddAuthoritiesScreen> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const SendComplaintScreen(),
+                    builder: (context) => SendComplaintScreen(
+                      emailBody: widget.emailBody,
+                      emailTo: widget.emailTo,
+                      emailSubject: widget.emailSubject,
+                    ),
                   ),
                 );
               },

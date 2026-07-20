@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:sky_rightz_360/core/constants/app_colors.dart';
 import '../models/trip_model.dart';
 import '../models/alert_model.dart';
-import '../repositories/trip_repository.dart';
-import '../repositories/alert_repository.dart';
+import '../presentation/providers/trips_provider.dart';
+import '../presentation/providers/alert_provider.dart';
 import '../widgets/traveller_bottom_nav.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'dart:async';
+import '../data/datasources/flight_remote_datasource.dart';
 
 class SentinelMonitorScreen extends StatefulWidget {
   final TripModel? initialTrip;
@@ -21,8 +23,6 @@ class SentinelMonitorScreen extends StatefulWidget {
 }
 
 class _SentinelMonitorScreenState extends State<SentinelMonitorScreen> {
-  final TripRepository _tripRepository = TripRepository();
-  final AlertRepository _alertRepository = AlertRepository();
   bool _pushNotifications = true;
   bool _emailAlerts = true;
   bool _whatsappMessages = true;
@@ -32,18 +32,22 @@ class _SentinelMonitorScreenState extends State<SentinelMonitorScreen> {
   TripModel? _selectedTrip;
   String? _errorMessage;
   StreamSubscription<RemoteMessage>? _fcmSubscription;
+  FlightStatusModel? _liveStatus;
 
   @override
   void initState() {
     super.initState();
     _selectedTrip = widget.initialTrip;
-    _loadTrips();
     
     // Listen for incoming FCM messages to instantly refresh the dashboard
     _fcmSubscription = FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       if (mounted) {
         _loadTrips();
       }
+    });
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadTrips();
     });
   }
 
@@ -53,21 +57,34 @@ class _SentinelMonitorScreenState extends State<SentinelMonitorScreen> {
     super.dispose();
   }
 
-  Future<void> _loadTrips() async {
+  static String _toYMD(String raw) {
+    if (raw.isEmpty) return '';
+    if (RegExp(r'^\d{4}-\d{2}-\d{2}$').hasMatch(raw)) return raw;
+    try {
+      return DateTime.parse(raw).toIso8601String().split('T').first;
+    } catch (_) {
+      return '';
+    }
+  }
+
+  Future<void> _loadTrips({bool forceRefresh = false}) async {
     setState(() {
       _isLoading = true;
       _errorMessage = null;
     });
 
     try {
-      final results = await Future.wait([
-        _tripRepository.fetchUserTrips(),
-        _alertRepository.fetchAlerts(limit: 50).catchError((_) => AlertListResponse(alerts: [], page: 1, pages: 1, total: 0)),
+      final tripsProvider = context.read<TripsProvider>();
+      final alertProvider = context.read<AlertProvider>();
+
+      await Future.wait([
+        tripsProvider.loadTrips(),
       ]);
-      final trips = results[0] as List<TripModel>;
-      final alertListResponse = results[1] as AlertListResponse;
-      
+
       if (!mounted) return;
+
+      final trips = tripsProvider.trips;
+      final alerts = alertProvider.alerts;
 
       final monitoredTrips =
           trips.where((trip) => trip.trackingEnabled).toList();
@@ -82,10 +99,25 @@ class _SentinelMonitorScreenState extends State<SentinelMonitorScreen> {
               orElse: () => _selectedTrip!,
             );
 
+      _trips = monitoredTrips.isNotEmpty ? monitoredTrips : trips;
+      _dbAlerts = alerts;
+      _selectedTrip = selected;
+
+      if (selected != null && selected.flightNumber.isNotEmpty) {
+        try {
+          final dateParam = _toYMD(selected.departureDate);
+          final live = await FlightRemoteDatasource.fetchFlightStatus(
+            selected.flightNumber,
+            flightDate: dateParam,
+            forceRefresh: forceRefresh,
+          );
+          _liveStatus = live;
+        } catch (e) {
+          debugPrint('[SentinelMonitorScreen] Realtime status fetch failed: $e');
+        }
+      }
+
       setState(() {
-        _trips = monitoredTrips.isNotEmpty ? monitoredTrips : trips;
-        _dbAlerts = alertListResponse.alerts;
-        _selectedTrip = selected;
         _isLoading = false;
       });
     } catch (e) {
@@ -131,7 +163,37 @@ class _SentinelMonitorScreenState extends State<SentinelMonitorScreen> {
         .where((a) => a.flightCode == trip.flightNumber && !a.isRead)
         .length;
         
-    return timelineAlertsCount + unreadDbAlertsCount;
+    final liveAlertsCount = (_liveStatus != null && (_liveStatus!.isDelayed || _liveStatus!.isCancelled)) ? 1 : 0;
+        
+    return timelineAlertsCount + unreadDbAlertsCount + liveAlertsCount;
+  }
+
+  String _getDepartureTime(TripModel trip) {
+    if (_liveStatus != null) {
+      final timeStr = _liveStatus!.departure.actual ?? _liveStatus!.departure.estimated;
+      if (timeStr.isNotEmpty) {
+        return _timeLabel(timeStr, 'Monitoring');
+      }
+      final sched = _liveStatus!.departure.scheduled;
+      if (sched.isNotEmpty) {
+        return _timeLabel(sched, 'Monitoring');
+      }
+    }
+    return _timeLabel(_firstLeg?.fromTime, 'Monitoring');
+  }
+
+  String _getArrivalTime(TripModel trip) {
+    if (_liveStatus != null) {
+      final timeStr = _liveStatus!.arrival.actual ?? _liveStatus!.arrival.estimated;
+      if (timeStr.isNotEmpty) {
+        return _timeLabel(timeStr, 'Monitoring');
+      }
+      final sched = _liveStatus!.arrival.scheduled;
+      if (sched.isNotEmpty) {
+        return _timeLabel(sched, 'Monitoring');
+      }
+    }
+    return _timeLabel(_firstLeg?.toTime, 'Monitoring');
   }
 
   String _readable(String? value, {String fallback = '-'}) {
@@ -147,7 +209,7 @@ class _SentinelMonitorScreenState extends State<SentinelMonitorScreen> {
   }
 
   /// Extracts HH:mm from an ISO-8601 string without applying any timezone
-  /// conversion.  Aviationstack embeds the local airport time in the string
+  /// conversion. AirLabs embeds the local airport time in the string
   /// itself (e.g. "2026-06-19T16:15:00+00:00" where 16:15 IS the local time),
   /// so calling DateTime.parse().toLocal() would shift the value a second time
   /// (e.g. +5 h on a PKT device → 21:15).  We avoid that by reading the
@@ -215,7 +277,7 @@ class _SentinelMonitorScreenState extends State<SentinelMonitorScreen> {
             ),
             SizedBox(height: 2),
             Text(
-              trip == null ? 'No monitored flight yet' : '$_flightLabel · $_routeLabel',
+              trip == null ? 'No monitored flight yet' : '$_flightLabel · ${(_liveStatus != null && _liveStatus!.departure.iata.isNotEmpty) ? "${_liveStatus!.departure.iata} -> ${_liveStatus!.arrival.iata}" : _routeLabel}',
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
@@ -231,12 +293,12 @@ class _SentinelMonitorScreenState extends State<SentinelMonitorScreen> {
             margin: EdgeInsets.only(right: 24, top: 12, bottom: 12),
             padding: EdgeInsets.symmetric(horizontal: 10, vertical: 4),
             decoration: BoxDecoration(
-              color: trip?.trackingEnabled == true
+              color: (_liveStatus != null || trip?.trackingEnabled == true)
                   ? Theme.of(context).colorScheme.surface
                   : Theme.of(context).colorScheme.outline.withOpacity(0.5),
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: (trip?.trackingEnabled == true
+                color: ((_liveStatus != null || trip?.trackingEnabled == true)
                         ? const Color(0xFF10B981)
                         : Theme.of(context).colorScheme.onSurface)
                     .withOpacity(0.2),
@@ -249,7 +311,7 @@ class _SentinelMonitorScreenState extends State<SentinelMonitorScreen> {
                   width: 5,
                   height: 5,
                   decoration: BoxDecoration(
-                    color: trip?.trackingEnabled == true
+                    color: (_liveStatus != null || trip?.trackingEnabled == true)
                         ? const Color(0xFF10B981)
                         : Theme.of(context).colorScheme.onSurface.withOpacity(0.54),
                     shape: BoxShape.circle,
@@ -257,9 +319,9 @@ class _SentinelMonitorScreenState extends State<SentinelMonitorScreen> {
                 ),
                 SizedBox(width: 6),
                 Text(
-                  trip?.trackingEnabled == true ? 'Active' : 'Idle',
+                  (_liveStatus != null || trip?.trackingEnabled == true) ? 'Active' : 'Idle',
                   style: TextStyle(
-                    color: trip?.trackingEnabled == true
+                    color: (_liveStatus != null || trip?.trackingEnabled == true)
                         ? const Color(0xFF10B981)
                         : Theme.of(context).colorScheme.onSurface.withOpacity(0.54),
                     fontSize: 9,
@@ -307,7 +369,7 @@ class _SentinelMonitorScreenState extends State<SentinelMonitorScreen> {
     return RefreshIndicator(
       color: const Color(0xFFFFC229),
       backgroundColor: Theme.of(context).colorScheme.surface,
-      onRefresh: _loadTrips,
+      onRefresh: () => _loadTrips(forceRefresh: true),
       child: SingleChildScrollView(
         physics: const AlwaysScrollableScrollPhysics(),
         padding: EdgeInsets.symmetric(horizontal: 24, vertical: 8),
@@ -343,7 +405,9 @@ class _SentinelMonitorScreenState extends State<SentinelMonitorScreen> {
               children: [
                 _buildMetricBox(
                   label: 'Delay Status',
-                  value: _firstLeg?.delayProb ?? 'Monitoring',
+                  value: _liveStatus != null 
+                      ? (_liveStatus!.delayMinutes > 0 ? '+${_liveStatus!.delayMinutes}m' : 'On Time')
+                      : (_firstLeg?.delayProb ?? 'Monitoring'),
                   icon: _activeAlerts > 0
                       ? Icons.error_outline
                       : Icons.check_circle_outline,
@@ -353,13 +417,15 @@ class _SentinelMonitorScreenState extends State<SentinelMonitorScreen> {
                 ),
                 _buildMetricBox(
                   label: 'Flight Status',
-                  value: _statusLabel(trip.status),
+                  value: _liveStatus != null ? _liveStatus!.statusLabel : _statusLabel(trip.status),
                   icon: Icons.radar_outlined,
                   iconColor: riskColor,
                 ),
                 _buildMetricBox(
                   label: 'Risk Level',
-                  value: risk,
+                  value: _liveStatus != null 
+                      ? (_liveStatus!.isCancelled ? 'Critical' : (_liveStatus!.isDelayed ? 'High' : 'Low'))
+                      : risk,
                   icon: Icons.shield_outlined,
                   iconColor: riskColor,
                 ),
@@ -421,7 +487,7 @@ class _SentinelMonitorScreenState extends State<SentinelMonitorScreen> {
                     ),
                     SizedBox(height: 6),
                     Text(
-                      _statusLabel(trip.status),
+                      _liveStatus != null ? _liveStatus!.statusLabel : _statusLabel(trip.status),
                       style: TextStyle(
                         color: Theme.of(context).colorScheme.onSurface.withOpacity(0.45),
                         fontSize: 12,
@@ -434,13 +500,17 @@ class _SentinelMonitorScreenState extends State<SentinelMonitorScreen> {
                 padding:
                     EdgeInsets.symmetric(horizontal: 12, vertical: 7),
                 decoration: BoxDecoration(
-                  color: riskColor.withOpacity(0.12),
+                  color: (_liveStatus != null && (_liveStatus!.isDelayed || _liveStatus!.isCancelled) ? Colors.red.withOpacity(0.12) : riskColor.withOpacity(0.12)),
                   borderRadius: BorderRadius.circular(14),
                 ),
                 child: Text(
-                  '${risk.toUpperCase()} RISK',
+                  _liveStatus != null 
+                      ? (_liveStatus!.isCancelled ? 'CRITICAL RISK' : (_liveStatus!.isDelayed ? 'HIGH RISK' : 'LOW RISK'))
+                      : '${risk.toUpperCase()} RISK',
                   style: TextStyle(
-                    color: riskColor,
+                    color: _liveStatus != null 
+                        ? (_liveStatus!.isCancelled ? Colors.red : (_liveStatus!.isDelayed ? const Color(0xFFFFC229) : const Color(0xFF10B981)))
+                        : riskColor,
                     fontSize: 10,
                     fontWeight: FontWeight.bold,
                   ),
@@ -457,7 +527,7 @@ class _SentinelMonitorScreenState extends State<SentinelMonitorScreen> {
             ),
             child: Row(
               children: [
-                Expanded(child: _buildRoutePoint(origin, 'Departure')),
+                Expanded(child: _buildRoutePoint((_liveStatus != null && _liveStatus!.departure.iata.isNotEmpty) ? _liveStatus!.departure.iata : origin, 'Departure')),
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: 14),
                   child: Icon(
@@ -466,7 +536,7 @@ class _SentinelMonitorScreenState extends State<SentinelMonitorScreen> {
                     size: 30,
                   ),
                 ),
-                Expanded(child: _buildRoutePoint(destination, 'Arrival')),
+                Expanded(child: _buildRoutePoint((_liveStatus != null && _liveStatus!.arrival.iata.isNotEmpty) ? _liveStatus!.arrival.iata : destination, 'Arrival')),
               ],
             ),
           ),
@@ -474,13 +544,13 @@ class _SentinelMonitorScreenState extends State<SentinelMonitorScreen> {
           _buildDetailRow(Icons.calendar_today_outlined, 'Departure Date',
               _readable(trip.departureDate)),
           _buildDetailRow(Icons.access_time, 'Departure Time',
-              _timeLabel(_firstLeg?.fromTime, 'Monitoring')),
+              _getDepartureTime(trip)),
           _buildDetailRow(Icons.schedule, 'Arrival Time',
-              _timeLabel(_firstLeg?.toTime, 'Monitoring')),
+              _getArrivalTime(trip)),
           _buildDetailRow(Icons.confirmation_number_outlined,
               'Booking Reference', _readable(trip.bookingReference)),
           _buildDetailRow(Icons.radar_outlined, 'Last Checked',
-              _timeLabel(trip.lastTrackedAt, 'Pending first check')),
+              _liveStatus != null ? _timeLabel(DateTime.now().toIso8601String(), 'Just now') : _timeLabel(trip.lastTrackedAt, 'Pending first check')),
         ],
       ),
     );
@@ -556,10 +626,34 @@ class _SentinelMonitorScreenState extends State<SentinelMonitorScreen> {
           final trip = _trips[index];
           final selected = trip.id == _selectedTrip?.id;
           return GestureDetector(
-            onTap: () {
+            onTap: () async {
+              if (trip.id == _selectedTrip?.id) return;
               setState(() {
                 _selectedTrip = trip;
+                _liveStatus = null;
+                _isLoading = true;
               });
+              if (trip.flightNumber.isNotEmpty) {
+                try {
+                  final dateParam = _toYMD(trip.departureDate);
+                  final live = await FlightRemoteDatasource.fetchFlightStatus(
+                    trip.flightNumber,
+                    flightDate: dateParam,
+                  );
+                  if (mounted && _selectedTrip?.id == trip.id) {
+                    setState(() {
+                      _liveStatus = live;
+                    });
+                  }
+                } catch (e) {
+                  debugPrint('[SentinelMonitorScreen] Realtime status selector fetch failed: $e');
+                }
+              }
+              if (mounted) {
+                setState(() {
+                  _isLoading = false;
+                });
+              }
             },
             child: Container(
               alignment: Alignment.center,

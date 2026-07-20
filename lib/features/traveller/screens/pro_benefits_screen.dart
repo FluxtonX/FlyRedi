@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:sky_rightz_360/core/constants/app_colors.dart';
-import 'package:get/get.dart';
-import 'package:sky_rightz_360/features/auth/presentation/controllers/auth_controller.dart';
+import 'package:provider/provider.dart';
+import 'package:sky_rightz_360/features/auth/presentation/providers/auth_provider.dart';
+import 'package:sky_rightz_360/features/traveller/presentation/providers/profile_provider.dart';
 import 'package:sky_rightz_360/features/onboarding/widgets/plan_selection_page.dart';
 import 'traveller_tabs_screen.dart';
 
@@ -10,15 +10,16 @@ class ProBenefitsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final AuthController authController = Get.find<AuthController>();
+    final auth = context.watch<AuthProvider>();
+    final profile = auth.user;
 
     return Scaffold(
       body: PlanSelectionPage(
         onBack: () => Navigator.pop(context),
         onContinueFree: () async {
-          final profile = authController.userProfile.value;
           if (profile != null) {
-            await authController.updateProfileState(profile.copyWith(plan: 'Free'));
+            final profileProvider = context.read<ProfileProvider>();
+            await profileProvider.updateProfile(plan: 'Free');
           }
           if (context.mounted) {
             Navigator.of(context).pushAndRemoveUntil(
@@ -28,9 +29,9 @@ class ProBenefitsScreen extends StatelessWidget {
           }
         },
         onUpgradeToPro: () async {
-          final profile = authController.userProfile.value;
           if (profile != null) {
-            await authController.updateProfileState(profile.copyWith(plan: 'Pro'));
+            final profileProvider = context.read<ProfileProvider>();
+            await profileProvider.updateProfile(plan: 'Pro');
           }
           if (context.mounted) {
             Navigator.of(context).pushAndRemoveUntil(

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:sky_rightz_360/core/constants/app_colors.dart';
 import '../models/trip_model.dart';
-import '../models/user_profile.dart';
-import '../repositories/profile_repository.dart';
-import '../repositories/trip_repository.dart';
+import '../../auth/presentation/providers/auth_provider.dart';
+import '../presentation/providers/trips_provider.dart';
 import '../widgets/skeleton_box.dart';
 import '../widgets/traveller_bottom_nav.dart';
 import '../utils/add_flight_navigation.dart';
@@ -11,7 +11,6 @@ import 'active_disruptions_screen.dart';
 import 'upcoming_trips_screen.dart';
 import 'border_ready_screen.dart';
 import 'sentinel_monitor_screen.dart';
-import 'live_flight_tracker_screen.dart';
 
 class TripsOverviewScreen extends StatefulWidget {
   final bool showBottomNav;
@@ -26,16 +25,8 @@ class TripsOverviewScreen extends StatefulWidget {
 }
 
 class _TripsOverviewScreenState extends State<TripsOverviewScreen> {
-  final TripRepository _repository = TripRepository();
-  final ProfileRepository _profileRepository = ProfileRepository();
-  List<TripModel> _trips = [];
-  UserProfile? _profile;
   final Set<String> _deletingTripIds = {};
-  bool _isLoading = true;
-  bool _hasLoadedTrips = false;
-  String? _errorMessage;
 
-  // Reusable decoration — avoids recreating identical objects per card per rebuild
   BoxDecoration _getCardDecoration(BuildContext context) {
     return BoxDecoration(
       color: Theme.of(context).colorScheme.surface,
@@ -47,90 +38,26 @@ class _TripsOverviewScreenState extends State<TripsOverviewScreen> {
   @override
   void initState() {
     super.initState();
-    TripRepository.tripsVersion.addListener(_onTripsChanged);
-    _loadTrips();
-  }
-
-  @override
-  void dispose() {
-    TripRepository.tripsVersion.removeListener(_onTripsChanged);
-    super.dispose();
-  }
-
-  void _onTripsChanged() {
-    _loadTrips();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadTrips();
+    });
   }
 
   Future<void> _loadTrips() async {
     if (!mounted) return;
-    setState(() {
-      _isLoading = !_hasLoadedTrips;
-      _errorMessage = null;
-    });
-
     try {
-      final results = await Future.wait([
-        _repository.fetchUserTrips(
-          onCachedData: (cachedData) {
-            if (mounted) {
-              setState(() {
-                _trips = cachedData;
-                if (_profile != null) {
-                  _isLoading = false;
-                  _hasLoadedTrips = true;
-                }
-              });
-            }
-          },
-        ),
-        _profileRepository.getProfile(
-          onCachedData: (cachedData) {
-            if (mounted) {
-              setState(() {
-                _profile = cachedData;
-                if (_trips.isNotEmpty || _hasLoadedTrips) {
-                  _isLoading = false;
-                  _hasLoadedTrips = true;
-                }
-              });
-            }
-          },
-        ),
-      ]);
-      if (!mounted) return;
-      setState(() {
-        _trips = results[0] as List<TripModel>;
-        _profile = results[1] as UserProfile;
-        _isLoading = false;
-        _hasLoadedTrips = true;
-      });
-    } catch (e) {
-      if (!mounted) return;
-      if (_hasLoadedTrips) {
-        setState(() {
-          _errorMessage = null;
-          _isLoading = false;
-        });
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Could not refresh trips.'),
-            
-          ),
-        );
-        return;
-      }
-      setState(() {
-        _errorMessage = e.toString();
-        _isLoading = false;
-      });
-    }
+      await context.read<TripsProvider>().loadTrips();
+    } catch (_) {}
   }
 
   Future<void> _handleAddFlightTap() async {
+    final tripsProvider = context.read<TripsProvider>();
+    final auth = context.read<AuthProvider>();
+
     await openAddFlightWithLimit(
       context: context,
-      currentTrips: _trips.length,
-      hasUnlimitedFlights: _profile?.hasUnlimitedFlightMonitoring ?? false,
+      currentTrips: tripsProvider.trips.length,
+      hasUnlimitedFlights: auth.user?.hasUnlimitedFlightMonitoring ?? false,
       onReturn: () async {
         if (!mounted) return;
         await _loadTrips();
@@ -139,34 +66,11 @@ class _TripsOverviewScreenState extends State<TripsOverviewScreen> {
   }
 
   Future<void> _toggleTracking(TripModel trip) async {
-    bool newStatus = !trip.trackingEnabled;
-    // Optimistic UI update
-    setState(() {
-      final index = _trips.indexWhere((t) => t.id == trip.id);
-      if (index != -1) {
-        _trips[index] = TripModel(
-          id: trip.id,
-          userId: trip.userId,
-          tripName: trip.tripName,
-          flightNumber: trip.flightNumber,
-          origin: trip.origin,
-          destination: trip.destination,
-          departureDate: trip.departureDate,
-          bookingReference: trip.bookingReference,
-          totalDuration: trip.totalDuration,
-          stops: trip.stops,
-          timeline: trip.timeline,
-          trackingEnabled: newStatus,
-          status: trip.status,
-          lastTrackedAt: trip.lastTrackedAt,
-          shareToken: trip.shareToken,
-          isShared: trip.isShared,
-        );
-      }
-    });
+    final tripsProvider = context.read<TripsProvider>();
+    final newStatus = !trip.trackingEnabled;
 
     try {
-      await _repository.enableTripLiveTracking(trip.id, newStatus);
+      await tripsProvider.setLiveTracking(trip.id, newStatus);
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -176,7 +80,7 @@ class _TripsOverviewScreenState extends State<TripsOverviewScreen> {
                 newStatus ? Icons.check_circle : Icons.info_outline,
                 color: newStatus ? const Color(0xFF10B981) : Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
               ),
-              SizedBox(width: 10),
+              const SizedBox(width: 10),
               Text(
                 newStatus
                     ? 'Sentinel™ Protection Enabled!'
@@ -195,18 +99,11 @@ class _TripsOverviewScreenState extends State<TripsOverviewScreen> {
         ),
       );
     } catch (e) {
-      // Revert optimistic update on failure
-      setState(() {
-        final index = _trips.indexWhere((t) => t.id == trip.id);
-        if (index != -1) {
-          _trips[index] = trip;
-        }
-      });
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            'Failed to update tracking: $e',
+            'Failed to update tracking: ${e.toString()}',
             style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
           ),
           backgroundColor: Colors.red,
@@ -238,7 +135,7 @@ class _TripsOverviewScreenState extends State<TripsOverviewScreen> {
             ),
             TextButton(
               onPressed: () => Navigator.pop(context, true),
-              child: Text(
+              child: const Text(
                 'Delete',
                 style: TextStyle(
                   color: Color(0xFFEF4444),
@@ -259,35 +156,29 @@ class _TripsOverviewScreenState extends State<TripsOverviewScreen> {
   Future<void> _deleteTrip(TripModel trip) async {
     if (_deletingTripIds.contains(trip.id)) return;
 
-    final originalTrips = List<TripModel>.from(_trips);
     setState(() {
       _deletingTripIds.add(trip.id);
-      _trips.removeWhere((item) => item.id == trip.id);
     });
 
-    try {
-      await _repository.deleteTrip(trip.id);
-      if (!mounted) return;
-      await _loadTrips();
-      if (!mounted) return;
+    final tripsProvider = context.read<TripsProvider>();
+    final success = await tripsProvider.deleteTrip(trip.id);
+
+    if (mounted) {
       setState(() {
         _deletingTripIds.remove(trip.id);
       });
-    } catch (e) {
-      if (!mounted) return;
-      setState(() {
-        _trips = originalTrips;
-        _deletingTripIds.remove(trip.id);
-      });
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            'Failed to delete trip: $e',
-            style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+      if (!success) {
+        final error = tripsProvider.errorMessage;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              error ?? 'Failed to delete trip.',
+              style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+            ),
           ),
-          
-        ),
-      );
+        );
+        tripsProvider.clearError();
+      }
     }
   }
 
@@ -323,16 +214,10 @@ class _TripsOverviewScreenState extends State<TripsOverviewScreen> {
     return 'Date not set';
   }
 
-  /// Extracts HH:mm from an ISO-8601 string without applying any timezone
-  /// conversion.  Aviationstack embeds the local airport time in the string
-  /// itself (e.g. "2026-06-19T16:15:00+00:00" where 16:15 IS the local time),
-  /// so calling DateTime.parse().toLocal() would shift the value a second time
-  /// (e.g. +5 h on a PKT device → 21:15).  We avoid that by reading the
-  /// time component directly.
   String _timeLabel(String? isoLike, String fallback) {
     if (isoLike == null || isoLike.trim().isEmpty) return fallback;
     
-    String _to12Hour(String hh, String mm) {
+    String to12Hour(String hh, String mm) {
       int hour = int.parse(hh);
       String amPm = hour >= 12 ? 'PM' : 'AM';
       hour = hour % 12;
@@ -340,26 +225,23 @@ class _TripsOverviewScreenState extends State<TripsOverviewScreen> {
       return '${hour.toString().padLeft(2, '0')}:$mm $amPm';
     }
 
-    // ISO string with a 'T' separator — extract the HH:mm after the T.
     final isoMatch = RegExp(r'T(\d{2}):(\d{2})').firstMatch(isoLike);
-    if (isoMatch != null) return _to12Hour(isoMatch.group(1)!, isoMatch.group(2)!);
+    if (isoMatch != null) return to12Hour(isoMatch.group(1)!, isoMatch.group(2)!);
     
-    // Plain HH:mm (no date prefix) — return as-is after validation.
     final plainMatch = RegExp(r'^(\d{2}):(\d{2})').firstMatch(isoLike.trim());
-    if (plainMatch != null) return _to12Hour(plainMatch.group(1)!, plainMatch.group(2)!);
+    if (plainMatch != null) return to12Hour(plainMatch.group(1)!, plainMatch.group(2)!);
     
-    // Unrecognised format — show the raw string so no data is lost.
     return isoLike;
-  }
-
-  String _lastCheckedLabel(TripModel trip) {
-    if (!_hasReadableTripValue(trip.lastTrackedAt ?? '')) return 'Pending';
-    return _timeLabel(trip.lastTrackedAt, 'Pending');
   }
 
   @override
   Widget build(BuildContext context) {
-    if (_isLoading) {
+    final tripsProvider = context.watch<TripsProvider>();
+    final auth = context.watch<AuthProvider>();
+
+    final isLoading = tripsProvider.isLoading && tripsProvider.trips.isEmpty;
+
+    if (isLoading) {
       return Scaffold(
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         body: _buildTripsSkeleton(),
@@ -369,24 +251,24 @@ class _TripsOverviewScreenState extends State<TripsOverviewScreen> {
       );
     }
 
-    if (_errorMessage != null) {
+    if (tripsProvider.state == TripsState.error && tripsProvider.trips.isEmpty) {
       return Scaffold(
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         body: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.error_outline, color: Colors.red, size: 48),
-              SizedBox(height: 16),
+              const Icon(Icons.error_outline, color: Colors.red, size: 48),
+              const SizedBox(height: 16),
               Text(
-                'Failed to load trips:\n$_errorMessage',
+                'Failed to load trips:\n${tripsProvider.errorMessage}',
                 textAlign: TextAlign.center,
                 style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
               ),
-              SizedBox(height: 24),
+              const SizedBox(height: 24),
               ElevatedButton(
                 onPressed: _loadTrips,
-                child: Text('Retry'),
+                child: const Text('Retry'),
               ),
             ],
           ),
@@ -397,22 +279,23 @@ class _TripsOverviewScreenState extends State<TripsOverviewScreen> {
       );
     }
 
-    final bool isEmpty = _trips.isEmpty;
-    final int monitoredCount = _trips.where((t) => t.trackingEnabled).length;
-    final int alertsCount = _trips
+    final trips = tripsProvider.trips;
+    final bool isEmpty = trips.isEmpty;
+    final int monitoredCount = trips.where((t) => t.trackingEnabled).length;
+    final int alertsCount = trips
         .expand((t) => t.timeline)
         .where((leg) => (leg.activeAlerts ?? 0) > 0)
         .length;
-    final int upcomingCount = _trips.length;
+    final int upcomingCount = trips.length;
 
     final List<TripModel> monitoredTrips =
-        _trips.where((t) => t.trackingEnabled).toList();
+        trips.where((t) => t.trackingEnabled).toList();
 
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: EdgeInsets.only(left: 24, right: 24, top: 24, bottom: 100),
+          padding: const EdgeInsets.only(left: 24, right: 24, top: 24, bottom: 100),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
@@ -431,7 +314,7 @@ class _TripsOverviewScreenState extends State<TripsOverviewScreen> {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      SizedBox(height: 4),
+                      const SizedBox(height: 4),
                       Text(
                         'Manage all your flights',
                         style: TextStyle(
@@ -448,7 +331,7 @@ class _TripsOverviewScreenState extends State<TripsOverviewScreen> {
                 ],
               ),
 
-              SizedBox(height: 24),
+              const SizedBox(height: 24),
 
               // Overview 3-Card Row
               Row(
@@ -469,7 +352,7 @@ class _TripsOverviewScreenState extends State<TripsOverviewScreen> {
                       },
                     ),
                   ),
-                  SizedBox(width: 12),
+                  const SizedBox(width: 12),
                   Expanded(
                     child: _buildStatCard(
                       icon: Icons.error_outline,
@@ -487,7 +370,7 @@ class _TripsOverviewScreenState extends State<TripsOverviewScreen> {
                       },
                     ),
                   ),
-                  SizedBox(width: 12),
+                  const SizedBox(width: 12),
                   Expanded(
                     child: _buildStatCard(
                       icon: Icons.check_circle_outline,
@@ -507,7 +390,7 @@ class _TripsOverviewScreenState extends State<TripsOverviewScreen> {
                 ],
               ),
 
-              SizedBox(height: 28),
+              const SizedBox(height: 28),
 
               // Sentinel Protected Section Header
               Row(
@@ -521,18 +404,13 @@ class _TripsOverviewScreenState extends State<TripsOverviewScreen> {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  Row(
-                    children: [
-                      SizedBox(width: 6),
-                    ],
-                  ),
                 ],
               ),
-              SizedBox(height: 14),
+              const SizedBox(height: 14),
 
               if (monitoredTrips.isEmpty)
                 Container(
-                  padding: EdgeInsets.symmetric(vertical: 36),
+                  padding: const EdgeInsets.symmetric(vertical: 36),
                   decoration: BoxDecoration(
                     color: Theme.of(context).colorScheme.surface,
                     borderRadius: BorderRadius.circular(20),
@@ -562,7 +440,7 @@ class _TripsOverviewScreenState extends State<TripsOverviewScreen> {
                     final destination = _tripLocationLabel(trip.destination, 'Destination not set');
                     
                     return Padding(
-                      padding: EdgeInsets.only(bottom: 12.0),
+                      padding: const EdgeInsets.only(bottom: 12.0),
                       child: _buildProtectedFlightCard(
                         trip: trip,
                         airlineCode: _tripFlightLabel(trip),
@@ -581,7 +459,7 @@ class _TripsOverviewScreenState extends State<TripsOverviewScreen> {
                   },
                 ),
 
-              SizedBox(height: 28), // ── Upcoming Trips Section ──
+              const SizedBox(height: 28), // ── Upcoming Trips Section ──
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -589,7 +467,7 @@ class _TripsOverviewScreenState extends State<TripsOverviewScreen> {
                     children: [
                       Icon(Icons.flight_takeoff,
                           color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5), size: 18),
-                      SizedBox(width: 8),
+                      const SizedBox(width: 8),
                       Text(
                         'Upcoming Trips',
                         style: TextStyle(
@@ -609,7 +487,7 @@ class _TripsOverviewScreenState extends State<TripsOverviewScreen> {
                         ),
                       );
                     },
-                    child: Text(
+                    child: const Text(
                       'View all',
                       style: TextStyle(
                         color: Color(0xFFFFC229),
@@ -620,11 +498,11 @@ class _TripsOverviewScreenState extends State<TripsOverviewScreen> {
                   ),
                 ],
               ),
-              SizedBox(height: 14),
+              const SizedBox(height: 14),
 
               if (isEmpty)
                 Container(
-                  padding: EdgeInsets.symmetric(vertical: 36),
+                  padding: const EdgeInsets.symmetric(vertical: 36),
                   decoration: BoxDecoration(
                     color: Theme.of(context).colorScheme.surface,
                     borderRadius: BorderRadius.circular(20),
@@ -646,20 +524,18 @@ class _TripsOverviewScreenState extends State<TripsOverviewScreen> {
                 ListView.builder(
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
-                  itemCount: _trips.length,
+                  itemCount: trips.length,
                   itemBuilder: (context, index) {
-                    final trip = _trips[index];
+                    final trip = trips[index];
                     final firstLeg = trip.timeline.isNotEmpty ? trip.timeline.first : null;
                     return Padding(
-                      padding: EdgeInsets.only(bottom: 12.0),
+                      padding: const EdgeInsets.only(bottom: 12.0),
                       child: _buildUpcomingCard(trip, firstLeg),
                     );
                   },
                 ),
 
-              SizedBox(height: 28),
-
-
+              const SizedBox(height: 28),
 
               // Two Half-Width bottom action cards
               IntrinsicHeight(
@@ -683,14 +559,14 @@ class _TripsOverviewScreenState extends State<TripsOverviewScreen> {
                         ),
                       ),
                     ),
-                    SizedBox(width: 12),
+                    const SizedBox(width: 12),
                     Expanded(
                       child: GestureDetector(
                         onTap: () {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => BorderReadyScreen(),
+                              builder: (context) =>  BorderReadyScreen(),
                             ),
                           );
                         },
@@ -716,36 +592,36 @@ class _TripsOverviewScreenState extends State<TripsOverviewScreen> {
   Widget _buildTripsSkeleton() {
     return SafeArea(
       child: SingleChildScrollView(
-        padding: EdgeInsets.all(24),
+        padding: const EdgeInsets.all(24),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                SkeletonBox(width: 130, height: 50, radius: 14),
-                SkeletonBox(width: 42, height: 42, radius: 14),
+                const SkeletonBox(width: 130, height: 50, radius: 14),
+                const SkeletonBox(width: 42, height: 42, radius: 14),
               ],
             ),
-            SizedBox(height: 24),
+            const SizedBox(height: 24),
             Row(
               children: [
-                Expanded(child: SkeletonBox(height: 96, radius: 18)),
-                SizedBox(width: 12),
-                Expanded(child: SkeletonBox(height: 96, radius: 18)),
-                SizedBox(width: 12),
-                Expanded(child: SkeletonBox(height: 96, radius: 18)),
+                Expanded(child: const SkeletonBox(height: 96, radius: 18)),
+                const SizedBox(width: 12),
+                Expanded(child: const SkeletonBox(height: 96, radius: 18)),
+                const SizedBox(width: 12),
+                Expanded(child: const SkeletonBox(height: 96, radius: 18)),
               ],
             ),
-            SizedBox(height: 28),
+            const SizedBox(height: 28),
             const SkeletonBox(width: 180, height: 24, radius: 12),
-            SizedBox(height: 14),
+            const SizedBox(height: 14),
             const SkeletonBox(height: 132, radius: 20),
-            SizedBox(height: 28),
+            const SizedBox(height: 28),
             const SkeletonBox(width: 160, height: 24, radius: 12),
-            SizedBox(height: 14),
+            const SizedBox(height: 14),
             const SkeletonBox(height: 112, radius: 18),
-            SizedBox(height: 12),
+            const SizedBox(height: 12),
             const SkeletonBox(height: 112, radius: 18),
           ],
         ),
@@ -765,7 +641,7 @@ class _TripsOverviewScreenState extends State<TripsOverviewScreen> {
     final isDeleting = _deletingTripIds.contains(trip.id);
 
     return Container(
-      padding: EdgeInsets.all(18),
+      padding: const EdgeInsets.all(18),
       decoration: _getCardDecoration(context),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -784,7 +660,7 @@ class _TripsOverviewScreenState extends State<TripsOverviewScreen> {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  SizedBox(height: 4),
+                  const SizedBox(height: 4),
                   Text(
                     _tripRouteLabel(trip),
                     style: TextStyle(
@@ -792,7 +668,7 @@ class _TripsOverviewScreenState extends State<TripsOverviewScreen> {
                       fontSize: 12,
                     ),
                   ),
-                  SizedBox(height: 2),
+                  const SizedBox(height: 2),
                   Text(
                     _tripDateLabel(trip),
                     style: TextStyle(
@@ -812,11 +688,11 @@ class _TripsOverviewScreenState extends State<TripsOverviewScreen> {
                       height: 28,
                       alignment: Alignment.center,
                       decoration: BoxDecoration(
-                        color: Color(0xFFE11D48).withOpacity(0.12),
+                        color: const Color(0xFFE11D48).withOpacity(0.12),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: isDeleting
-                          ? SizedBox(
+                          ? const SizedBox(
                               width: 14,
                               height: 14,
                               child: CircularProgressIndicator(
@@ -826,14 +702,14 @@ class _TripsOverviewScreenState extends State<TripsOverviewScreen> {
                                 ),
                               ),
                             )
-                          : Icon(
+                          : const Icon(
                               Icons.delete_outline,
                               color: Color(0xFFE11D48),
                               size: 16,
                             ),
                     ),
                   ),
-                  SizedBox(height: 8),
+                  const SizedBox(height: 8),
                   Text(
                     trip.trackingEnabled ? 'Active Sentinel' : 'Not Monitored',
                     style: TextStyle(
@@ -844,21 +720,20 @@ class _TripsOverviewScreenState extends State<TripsOverviewScreen> {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  SizedBox(height: 8),
+                  const SizedBox(height: 8),
                   GestureDetector(
                     onTap: () => _toggleTracking(trip),
                     child: Container(
-                      padding: EdgeInsets.symmetric(
-                          horizontal: 14, vertical: 6),
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
                       decoration: BoxDecoration(
                         color: trip.trackingEnabled
-                            ? Color(0xFF10B981).withOpacity(0.12)
-                            : Color(0xFFFFC229).withOpacity(0.1),
+                            ? const Color(0xFF10B981).withOpacity(0.12)
+                            : const Color(0xFFFFC229).withOpacity(0.1),
                         borderRadius: BorderRadius.circular(10),
                         border: Border.all(
                           color: trip.trackingEnabled
-                              ? Color(0xFF10B981).withOpacity(0.3)
-                              : Color(0xFFFFC229).withOpacity(0.3),
+                              ? const Color(0xFF10B981).withOpacity(0.3)
+                              : const Color(0xFFFFC229).withOpacity(0.3),
                         ),
                       ),
                       child: Text(
@@ -894,7 +769,7 @@ class _TripsOverviewScreenState extends State<TripsOverviewScreen> {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: EdgeInsets.all(16),
+        padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.circular(18),
@@ -905,7 +780,7 @@ class _TripsOverviewScreenState extends State<TripsOverviewScreen> {
         child: Column(
           children: [
             Container(
-              padding: EdgeInsets.all(8),
+              padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
                 color: iconColor.withOpacity(0.1),
                 shape: BoxShape.circle,
@@ -916,7 +791,7 @@ class _TripsOverviewScreenState extends State<TripsOverviewScreen> {
                 size: 18,
               ),
             ),
-            SizedBox(height: 12),
+            const SizedBox(height: 12),
             Text(
               count,
               style: TextStyle(
@@ -925,7 +800,7 @@ class _TripsOverviewScreenState extends State<TripsOverviewScreen> {
                 fontWeight: FontWeight.bold,
               ),
             ),
-            SizedBox(height: 4),
+            const SizedBox(height: 4),
             FittedBox(
               fit: BoxFit.scaleDown,
               child: Text(
@@ -968,7 +843,7 @@ class _TripsOverviewScreenState extends State<TripsOverviewScreen> {
         );
       },
       child: Container(
-        padding: EdgeInsets.all(18),
+        padding: const EdgeInsets.all(18),
         decoration: BoxDecoration(
           color: Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.circular(20),
@@ -990,10 +865,9 @@ class _TripsOverviewScreenState extends State<TripsOverviewScreen> {
                         fontSize: 11,
                       ),
                     ),
-                    SizedBox(width: 6),
+                    const SizedBox(width: 6),
                     Container(
-                      padding: EdgeInsets.symmetric(
-                          horizontal: 6, vertical: 2),
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                       decoration: BoxDecoration(
                         color: riskColor.withOpacity(0.1),
                         borderRadius: BorderRadius.circular(4),
@@ -1019,7 +893,7 @@ class _TripsOverviewScreenState extends State<TripsOverviewScreen> {
                 ),
               ],
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -1034,7 +908,7 @@ class _TripsOverviewScreenState extends State<TripsOverviewScreen> {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    SizedBox(height: 4),
+                    const SizedBox(height: 4),
                     Text(
                       fromTime,
                       style: TextStyle(
@@ -1060,7 +934,7 @@ class _TripsOverviewScreenState extends State<TripsOverviewScreen> {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    SizedBox(height: 4),
+                    const SizedBox(height: 4),
                     Text(
                       statusText,
                       style: TextStyle(
@@ -1073,9 +947,9 @@ class _TripsOverviewScreenState extends State<TripsOverviewScreen> {
                 ),
               ],
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             Divider(color: Theme.of(context).colorScheme.outline),
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -1121,7 +995,7 @@ class _TripsOverviewScreenState extends State<TripsOverviewScreen> {
                 ),
               ],
             ),
-            SizedBox(height: 8),
+            const SizedBox(height: 8),
             Align(
               alignment: Alignment.centerLeft,
               child: Text(
@@ -1143,7 +1017,7 @@ class _TripsOverviewScreenState extends State<TripsOverviewScreen> {
     required String label,
   }) {
     return Container(
-      padding: EdgeInsets.symmetric(vertical: 18),
+      padding: const EdgeInsets.symmetric(vertical: 18),
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
@@ -1159,7 +1033,7 @@ class _TripsOverviewScreenState extends State<TripsOverviewScreen> {
             color: Theme.of(context).colorScheme.onSurface.withOpacity(0.8),
             size: 20,
           ),
-          SizedBox(height: 8),
+          const SizedBox(height: 8),
           Text(
             label,
             textAlign: TextAlign.center,

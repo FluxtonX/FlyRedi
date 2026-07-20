@@ -156,26 +156,33 @@ class RecommendedActionsCard extends StatelessWidget {
                 color: Color(0xFFFFC229).withOpacity(0.2),
               ),
             ),
-            child: Row(
+             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Row(
-                  children: [
-                    const Icon(
-                      Icons.description_outlined,
-                      color: Color(0xFFFFC229),
-                      size: 20,
-                    ),
-                    const SizedBox(width: 12),
-                    Text(
-                      'Compensation Eligible',
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.onSurface,
-                        fontSize: 16,
+                Expanded(
+                  child: Row(
+                    children: [
+                      const Icon(
+                        Icons.description_outlined,
+                        color: Color(0xFFFFC229),
+                        size: 20,
                       ),
-                    ),
-                  ],
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Text(
+                          'Compensation Eligible',
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.onSurface,
+                            fontSize: 16,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
+                const SizedBox(width: 8),
                 const Text(
                   '\$600',
                   style: TextStyle(
@@ -233,40 +240,6 @@ class RecommendedActionsCard extends StatelessWidget {
                           text:
                               '. You\'re entitled to ₦45,000 compensation under NCAA regulations.'),
                     ],
-                  ),
-                ),
-                SizedBox(height: 5),
-                GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const ResolveDashboardScreen()),
-                    );
-                  },
-                  child: Container(
-                    padding: EdgeInsets.symmetric(vertical: 14),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFFFC229),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    alignment: Alignment.center,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: const [
-                        Icon(Icons.arrow_forward,
-                            color: Colors.black, size: 18),
-                        SizedBox(width: 10),
-                        Text(
-                          'Resolve Now',
-                          style: TextStyle(
-                            color: Colors.black,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                      ],
-                    ),
                   ),
                 ),
               ],

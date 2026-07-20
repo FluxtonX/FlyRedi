@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import '../repositories/profile_repository.dart';
+import 'package:provider/provider.dart';
+import '../presentation/providers/profile_provider.dart';
 
 Future<bool?> showUpgradeToProDialog(BuildContext context) {
   return showDialog<bool>(
@@ -22,18 +23,25 @@ class _UpgradeToProDialogState extends State<UpgradeToProDialog> {
   Future<void> _handleUpgrade() async {
     setState(() => _isLoading = true);
     try {
-      // Send mock request to update plan to Plus, giving max 999 limit
-      final repository = ProfileRepository();
-      await repository.updateProfile(plan: 'Plus');
+      // Send request to update plan to Plus via ProfileProvider
+      final profileProvider = context.read<ProfileProvider>();
+      final success = await profileProvider.updateProfile(plan: 'Plus');
 
       if (!mounted) return;
-      Navigator.pop(context, true); // Return true indicating success
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Successfully upgraded to Pro! Welcome aboard.'),
-        ),
-      );
+      if (success) {
+        Navigator.pop(context, true); // Return true indicating success
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Successfully upgraded to Pro! Welcome aboard.'),
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to upgrade: ${profileProvider.errorMessage}'),
+          ),
+        );
+      }
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(

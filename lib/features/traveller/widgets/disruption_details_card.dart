@@ -1,10 +1,70 @@
 import 'package:flutter/material.dart';
+import '../models/alert_model.dart';
 
 class DisruptionDetailsCard extends StatelessWidget {
-  const DisruptionDetailsCard({super.key});
+  final AlertModel? alert;
+
+  const DisruptionDetailsCard({super.key, this.alert});
 
   @override
   Widget build(BuildContext context) {
+    final flightCode = alert != null && alert!.flightCode.isNotEmpty
+        ? alert!.flightCode
+        : 'W3 205';
+    final airline = alert != null && alert!.airline.isNotEmpty
+        ? alert!.airline
+        : 'Air Peace';
+    
+    // Status text mapping
+    String status = 'CANCELLED';
+    if (alert != null) {
+      if (alert!.eventType.toLowerCase().contains('cancel')) {
+        status = 'CANCELLED';
+      } else if (alert!.eventType.toLowerCase().contains('delay')) {
+        status = 'DELAYED';
+      } else {
+        status = alert!.eventType.toUpperCase();
+      }
+    }
+
+    // Extract route
+    String route = 'Lagos (LOS) → Abuja (ABV)';
+    if (alert != null && alert!.message.contains('(') && alert!.message.contains(')')) {
+      final startIndex = alert!.message.indexOf('(');
+      final endIndex = alert!.message.indexOf(')');
+      if (endIndex > startIndex) {
+        final content = alert!.message.substring(startIndex + 1, endIndex);
+        if (content.contains('→')) {
+          route = content;
+        } else if (content.contains('to')) {
+          route = content.replaceAll('to', '→');
+        } else if (content.contains('-')) {
+          route = content.replaceAll('-', '→');
+        }
+      }
+    }
+
+    // Format date & time
+    String dateStr = 'April 27, 2026';
+    String timeStr = '14:00 WAT';
+    if (alert != null && alert!.createdAt.isNotEmpty) {
+      try {
+        final dt = DateTime.parse(alert!.createdAt).toLocal();
+        final months = [
+          'January', 'February', 'March', 'April', 'May', 'June',
+          'July', 'August', 'September', 'October', 'November', 'December'
+        ];
+        dateStr = '${months[dt.month - 1]} ${dt.day}, ${dt.year}';
+        final hour = dt.hour.toString().padLeft(2, '0');
+        final minute = dt.minute.toString().padLeft(2, '0');
+        timeStr = '$hour:$minute WAT';
+      } catch (_) {}
+    }
+
+    // Status color mapping
+    final isDelay = status == 'DELAYED';
+    final statusColor = isDelay ? const Color(0xFFFFC229) : const Color(0xFFE11D48);
+
     return Container(
       padding: EdgeInsets.all(24),
       decoration: BoxDecoration(
@@ -17,19 +77,18 @@ class DisruptionDetailsCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // Row 1: Exclamation icon + W3 205 + CANCELLED badge
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
                 padding: EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: Color(0xFFE11D48).withOpacity(0.12), // Red tinted bg
+                  color: statusColor.withOpacity(0.12),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
-                  Icons.warning_amber_rounded,
-                  color: Color(0xFFE11D48),
+                  isDelay ? Icons.access_time_filled : Icons.warning_amber_rounded,
+                  color: statusColor,
                   size: 20,
                 ),
               ),
@@ -40,28 +99,32 @@ class DisruptionDetailsCard extends StatelessWidget {
                   children: [
                     Row(
                       children: [
-                        Text(
-                          'Flight W3 205',
-                          style: TextStyle(
-                            color: Theme.of(context).colorScheme.onSurface,
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
+                        Flexible(
+                          child: Text(
+                            'Flight $flightCode',
+                            style: TextStyle(
+                              color: Theme.of(context).colorScheme.onSurface,
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ),
                         SizedBox(width: 10),
                         Container(
                           padding: EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                           decoration: BoxDecoration(
-                            color: Color(0xFFE11D48).withOpacity(0.15),
+                            color: statusColor.withOpacity(0.15),
                             borderRadius: BorderRadius.circular(6),
                             border: Border.all(
-                              color: Color(0xFFE11D48).withOpacity(0.3),
+                              color: statusColor.withOpacity(0.3),
                             ),
                           ),
                           child: Text(
-                            'CANCELLED',
+                            status,
                             style: TextStyle(
-                              color: Color(0xFFE11D48),
+                              color: statusColor,
                               fontSize: 10,
                               fontWeight: FontWeight.bold,
                               letterSpacing: 0.5,
@@ -72,7 +135,7 @@ class DisruptionDetailsCard extends StatelessWidget {
                     ),
                     SizedBox(height: 4),
                     Text(
-                      'Air Peace',
+                      airline,
                       style: TextStyle(
                         color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
                         fontSize: 14,
@@ -92,7 +155,7 @@ class DisruptionDetailsCard extends StatelessWidget {
           _buildDetailRow(context, 
             icon: Icons.flight_takeoff,
             label: 'Route',
-            value: 'Lagos (LOS) → Abuja (ABV)',
+            value: route,
           ),
           SizedBox(height: 20),
 
@@ -100,7 +163,7 @@ class DisruptionDetailsCard extends StatelessWidget {
           _buildDetailRow(context, 
             icon: Icons.calendar_today_outlined,
             label: 'Date',
-            value: 'April 27, 2026',
+            value: dateStr,
           ),
           SizedBox(height: 20),
 
@@ -108,7 +171,7 @@ class DisruptionDetailsCard extends StatelessWidget {
           _buildDetailRow(context, 
             icon: Icons.access_time,
             label: 'Scheduled Time',
-            value: '14:00 WAT',
+            value: timeStr,
           ),
         ],
       ),

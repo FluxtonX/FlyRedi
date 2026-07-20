@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:provider/provider.dart';
 import 'package:sky_rightz_360/core/constants/app_colors.dart';
 
 import '../../auth/data/models/user_profile.dart';
-import '../../auth/presentation/controllers/auth_controller.dart';
-import '../repositories/profile_repository.dart';
+import '../../auth/presentation/providers/auth_provider.dart';
+import '../presentation/providers/profile_provider.dart';
 
 class PersonalInformationScreen extends StatefulWidget {
   const PersonalInformationScreen({super.key});
@@ -15,11 +15,6 @@ class PersonalInformationScreen extends StatefulWidget {
 }
 
 class _PersonalInformationScreenState extends State<PersonalInformationScreen> {
-  final ProfileRepository _repository = ProfileRepository();
-  final AuthController _authController = Get.find<AuthController>();
-
-  UserProfile? get _profile => _authController.userProfile.value;
-
   void _showSnackBar(String message, {bool isError = false}) {
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
@@ -34,7 +29,9 @@ class _PersonalInformationScreenState extends State<PersonalInformationScreen> {
   }
 
   void _showEditSheet() {
-    final profile = _profile;
+    final auth = context.read<AuthProvider>();
+    final profileProvider = context.read<ProfileProvider>();
+    final profile = auth.user;
     if (profile == null) return;
 
     final nameCtrl = TextEditingController(text: profile.displayName);
@@ -79,32 +76,39 @@ class _PersonalInformationScreenState extends State<PersonalInformationScreen> {
                       ),
                     ],
                   ),
-                  SizedBox(height: 18),
+                  const SizedBox(height: 18),
                   _sheetField(nameCtrl, 'Full Name', Icons.person_outline),
-                  SizedBox(height: 14),
+                  const SizedBox(height: 14),
                   _sheetField(
                     phoneCtrl,
                     'Phone Number',
                     Icons.phone_outlined,
                     keyboardType: TextInputType.phone,
                   ),
-                  SizedBox(height: 24),
+                  const SizedBox(height: 24),
                   ElevatedButton(
                     onPressed: isSaving
                         ? null
                         : () async {
                             setModalState(() => isSaving = true);
                             try {
-                              final updated = await _repository.updateProfile(
+                              final success = await profileProvider.updateProfile(
                                 displayName: nameCtrl.text.trim(),
                                 phoneNumber: phoneCtrl.text.trim(),
                               );
-                              await _authController.updateProfileState(updated);
-                              if (mounted) setState(() {});
-                              if (ctx.mounted) Navigator.pop(ctx);
-                              _showSnackBar(
-                                'Personal information updated successfully.',
-                              );
+                              if (success) {
+                                await auth.refreshProfile();
+                                if (mounted) setState(() {});
+                                if (ctx.mounted) Navigator.pop(ctx);
+                                _showSnackBar(
+                                  'Personal information updated successfully.',
+                                );
+                              } else {
+                                _showSnackBar(
+                                  profileProvider.errorMessage ?? 'Failed to update personal information.',
+                                  isError: true,
+                                );
+                              }
                             } catch (_) {
                               _showSnackBar(
                                 'Failed to update personal information.',
@@ -117,17 +121,17 @@ class _PersonalInformationScreenState extends State<PersonalInformationScreen> {
                             }
                           },
                     style: ElevatedButton.styleFrom(
-                      
+                      backgroundColor: const Color(0xFFFFC229),
                       foregroundColor: Colors.black,
                       disabledBackgroundColor:
-                          Color(0xFFFFC229).withOpacity(0.55),
-                      padding: EdgeInsets.symmetric(vertical: 16),
+                          const Color(0xFFFFC229).withOpacity(0.55),
+                      padding: const EdgeInsets.symmetric(vertical: 16),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16),
                       ),
                     ),
                     child: isSaving
-                        ? SizedBox(
+                        ? const SizedBox(
                             width: 20,
                             height: 20,
                             child: CircularProgressIndicator(
@@ -136,11 +140,12 @@ class _PersonalInformationScreenState extends State<PersonalInformationScreen> {
                                   AlwaysStoppedAnimation<Color>(Colors.black),
                             ),
                           )
-                        : Text(
+                        : const Text(
                             'Save Changes',
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 16,
+                    
                             ),
                           ),
                   ),
@@ -175,7 +180,7 @@ class _PersonalInformationScreenState extends State<PersonalInformationScreen> {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
-          borderSide: BorderSide(color: Color(0xFFFFC229), width: 1.5),
+          borderSide: const BorderSide(color: Color(0xFFFFC229), width: 1.5),
         ),
       ),
     );
@@ -183,8 +188,36 @@ class _PersonalInformationScreenState extends State<PersonalInformationScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final auth = context.watch<AuthProvider>();
+    final profile = auth.user;
+
+    if (profile == null) {
+      return Scaffold(
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          leading: IconButton(
+            onPressed: () => Navigator.pop(context),
+            icon: Icon(Icons.arrow_back, color: Theme.of(context).colorScheme.onSurface),
+          ),
+          title: Text(
+            'Personal Information',
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.onSurface,
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+        body: const Center(
+          child: CircularProgressIndicator(
+            valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFFFC229)),
+          ),
+        ),
+      );
+    }
+
     return Scaffold(
-      
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -208,106 +241,94 @@ class _PersonalInformationScreenState extends State<PersonalInformationScreen> {
           ),
         ],
       ),
-      body: Obx(() {
-        final profile = _profile;
-        if (profile == null) {
-          return Center(
-            child: CircularProgressIndicator(
-              valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFFFC229)),
-            ),
-          );
-        }
-
-        return SingleChildScrollView(
-          padding: EdgeInsets.fromLTRB(24, 12, 24, 28),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Container(
-                padding: EdgeInsets.all(20),
-                decoration: _cardDecoration(),
-                child: Row(
-                  children: [
-                    CircleAvatar(
-                      radius: 30,
-                      
-                      child: Text(
-                        profile.initials,
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.fromLTRB(24, 12, 24, 28),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(20),
+              decoration: _cardDecoration(),
+              child: Row(
+                children: [
+                  CircleAvatar(
+                    radius: 30,
+                    child: Text(
+                      profile.initials,
+                      style: const TextStyle(
+                        color: Colors.black,
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
-                    SizedBox(width: 16),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            profile.displayName.isNotEmpty
-                                ? profile.displayName
-                                : 'Traveller',
-                            style: TextStyle(
-                              color: Theme.of(context).colorScheme.onSurface,
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          SizedBox(height: 6),
-                          Text(
-                            profile.email,
-                            style: TextStyle(
-                              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.45),
-                              fontSize: 12,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              SizedBox(height: 22),
-              _sectionLabel('Account Details'),
-              SizedBox(height: 14),
-              _infoRow(
-                  Icons.person_outline,
-                  'Full Name',
-                  profile.displayName.isEmpty
-                      ? 'Not added'
-                      : profile.displayName),
-              SizedBox(height: 10),
-              _infoRow(Icons.email_outlined, 'Email', profile.email),
-              SizedBox(height: 10),
-              _infoRow(
-                Icons.phone_outlined,
-                'Phone Number',
-                profile.phoneNumber.isEmpty ? 'Not added' : profile.phoneNumber,
-              ),
-              SizedBox(height: 10),
-              _infoRow(Icons.workspace_premium_outlined, 'Plan',
-                  '${profile.plan} Plan'),
-              SizedBox(height: 24),
-              ElevatedButton.icon(
-                onPressed: _showEditSheet,
-                icon: Icon(Icons.edit_outlined, size: 18),
-                label: Text('Edit Information'),
-                style: ElevatedButton.styleFrom(
-                  
-                  foregroundColor: Colors.black,
-                  padding: EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
                   ),
-                  textStyle: TextStyle(fontWeight: FontWeight.bold),
-                ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          profile.displayName.isNotEmpty
+                              ? profile.displayName
+                              : 'Traveller',
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.onSurface,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        Text(
+                          profile.email,
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.45),
+                            fontSize: 12,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
-            ],
-          ),
-        );
-      }),
+            ),
+            const SizedBox(height: 22),
+            _sectionLabel('Account Details'),
+            const SizedBox(height: 14),
+            _infoRow(
+                Icons.person_outline,
+                'Full Name',
+                profile.displayName.isEmpty
+                    ? 'Not added'
+                    : profile.displayName),
+            const SizedBox(height: 10),
+            _infoRow(Icons.email_outlined, 'Email', profile.email),
+            const SizedBox(height: 10),
+            _infoRow(
+              Icons.phone_outlined,
+              'Phone Number',
+              profile.phoneNumber.isEmpty ? 'Not added' : profile.phoneNumber,
+            ),
+            const SizedBox(height: 10),
+            _infoRow(Icons.workspace_premium_outlined, 'Plan',
+                '${profile.plan} Plan'),
+            const SizedBox(height: 24),
+            ElevatedButton.icon(
+              onPressed: _showEditSheet,
+              icon: const Icon(Icons.edit_outlined, size: 18),
+              label: const Text('Edit Information'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFFFFC229),
+                foregroundColor: Colors.black,
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                textStyle: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -325,12 +346,12 @@ class _PersonalInformationScreenState extends State<PersonalInformationScreen> {
 
   Widget _infoRow(IconData icon, String label, String value) {
     return Container(
-      padding: EdgeInsets.symmetric(vertical: 16, horizontal: 18),
+      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 18),
       decoration: _cardDecoration(),
       child: Row(
         children: [
           Icon(icon, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.54), size: 20),
-          SizedBox(width: 14),
+          const SizedBox(width: 14),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -342,7 +363,7 @@ class _PersonalInformationScreenState extends State<PersonalInformationScreen> {
                     fontSize: 11,
                   ),
                 ),
-                SizedBox(height: 5),
+                const SizedBox(height: 5),
                 Text(
                   value,
                   style: TextStyle(

@@ -1,9 +1,11 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import '../../onboarding/screens/onboarding_screen.dart';
-import '../../onboarding/repositories/onboarding_repository.dart';
-import '../../auth/presentation/controllers/auth_controller.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import '../../../config/app_router.dart';
+import '../../../core/logging/app_logger.dart';
+import '../../auth/presentation/providers/auth_provider.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -13,8 +15,7 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
-  final OnboardingRepository _onboardingRepository = OnboardingRepository();
-  final AuthController _authController = Get.find<AuthController>();
+  static const String _onboardingKey = 'local_onboarding_completed';
 
   @override
   void initState() {
@@ -23,31 +24,38 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   Future<void> _initializeApp() async {
-    // Wait for splash logo display
+    AppLogger.nav('SplashScreen → initializing');
     await Future.delayed(const Duration(seconds: 2));
     if (!mounted) return;
 
-    final hasSeenOnboarding =
-        await _onboardingRepository.getLocalOnboardingStatus();
+    final hasSeenOnboarding = await _getLocalOnboardingStatus();
     if (!mounted) return;
 
     if (!hasSeenOnboarding) {
-      Get.off(() => const OnboardingScreen());
+      AppLogger.nav('SplashScreen → /onboarding (first launch)');
+      Navigator.pushReplacementNamed(context, AppRouter.onboarding);
       return;
     }
 
-    if (!_authController.isAuthenticated) {
-      Get.offAllNamed('/login');
+    final authProvider = context.read<AuthProvider>();
+    if (!authProvider.isAuthenticated) {
+      AppLogger.nav('SplashScreen → /login (not authenticated)');
+      Navigator.pushReplacementNamed(context, AppRouter.login);
       return;
     }
 
-    Get.offAllNamed('/home');
+    AppLogger.nav('SplashScreen → /home (authenticated)');
+    Navigator.pushReplacementNamed(context, AppRouter.home);
+  }
+
+  Future<bool> _getLocalOnboardingStatus() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool(_onboardingKey) ?? false;
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      
       body: Center(
         child: Image.asset(
           'assets/images/flyredilogo.png',

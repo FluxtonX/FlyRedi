@@ -14,6 +14,7 @@ class NotificationCard extends StatelessWidget {
   final String issueDescription;
   final String rightsDescription;
   final VoidCallback? onMarkRead;
+  final VoidCallback? onStartResolution;
 
   const NotificationCard({
     super.key,
@@ -29,6 +30,7 @@ class NotificationCard extends StatelessWidget {
     required this.issueDescription,
     required this.rightsDescription,
     this.onMarkRead,
+    this.onStartResolution,
   });
 
   @override
@@ -200,7 +202,7 @@ class NotificationCard extends StatelessWidget {
               Expanded(
                 flex: 2,
                 child: GestureDetector(
-                  onTap: () {
+                  onTap: onStartResolution ?? () {
                     Navigator.push(
                       context,
                       MaterialPageRoute(

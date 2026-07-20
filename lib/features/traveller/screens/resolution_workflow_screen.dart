@@ -10,8 +10,12 @@ import '../widgets/review_submit_view.dart';
 import '../widgets/traveller_bottom_nav.dart';
 import 'complaint_ready_screen.dart';
 
+import '../models/alert_model.dart';
+
 class ResolutionWorkflowScreen extends StatefulWidget {
-  const ResolutionWorkflowScreen({super.key});
+  final AlertModel? alert;
+
+  const ResolutionWorkflowScreen({super.key, this.alert});
 
   @override
   State<ResolutionWorkflowScreen> createState() =>
@@ -20,15 +24,33 @@ class ResolutionWorkflowScreen extends StatefulWidget {
 
 class _ResolutionWorkflowScreenState extends State<ResolutionWorkflowScreen> {
   int _currentStep = 1;
+  final ScrollController _scrollController = ScrollController();
+
+  void _goToStep(int step) {
+    setState(() {
+      _currentStep = step;
+    });
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_scrollController.hasClients) {
+        _scrollController.jumpTo(0);
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      
       body: SafeArea(
         child: SingleChildScrollView(
+          controller: _scrollController,
           child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
@@ -39,22 +61,23 @@ class _ResolutionWorkflowScreenState extends State<ResolutionWorkflowScreen> {
                     IconButton(
                       onPressed: () {
                         if (_currentStep > 1) {
-                          setState(() {
-                            _currentStep--;
-                          });
+                          _goToStep(_currentStep - 1);
                         } else {
                           Navigator.pop(context);
                         }
                       },
                       icon: Icon(
                         Icons.arrow_back,
-                        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                        color: Theme.of(context)
+                            .colorScheme
+                            .onSurface
+                            .withOpacity(0.7),
                         size: 24,
                       ),
                       padding: EdgeInsets.zero,
                       constraints: const BoxConstraints(),
                     ),
-                    SizedBox(width: 16),
+                    const SizedBox(width: 16),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -67,11 +90,14 @@ class _ResolutionWorkflowScreenState extends State<ResolutionWorkflowScreen> {
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          SizedBox(height: 6),
+                          const SizedBox(height: 6),
                           Text(
                             "We'll guide you step-by-step to resolve this disruption",
                             style: TextStyle(
-                              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSurface
+                                  .withOpacity(0.5),
                               fontSize: 14,
                               height: 1.35,
                             ),
@@ -82,9 +108,9 @@ class _ResolutionWorkflowScreenState extends State<ResolutionWorkflowScreen> {
                   ],
                 ),
 
-                SizedBox(height: 32),
+                const SizedBox(height: 32),
                 WorkflowTimelineTracker(currentStep: _currentStep),
-                SizedBox(height: 40),
+                const SizedBox(height: 40),
 
                 // Dynamic step content
                 _buildStepContent(),
@@ -114,7 +140,7 @@ class _ResolutionWorkflowScreenState extends State<ResolutionWorkflowScreen> {
                 fontWeight: FontWeight.bold,
               ),
             ),
-            SizedBox(height: 6),
+            const SizedBox(height: 6),
             Text(
               "Let's verify the details of your travel disruption",
               style: TextStyle(
@@ -122,23 +148,24 @@ class _ResolutionWorkflowScreenState extends State<ResolutionWorkflowScreen> {
                 fontSize: 14,
               ),
             ),
-            SizedBox(height: 24),
-            const DisruptionDetailsCard(),
-            SizedBox(height: 24),
+            const SizedBox(height: 24),
+            DisruptionDetailsCard(alert: widget.alert),
+            const SizedBox(height: 24),
             ConfirmationCard(
               onYesPressed: () {
-                setState(() {
-                  _currentStep = 2;
-                });
+                _goToStep(2);
               },
             ),
-            SizedBox(height: 24),
+            const SizedBox(height: 24),
             Padding(
-              padding: EdgeInsets.symmetric(horizontal: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 8),
               child: RichText(
                 text: TextSpan(
                   style: TextStyle(
-                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
+                    color: Theme.of(context)
+                        .colorScheme
+                        .onSurface
+                        .withOpacity(0.4),
                     fontSize: 13,
                     height: 1.4,
                   ),
@@ -146,11 +173,14 @@ class _ResolutionWorkflowScreenState extends State<ResolutionWorkflowScreen> {
                     TextSpan(
                       text: 'Note: ',
                       style: TextStyle(
-                        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                        color: Theme.of(context)
+                            .colorScheme
+                            .onSurface
+                            .withOpacity(0.7),
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    TextSpan(
+                    const TextSpan(
                       text:
                           'Accurate information is essential for a successful claim. Double-check all details before proceeding.',
                     ),
@@ -163,42 +193,35 @@ class _ResolutionWorkflowScreenState extends State<ResolutionWorkflowScreen> {
       case 2:
         return PassengerRightsView(
           onContinue: () {
-            setState(() {
-              _currentStep = 3;
-            });
+            _goToStep(3);
           },
         );
       case 3:
         return UploadDocumentsView(
           onContinue: () {
-            setState(() {
-              _currentStep = 4;
-            });
+            _goToStep(4);
           },
         );
       case 4:
         return ChooseResolutionView(
           onContinue: () {
-            setState(() {
-              _currentStep = 5;
-            });
+            _goToStep(5);
           },
         );
       case 5:
         return ReviewSubmitView(
+          alert: widget.alert,
           onSubmit: () {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => const ComplaintReadyScreen(),
+                builder: (context) => ComplaintReadyScreen(alert: widget.alert),
               ),
             );
           },
         );
       default:
-        return SizedBox();
+        return const SizedBox();
     }
   }
-
-
 }

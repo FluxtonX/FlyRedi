@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import '../controllers/auth_controller.dart';
-import '../widgets/auth_textfield.dart';
+import 'package:provider/provider.dart';
+
 import '../../../../core/widgets/custom_button.dart';
+import '../providers/auth_provider.dart';
+import '../widgets/auth_textfield.dart';
 
 class ResetPasswordScreen extends StatefulWidget {
   const ResetPasswordScreen({super.key});
@@ -12,33 +13,53 @@ class ResetPasswordScreen extends StatefulWidget {
 }
 
 class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
-  final AuthController _authController = Get.find<AuthController>();
   final TextEditingController emailController = TextEditingController();
 
-  final RxnString _emailError = RxnString();
+  String? _emailError;
 
   bool _validateInputs() {
     final email = emailController.text.trim();
     if (email.isEmpty) {
-      _emailError.value = 'Email is required.';
+      setState(() => _emailError = 'Email is required.');
       return false;
     } else if (!RegExp(r'^[\w\-.]+@([\w\-]+\.)+[\w\-]{2,}$').hasMatch(email)) {
-      _emailError.value = 'Enter a valid email address.';
+      setState(() => _emailError = 'Enter a valid email address.');
       return false;
     }
-    _emailError.value = null;
+    setState(() => _emailError = null);
     return true;
   }
 
   Future<void> _handleSendResetLink() async {
     if (!_validateInputs()) return;
     FocusScope.of(context).unfocus();
-    
-    final success = await _authController.forgotPassword(emailController.text.trim());
+
+    final auth = context.read<AuthProvider>();
+    final success = await auth.forgotPassword(emailController.text.trim());
+
+    if (!mounted) return;
+
     if (success) {
       emailController.clear();
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Password reset link sent! Check your email.'),
+          backgroundColor: Color(0xFF22C55E),
+        ),
+      );
       await Future.delayed(const Duration(seconds: 2));
-      Get.back();
+      if (mounted) Navigator.pop(context);
+    } else {
+      final error = auth.errorMessage;
+      if (error != null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(error),
+            backgroundColor: const Color(0xFFE11D48),
+          ),
+        );
+        auth.clearError();
+      }
     }
   }
 
@@ -50,35 +71,30 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isLoading = context.select<AuthProvider, bool>((p) => p.isLoading);
+
     return Scaffold(
-      
       body: SafeArea(
         child: Padding(
-          padding: EdgeInsets.all(24),
+          padding: const EdgeInsets.all(24),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               GestureDetector(
-                onTap: () => Get.back(),
-                child: Row(
+                onTap: () => Navigator.pop(context),
+                child: const Row(
                   children: [
-                    Icon(
-                      Icons.arrow_back,
-                      color: Colors.white70,
-                    ),
+                    Icon(Icons.arrow_back, color: Colors.white70),
                     SizedBox(width: 8),
                     Text(
                       'Back',
-                      style: TextStyle(
-                        color: Colors.white70,
-                        fontSize: 18,
-                      ),
+                      style: TextStyle(color: Colors.white70, fontSize: 18),
                     ),
                   ],
                 ),
               ),
-              SizedBox(height: 60),
+              const SizedBox(height: 60),
               const Text(
                 'Reset password',
                 style: TextStyle(
@@ -87,15 +103,12 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               const Text(
                 'Enter your email to receive a reset link',
-                style: TextStyle(
-                  color: Colors.white70,
-                  fontSize: 18,
-                ),
+                style: TextStyle(color: Colors.white70, fontSize: 18),
               ),
-              SizedBox(height: 40),
+              const SizedBox(height: 40),
               AuthTextField(
                 controller: emailController,
                 label: 'Email',
@@ -104,19 +117,15 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                 textInputAction: TextInputAction.done,
                 onSubmitted: (_) => _handleSendResetLink(),
               ),
-              Obx(() => _emailError.value != null
-                  ? Column(
-                      children: [
-                        SizedBox(height: 6),
-                        _buildFieldError(_emailError.value!),
-                      ],
-                    )
-                  : SizedBox.shrink()),
-              SizedBox(height: 40),
-              Obx(() => CustomButton(
-                    title: _authController.isLoading.value ? 'Sending Link...' : 'Send Reset Link',
-                    onTap: _authController.isLoading.value ? () {} : _handleSendResetLink,
-                  )),
+              if (_emailError != null) ...[
+                const SizedBox(height: 6),
+                _buildFieldError(_emailError!),
+              ],
+              const SizedBox(height: 40),
+              CustomButton(
+                title: isLoading ? 'Sending Link...' : 'Send Reset Link',
+                onTap: isLoading ? () {} : _handleSendResetLink,
+              ),
             ],
           ),
         ),
@@ -126,15 +135,15 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
 
   Widget _buildFieldError(String message) {
     return Padding(
-      padding: EdgeInsets.only(left: 4),
+      padding: const EdgeInsets.only(left: 4),
       child: Row(
         children: [
-          Icon(Icons.info_outline_rounded, size: 14, color: Color(0xFFE11D48)),
-          SizedBox(width: 6),
+          const Icon(Icons.info_outline_rounded, size: 14, color: Color(0xFFE11D48)),
+          const SizedBox(width: 6),
           Expanded(
             child: Text(
               message,
-              style: TextStyle(
+              style: const TextStyle(
                 color: Color(0xFFE11D48),
                 fontSize: 12,
                 fontWeight: FontWeight.w500,

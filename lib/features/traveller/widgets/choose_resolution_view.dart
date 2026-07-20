@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class ChooseResolutionView extends StatefulWidget {
   final VoidCallback onContinue;
@@ -46,7 +47,7 @@ class _ChooseResolutionViewState extends State<ChooseResolutionView> {
           subtitle: 'Get a complete refund of your ticket cost',
           amount: '₦85,000',
           processingTime: '7-14 business days',
-          icon: Icons.attach_money,
+          svgPath: 'assets/icons/refund.svg',
           iconBgColor: Theme.of(context).colorScheme.outline,
           iconColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
         ),
@@ -56,8 +57,8 @@ class _ChooseResolutionViewState extends State<ChooseResolutionView> {
           subtitle: 'Free rebooking on next available flight',
           amount: 'No cost',
           processingTime: 'Immediate',
-          icon: Icons.cached,
-          iconBgColor: Color(0xFF10B981).withOpacity(0.12),
+          svgPath: 'assets/icons/rebooking.svg',
+          iconBgColor: const Color(0xFF10B981).withOpacity(0.12),
           iconColor: const Color(0xFF10B981),
         ),
         _buildOptionCard(
@@ -66,8 +67,8 @@ class _ChooseResolutionViewState extends State<ChooseResolutionView> {
           subtitle: 'Full refund plus NCAA mandated compensation',
           amount: '₦130,000',
           processingTime: '14-21 business days',
-          icon: Icons.attach_money,
-          iconBgColor: Color(0xFFF97316).withOpacity(0.12), // Orange tinted bg
+          svgPath: 'assets/icons/refund+compensation.svg',
+          iconBgColor: const Color(0xFFF97316).withOpacity(0.12), // Orange tinted bg
           iconColor: const Color(0xFFF97316),
           isRecommended: true,
         ),
@@ -142,7 +143,8 @@ class _ChooseResolutionViewState extends State<ChooseResolutionView> {
     required String subtitle,
     required String amount,
     required String processingTime,
-    required IconData icon,
+    IconData? icon,
+    String? svgPath,
     required Color iconBgColor,
     required Color iconColor,
     bool isRecommended = false,
@@ -157,8 +159,8 @@ class _ChooseResolutionViewState extends State<ChooseResolutionView> {
         });
       },
       child: Container(
-        padding: EdgeInsets.all(20),
-        margin: EdgeInsets.only(bottom: 18),
+        padding: const EdgeInsets.all(20),
+        margin: const EdgeInsets.only(bottom: 18),
         decoration: BoxDecoration(
           color: Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.circular(24),
@@ -172,18 +174,25 @@ class _ChooseResolutionViewState extends State<ChooseResolutionView> {
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(
-                  padding: EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: iconBgColor,
-                    shape: BoxShape.circle,
+                if (svgPath != null)
+                  SvgPicture.asset(
+                    svgPath,
+                    width: 44,
+                    height: 44,
+                  )
+                else
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: iconBgColor,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      icon,
+                      color: iconColor,
+                      size: 20,
+                    ),
                   ),
-                  child: Icon(
-                    icon,
-                    color: iconColor,
-                    size: 20,
-                  ),
-                ),
                 SizedBox(width: 16),
                 Expanded(
                   child: Column(

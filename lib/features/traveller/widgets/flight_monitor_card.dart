@@ -1,8 +1,6 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
-
-import '../repositories/flight_api_service.dart';
+import '../data/datasources/flight_remote_datasource.dart';
 import '../screens/flight_detail_screen.dart';
 import '../models/trip_model.dart';
 
@@ -38,7 +36,7 @@ class _FlightMonitorCardState extends State<FlightMonitorCard> {
   }
 
   // ── Status Mapping ────────────────────────────────────────────────────────
-  /// Maps Aviationstack's raw `flight_status` to a human-readable label.
+  /// Maps AirLabs' raw `status` to a human-readable label.
   static String _mapStatus(String raw) {
     switch (raw.toLowerCase()) {
       case 'active':
@@ -133,7 +131,7 @@ class _FlightMonitorCardState extends State<FlightMonitorCard> {
     debugPrint('[FlightMonitorCard] Polling ${trip.flightNumber} date=$dateParam');
 
     try {
-      final result = await FlightApiService.fetchFlightStatus(
+      final result = await FlightRemoteDatasource.fetchFlightStatus(
         trip.flightNumber,
         flightDate: dateParam,
       );

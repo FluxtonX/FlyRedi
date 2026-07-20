@@ -1,10 +1,23 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:sky_rightz_360/core/constants/app_colors.dart';
+import 'package:flutter/services.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:share_plus/share_plus.dart';
 import '../widgets/traveller_bottom_nav.dart';
-import 'set_reminders_screen.dart';
+import 'traveller_tabs_screen.dart';
 
 class SendComplaintScreen extends StatefulWidget {
-  const SendComplaintScreen({super.key});
+  final String emailBody;
+  final String emailTo;
+  final String emailSubject;
+
+  const SendComplaintScreen({
+    super.key,
+    required this.emailBody,
+    required this.emailTo,
+    required this.emailSubject,
+  });
 
   @override
   State<SendComplaintScreen> createState() => _SendComplaintScreenState();
@@ -12,16 +25,175 @@ class SendComplaintScreen extends StatefulWidget {
 
 class _SendComplaintScreenState extends State<SendComplaintScreen> {
   int _selectedOption = 0; // 0: Open in Email App, 1: Copy, 2: PDF, 3: Share
+  bool _isProcessing = false;
+
+  Future<void> _executeSendAction() async {
+    setState(() {
+      _isProcessing = true;
+    });
+
+    // Show loading dialog
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return Dialog(
+          backgroundColor: Theme.of(context).colorScheme.surface,
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          child: Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const CircularProgressIndicator(
+                  valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFFFC229)),
+                ),
+                const SizedBox(height: 20),
+                Text(
+                  _selectedOption == 0
+                      ? 'Opening Email Client...'
+                      : _selectedOption == 1
+                          ? 'Copying Email...'
+                          : _selectedOption == 2
+                              ? 'Generating PDF...'
+                              : 'Preparing Share...',
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurface,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+
+    // Wait a brief moment to make it look professional/smooth
+    await Future.delayed(const Duration(milliseconds: 1200));
+
+    // Close loading dialog
+    if (mounted) {
+      Navigator.pop(context);
+    }
+
+    try {
+      if (_selectedOption == 0) {
+        // Open Gmail / Mail app - bypass canLaunchUrl checks directly
+        final Uri emailLaunchUri = Uri(
+          scheme: 'mailto',
+          path: widget.emailTo,
+          queryParameters: {
+            'subject': widget.emailSubject,
+            'body': widget.emailBody,
+          },
+        );
+        try {
+          await launchUrl(emailLaunchUri, mode: LaunchMode.externalApplication);
+        } catch (_) {
+          try {
+            await launchUrl(emailLaunchUri);
+          } catch (e) {
+            await Clipboard.setData(ClipboardData(text: widget.emailBody));
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Could not open email app. Content copied to clipboard!'),
+                  backgroundColor: Color(0xFF1E293B),
+                ),
+              );
+            }
+          }
+        }
+      } else if (_selectedOption == 1) {
+        // Copy Email
+        await Clipboard.setData(ClipboardData(text: widget.emailBody));
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Email content copied to clipboard!'),
+              backgroundColor: Color(0xFF1E293B),
+            ),
+          );
+        }
+      } else if (_selectedOption == 2) {
+        // Download PDF / Text Document (Real file writing + triggering native save sheet)
+        try {
+          final tempDir = await getTemporaryDirectory();
+          final file = File('${tempDir.path}/NCAA_Flight_Complaint.pdf');
+          await file.writeAsString(widget.emailBody);
+
+          if (mounted) {
+            // Trigger native dialog allowing 'Save to Files' or 'Copy to...'
+            await Share.shareXFiles(
+              [XFile(file.path)],
+              subject: 'NCAA Flight Complaint PDF',
+              text: 'Save your Flight Complaint PDF to your device',
+            );
+
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Use the system dialog to save the PDF to your File Manager!'),
+                backgroundColor: Color(0xFF1E293B),
+              ),
+            );
+          }
+        } catch (e) {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Failed to save file: $e'),
+                backgroundColor: const Color(0xFF1E293B),
+              ),
+            );
+          }
+        }
+      } else {
+        // Share using share_plus package
+        try {
+          await Share.share(widget.emailBody, subject: widget.emailSubject);
+        } catch (e) {
+          await Clipboard.setData(ClipboardData(text: widget.emailBody));
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Share failed. Content copied to clipboard instead!'),
+                backgroundColor: Color(0xFF1E293B),
+              ),
+            );
+          }
+        }
+      }
+    } catch (e) {
+      debugPrint('[SendComplaintScreen] Error executing action: $e');
+    }
+
+    setState(() {
+      _isProcessing = false;
+    });
+
+    // Navigate to Home screen perfectly
+    if (mounted) {
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const TravellerTabsScreen(initialIndex: 0),
+        ),
+        (route) => false,
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Theme.of(context).colorScheme.onSurface),
+          icon: Icon(Icons.arrow_back,
+              color: Theme.of(context).colorScheme.onSurface),
           onPressed: () => Navigator.pop(context),
         ),
         title: Column(
@@ -39,7 +211,8 @@ class _SendComplaintScreenState extends State<SendComplaintScreen> {
             Text(
               "Choose how you'd like to send your email",
               style: TextStyle(
-                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.54),
+                color:
+                    Theme.of(context).colorScheme.onSurface.withOpacity(0.54),
                 fontSize: 12,
                 fontWeight: FontWeight.normal,
               ),
@@ -78,7 +251,10 @@ class _SendComplaintScreenState extends State<SendComplaintScreen> {
                   Text(
                     "We don't send emails on your behalf. You'll send this complaint from your own email account, giving you full control and transparency.",
                     style: TextStyle(
-                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.55),
+                      color: Theme.of(context)
+                          .colorScheme
+                          .onSurface
+                          .withOpacity(0.55),
                       fontSize: 12,
                       height: 1.45,
                     ),
@@ -104,7 +280,8 @@ class _SendComplaintScreenState extends State<SendComplaintScreen> {
               index: 0,
               icon: Icons.mail_outline,
               title: 'Open in Email App',
-              subtitle: 'Your email app will open with the complaint pre-filled',
+              subtitle:
+                  'Your email app will open with the complaint pre-filled',
               recommended: true,
             ),
             SizedBox(height: 12),
@@ -142,7 +319,7 @@ class _SendComplaintScreenState extends State<SendComplaintScreen> {
 
             // Email Summary Card
             Container(
-              padding: EdgeInsets.all(20),
+              padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
                 color: Theme.of(context).colorScheme.surface,
                 borderRadius: BorderRadius.circular(20),
@@ -161,55 +338,37 @@ class _SendComplaintScreenState extends State<SendComplaintScreen> {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  SizedBox(height: 14),
-                  _buildSummaryRow('To:', 'complaints@airpeace.com'),
-                  SizedBox(height: 10),
-                  _buildSummaryRow('CC:', '2 authorities'),
-                  SizedBox(height: 10),
+                  const SizedBox(height: 14),
+                  _buildSummaryRow('To:', widget.emailTo),
+                  const SizedBox(height: 10),
+                  _buildSummaryRow(
+                      'CC:',
+                      widget.emailSubject.toLowerCase().contains('delay')
+                          ? '1 authority'
+                          : '2 authorities'),
+                  const SizedBox(height: 10),
                   _buildSummaryRow('Attachments:', '3 files'),
-                  SizedBox(height: 10),
-                  _buildSummaryRow('Claim Amount:', '₦130,000', highlightValue: true),
+                  const SizedBox(height: 10),
+                  _buildSummaryRow(
+                    'Claim Amount:',
+                    widget.emailBody.contains('130,000') ||
+                            widget.emailSubject.contains('130,000')
+                        ? '₦130,000'
+                        : '₦45,000',
+                    highlightValue: true,
+                  ),
                 ],
               ),
             ),
 
-            SizedBox(height: 20),
+            const SizedBox(height: 32),
 
-            // Next Step Card
-            Container(
-              padding: EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.surface,
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(
-                  color: Theme.of(context).colorScheme.outline,
-                ),
-              ),
-              child: Text(
-                'Next Step: After sending, set up follow-up reminders so we can notify you if you don\'t receive a response.',
-                style: TextStyle(
-                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
-                  fontSize: 12,
-                  height: 1.4,
-                ),
-              ),
-            ),
-
-            SizedBox(height: 28),
-
-            // Action Button to proceed to Reminders
+            // Action Button
             GestureDetector(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const SetRemindersScreen(),
-                  ),
-                );
-              },
+              onTap: _isProcessing ? null : _executeSendAction,
               child: Container(
                 width: double.infinity,
-                padding: EdgeInsets.symmetric(vertical: 18),
+                padding: const EdgeInsets.symmetric(vertical: 18),
                 decoration: BoxDecoration(
                   color: const Color(0xFFFFC229), // Yellow
                   borderRadius: BorderRadius.circular(16),
@@ -218,16 +377,28 @@ class _SendComplaintScreenState extends State<SendComplaintScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      'Continue to Reminders',
-                      style: TextStyle(
+                      _selectedOption == 0
+                          ? 'Send Email'
+                          : _selectedOption == 1
+                              ? 'Copy Email Content'
+                              : _selectedOption == 2
+                                  ? 'Download as PDF'
+                                  : 'Share Email',
+                      style: const TextStyle(
                         color: Colors.black,
                         fontSize: 14,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    SizedBox(width: 8),
+                    const SizedBox(width: 8),
                     Icon(
-                      Icons.chevron_right,
+                      _selectedOption == 0
+                          ? Icons.send
+                          : _selectedOption == 1
+                              ? Icons.copy
+                              : _selectedOption == 2
+                                  ? Icons.download
+                                  : Icons.share,
                       color: Colors.black,
                       size: 18,
                     ),
@@ -263,7 +434,9 @@ class _SendComplaintScreenState extends State<SendComplaintScreen> {
           color: Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.circular(18),
           border: Border.all(
-            color: isSelected ? const Color(0xFFFFC229) : Theme.of(context).colorScheme.outline,
+            color: isSelected
+                ? const Color(0xFFFFC229)
+                : Theme.of(context).colorScheme.outline,
             width: isSelected ? 1.5 : 1.0,
           ),
         ),
@@ -277,7 +450,9 @@ class _SendComplaintScreenState extends State<SendComplaintScreen> {
               ),
               child: Icon(
                 icon,
-                color: isSelected ? const Color(0xFFFFC229) : Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                color: isSelected
+                    ? const Color(0xFFFFC229)
+                    : Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                 size: 18,
               ),
             ),
@@ -299,7 +474,8 @@ class _SendComplaintScreenState extends State<SendComplaintScreen> {
                       if (recommended) ...[
                         SizedBox(width: 6),
                         Container(
-                          padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          padding:
+                              EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                           decoration: BoxDecoration(
                             color: Color(0xFFFFC229).withOpacity(0.12),
                             borderRadius: BorderRadius.circular(4),
@@ -320,7 +496,10 @@ class _SendComplaintScreenState extends State<SendComplaintScreen> {
                   Text(
                     subtitle,
                     style: TextStyle(
-                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
+                      color: Theme.of(context)
+                          .colorScheme
+                          .onSurface
+                          .withOpacity(0.4),
                       fontSize: 11,
                     ),
                   ),
@@ -346,7 +525,8 @@ class _SendComplaintScreenState extends State<SendComplaintScreen> {
     );
   }
 
-  Widget _buildSummaryRow(String label, String value, {bool highlightValue = false}) {
+  Widget _buildSummaryRow(String label, String value,
+      {bool highlightValue = false}) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -360,7 +540,9 @@ class _SendComplaintScreenState extends State<SendComplaintScreen> {
         Text(
           value,
           style: TextStyle(
-            color: highlightValue ? const Color(0xFFFFC229) : Theme.of(context).colorScheme.onSurface,
+            color: highlightValue
+                ? const Color(0xFFFFC229)
+                : Theme.of(context).colorScheme.onSurface,
             fontSize: 13,
             fontWeight: FontWeight.bold,
           ),

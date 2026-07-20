@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:sky_rightz_360/core/constants/app_colors.dart';
 import '../models/trip_model.dart';
-import '../models/user_profile.dart';
-import '../repositories/profile_repository.dart';
-import '../repositories/trip_repository.dart';
+import '../../auth/presentation/providers/auth_provider.dart';
+import '../presentation/providers/trips_provider.dart';
 import '../utils/add_flight_navigation.dart';
 import '../widgets/traveller_bottom_nav.dart';
 
@@ -15,82 +15,31 @@ class UpcomingTripsScreen extends StatefulWidget {
 }
 
 class _UpcomingTripsScreenState extends State<UpcomingTripsScreen> {
-  final TripRepository _tripRepository = TripRepository();
-  final ProfileRepository _profileRepository = ProfileRepository();
-  List<TripModel> _trips = [];
-  UserProfile? _profile;
   final Set<String> _deletingTripIds = {};
-  bool _isLoading = true;
-  String? _errorMessage;
 
   @override
   void initState() {
     super.initState();
-    TripRepository.tripsVersion.addListener(_onTripsChanged);
-    _loadLimitData();
-  }
-
-  @override
-  void dispose() {
-    TripRepository.tripsVersion.removeListener(_onTripsChanged);
-    super.dispose();
-  }
-
-  void _onTripsChanged() {
-    _loadLimitData();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadLimitData();
+    });
   }
 
   Future<void> _loadLimitData() async {
+    if (!mounted) return;
     try {
-      final results = await Future.wait([
-        _tripRepository.fetchUserTrips(
-          onCachedData: (cachedData) {
-            if (mounted) {
-              setState(() {
-                _trips = cachedData;
-                if (_profile != null) {
-                  _isLoading = false;
-                  _errorMessage = null;
-                }
-              });
-            }
-          },
-        ),
-        _profileRepository.getProfile(
-          onCachedData: (cachedData) {
-            if (mounted) {
-              setState(() {
-                _profile = cachedData;
-                if (_trips.isNotEmpty || !_isLoading) {
-                  _isLoading = false;
-                  _errorMessage = null;
-                }
-              });
-            }
-          },
-        ),
-      ]);
-      if (!mounted) return;
-      setState(() {
-        _trips = results[0] as List<TripModel>;
-        _profile = results[1] as UserProfile;
-        _isLoading = false;
-        _errorMessage = null;
-      });
-    } catch (e) {
-      if (!mounted) return;
-      setState(() {
-        _isLoading = false;
-        _errorMessage = e.toString();
-      });
-    }
+      await context.read<TripsProvider>().loadTrips();
+    } catch (_) {}
   }
 
   Future<void> _handleAddFlightTap() async {
+    final tripsProvider = context.read<TripsProvider>();
+    final auth = context.read<AuthProvider>();
+
     await openAddFlightWithLimit(
       context: context,
-      currentTrips: _trips.length,
-      hasUnlimitedFlights: _profile?.hasUnlimitedFlightMonitoring ?? false,
+      currentTrips: tripsProvider.trips.length,
+      hasUnlimitedFlights: auth.user?.hasUnlimitedFlightMonitoring ?? false,
       onReturn: () async {
         if (!mounted) return;
         await _loadLimitData();
@@ -121,7 +70,7 @@ class _UpcomingTripsScreenState extends State<UpcomingTripsScreen> {
             ),
             TextButton(
               onPressed: () => Navigator.pop(context, true),
-              child: Text(
+              child: const Text(
                 'Delete',
                 style: TextStyle(
                   color: Color(0xFFEF4444),
@@ -142,35 +91,29 @@ class _UpcomingTripsScreenState extends State<UpcomingTripsScreen> {
   Future<void> _deleteTrip(TripModel trip) async {
     if (_deletingTripIds.contains(trip.id)) return;
 
-    final originalTrips = List<TripModel>.from(_trips);
     setState(() {
       _deletingTripIds.add(trip.id);
-      _trips.removeWhere((item) => item.id == trip.id);
     });
 
-    try {
-      await _tripRepository.deleteTrip(trip.id);
-      if (!mounted) return;
-      await _loadLimitData();
-      if (!mounted) return;
+    final tripsProvider = context.read<TripsProvider>();
+    final success = await tripsProvider.deleteTrip(trip.id);
+
+    if (mounted) {
       setState(() {
         _deletingTripIds.remove(trip.id);
       });
-    } catch (e) {
-      if (!mounted) return;
-      setState(() {
-        _trips = originalTrips;
-        _deletingTripIds.remove(trip.id);
-      });
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            'Failed to delete trip: $e',
-            style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+      if (!success) {
+        final error = tripsProvider.errorMessage;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              error ?? 'Failed to delete trip.',
+              style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+            ),
           ),
-          
-        ),
-      );
+        );
+        tripsProvider.clearError();
+      }
     }
   }
 
@@ -197,21 +140,12 @@ class _UpcomingTripsScreenState extends State<UpcomingTripsScreen> {
     return 'Date not set';
   }
 
-  /// Extracts HH:mm from an ISO-8601 string without applying any timezone
-  /// conversion.  Aviationstack embeds the local airport time in the string
-  /// itself (e.g. "2026-06-19T16:15:00+00:00" where 16:15 IS the local time),
-  /// so calling DateTime.parse().toLocal() would shift the value a second time
-  /// (e.g. +5 h on a PKT device → 21:15).  We avoid that by reading the
-  /// time component directly.
   String _formatFlightTime(String? isoLike, String fallback) {
     if (isoLike == null || isoLike.trim().isEmpty) return fallback;
-    // ISO string with a 'T' separator — extract the HH:mm after the T.
     final isoMatch = RegExp(r'T(\d{2}):(\d{2})').firstMatch(isoLike);
     if (isoMatch != null) return '${isoMatch.group(1)}:${isoMatch.group(2)}';
-    // Plain HH:mm (no date prefix) — return as-is after validation.
     final plainMatch = RegExp(r'^(\d{2}):(\d{2})').firstMatch(isoLike.trim());
     if (plainMatch != null) return '${plainMatch.group(1)}:${plainMatch.group(2)}';
-    // Unrecognised format — show the raw string so no data is lost.
     return isoLike;
   }
 
@@ -240,7 +174,7 @@ class _UpcomingTripsScreenState extends State<UpcomingTripsScreen> {
             icon: Icon(Icons.add, color: Theme.of(context).colorScheme.onSurface),
             onPressed: _handleAddFlightTap,
           ),
-          SizedBox(width: 12),
+          const SizedBox(width: 12),
         ],
       ),
       body: _buildBody(),
@@ -249,20 +183,24 @@ class _UpcomingTripsScreenState extends State<UpcomingTripsScreen> {
   }
 
   Widget _buildBody() {
-    if (_isLoading) {
-      return Center(
+    final tripsProvider = context.watch<TripsProvider>();
+    final trips = tripsProvider.trips;
+    final isLoading = tripsProvider.isLoading && trips.isEmpty;
+
+    if (isLoading) {
+      return const Center(
         child: CircularProgressIndicator(
           valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFFFC229)),
         ),
       );
     }
 
-    if (_errorMessage != null) {
+    if (tripsProvider.state == TripsState.error && trips.isEmpty) {
       return Center(
         child: Padding(
-          padding: EdgeInsets.all(24),
+          padding: const EdgeInsets.all(24),
           child: Text(
-            'Failed to load trips:\n$_errorMessage',
+            'Failed to load trips:\n${tripsProvider.errorMessage}',
             textAlign: TextAlign.center,
             style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
           ),
@@ -270,14 +208,19 @@ class _UpcomingTripsScreenState extends State<UpcomingTripsScreen> {
       );
     }
 
-    return SingleChildScrollView(
-        padding: EdgeInsets.all(24),
+    return RefreshIndicator(
+      onRefresh: _loadLimitData,
+      color: const Color(0xFFFFC229),
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      child: SingleChildScrollView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: const EdgeInsets.all(24),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            if (_trips.isEmpty)
+            if (trips.isEmpty)
               Container(
-                padding: EdgeInsets.symmetric(vertical: 36),
+                padding: const EdgeInsets.symmetric(vertical: 36),
                 decoration: BoxDecoration(
                   color: Theme.of(context).colorScheme.surface,
                   borderRadius: BorderRadius.circular(20),
@@ -296,7 +239,7 @@ class _UpcomingTripsScreenState extends State<UpcomingTripsScreen> {
                 ),
               )
             else
-              ..._trips.map((trip) {
+              ...trips.map((trip) {
                 final firstLeg =
                     trip.timeline.isNotEmpty ? trip.timeline.first : null;
                 final flightLabel = _tripFlightLabel(trip);
@@ -306,7 +249,7 @@ class _UpcomingTripsScreenState extends State<UpcomingTripsScreen> {
                 final departureDate = _tripDateLabel(trip);
 
                 return Padding(
-                  padding: EdgeInsets.only(bottom: 14),
+                  padding: const EdgeInsets.only(bottom: 14),
                   child: _buildUpcomingFlightCard(
                     airlineName: flightLabel,
                     flightCode: flightLabel,
@@ -327,9 +270,10 @@ class _UpcomingTripsScreenState extends State<UpcomingTripsScreen> {
                     onDelete: () => _confirmDeleteTrip(trip),
                   ),
                 );
-              }).toList(),
+              }),
           ],
         ),
+      ),
     );
   }
 
@@ -351,7 +295,7 @@ class _UpcomingTripsScreenState extends State<UpcomingTripsScreen> {
     required VoidCallback onDelete,
   }) {
     return Container(
-      padding: EdgeInsets.all(20),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(22),
@@ -374,7 +318,7 @@ class _UpcomingTripsScreenState extends State<UpcomingTripsScreen> {
                       fontSize: 11,
                     ),
                   ),
-                  SizedBox(height: 2),
+                  const SizedBox(height: 2),
                   Text(
                     flightCode,
                     style: TextStyle(
@@ -389,7 +333,7 @@ class _UpcomingTripsScreenState extends State<UpcomingTripsScreen> {
                 children: [
                   Container(
                     padding:
-                        EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                        const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                     decoration: BoxDecoration(
                       color: statusColor.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(6),
@@ -403,7 +347,7 @@ class _UpcomingTripsScreenState extends State<UpcomingTripsScreen> {
                       ),
                     ),
                   ),
-                  SizedBox(width: 8),
+                  const SizedBox(width: 8),
                   GestureDetector(
                     onTap: isDeleting ? null : onDelete,
                     child: Container(
@@ -411,11 +355,11 @@ class _UpcomingTripsScreenState extends State<UpcomingTripsScreen> {
                       height: 28,
                       alignment: Alignment.center,
                       decoration: BoxDecoration(
-                        color: Color(0xFFE11D48).withOpacity(0.12),
+                        color: const Color(0xFFE11D48).withOpacity(0.12),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: isDeleting
-                          ? SizedBox(
+                          ? const SizedBox(
                               width: 14,
                               height: 14,
                               child: CircularProgressIndicator(
@@ -425,7 +369,7 @@ class _UpcomingTripsScreenState extends State<UpcomingTripsScreen> {
                                 ),
                               ),
                             )
-                          : Icon(
+                          : const Icon(
                               Icons.delete_outline,
                               color: Color(0xFFE11D48),
                               size: 16,
@@ -436,7 +380,7 @@ class _UpcomingTripsScreenState extends State<UpcomingTripsScreen> {
               ),
             ],
           ),
-          SizedBox(height: 20),
+          const SizedBox(height: 20),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -451,7 +395,7 @@ class _UpcomingTripsScreenState extends State<UpcomingTripsScreen> {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  SizedBox(height: 4),
+                  const SizedBox(height: 4),
                   Text(
                     fromTime,
                     style: TextStyle(
@@ -460,7 +404,7 @@ class _UpcomingTripsScreenState extends State<UpcomingTripsScreen> {
                       fontWeight: FontWeight.w600,
                     ),
                   ),
-                  SizedBox(height: 2),
+                  const SizedBox(height: 2),
                   Text(
                     fromCity,
                     style: TextStyle(
@@ -486,7 +430,7 @@ class _UpcomingTripsScreenState extends State<UpcomingTripsScreen> {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  SizedBox(height: 4),
+                  const SizedBox(height: 4),
                   Text(
                     toTime,
                     style: TextStyle(
@@ -495,7 +439,7 @@ class _UpcomingTripsScreenState extends State<UpcomingTripsScreen> {
                       fontWeight: FontWeight.w600,
                     ),
                   ),
-                  SizedBox(height: 2),
+                  const SizedBox(height: 2),
                   Text(
                     toCity,
                     style: TextStyle(
@@ -507,16 +451,16 @@ class _UpcomingTripsScreenState extends State<UpcomingTripsScreen> {
               ),
             ],
           ),
-          SizedBox(height: 20),
+          const SizedBox(height: 20),
           Divider(color: Theme.of(context).colorScheme.outline),
-          SizedBox(height: 12),
+          const SizedBox(height: 12),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Row(
                 children: [
                   Icon(Icons.location_on_outlined, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3), size: 14),
-                  SizedBox(width: 4),
+                  const SizedBox(width: 4),
                   Text(
                     '$terminal  •  $gate',
                     style: TextStyle(

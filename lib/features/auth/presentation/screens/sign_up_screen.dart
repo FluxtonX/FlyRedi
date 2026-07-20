@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import '../controllers/auth_controller.dart';
-import '../widgets/auth_textfield.dart';
+import 'package:provider/provider.dart';
+
+import '../../../../config/app_router.dart';
 import '../../../../core/widgets/custom_button.dart';
+import '../providers/auth_provider.dart';
+import '../widgets/auth_textfield.dart';
+import '../widgets/google_sign_in_button.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
@@ -12,8 +15,6 @@ class SignUpScreen extends StatefulWidget {
 }
 
 class _SignUpScreenState extends State<SignUpScreen> {
-  final AuthController _authController = Get.find<AuthController>();
-
   final TextEditingController nameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
@@ -22,9 +23,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final FocusNode emailFocusNode = FocusNode();
   final FocusNode passwordFocusNode = FocusNode();
 
-  final RxnString _nameError = RxnString();
-  final RxnString _emailError = RxnString();
-  final RxnString _passwordError = RxnString();
+  String? _nameError;
+  String? _emailError;
+  String? _passwordError;
+
+  // Independent loading states for each button
+  bool _isEmailLoading = false;
+  bool _isGoogleLoading = false;
 
   bool _validateInputs() {
     String? nameErr;
@@ -55,23 +60,67 @@ class _SignUpScreenState extends State<SignUpScreen> {
       passErr = 'Password must include letters and numbers.';
     }
 
-    _nameError.value = nameErr;
-    _emailError.value = emailErr;
-    _passwordError.value = passErr;
+    setState(() {
+      _nameError = nameErr;
+      _emailError = emailErr;
+      _passwordError = passErr;
+    });
 
     return nameErr == null && emailErr == null && passErr == null;
   }
 
   Future<void> _handleRegister() async {
-    if (_authController.isLoading.value) return;
     FocusScope.of(context).unfocus();
     if (!_validateInputs()) return;
+    if (_isEmailLoading || _isGoogleLoading) return;
 
-    await _authController.register(
+    setState(() => _isEmailLoading = true);
+    final auth = context.read<AuthProvider>();
+    final success = await auth.register(
       nameController.text.trim(),
       emailController.text.trim(),
       passwordController.text,
     );
+
+    if (!mounted) return;
+    setState(() => _isEmailLoading = false);
+
+    if (success) {
+      Navigator.pushReplacementNamed(context, AppRouter.home);
+    } else {
+      _showError(auth);
+    }
+  }
+
+  Future<void> _handleGoogleLogin() async {
+    if (_isEmailLoading || _isGoogleLoading) return;
+    FocusScope.of(context).unfocus();
+
+    setState(() => _isGoogleLoading = true);
+    final auth = context.read<AuthProvider>();
+    final success = await auth.loginWithGoogle();
+
+    if (!mounted) return;
+    setState(() => _isGoogleLoading = false);
+
+    if (success) {
+      Navigator.pushReplacementNamed(context, AppRouter.home);
+    } else {
+      _showError(auth);
+    }
+  }
+
+  void _showError(AuthProvider auth) {
+    final error = auth.errorMessage;
+    if (error != null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(error),
+          backgroundColor: const Color(0xFFE11D48),
+        ),
+      );
+      auth.clearError();
+    }
   }
 
   @override
@@ -87,8 +136,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final anyLoading = _isEmailLoading || _isGoogleLoading;
+
     return Scaffold(
-      
       body: SafeArea(
         child: SingleChildScrollView(
           keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
@@ -102,14 +152,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                SizedBox(height: 40),
+                const SizedBox(height: 40),
                 Center(
                   child: Image.asset(
                     'assets/images/flyredilogo.png',
                     height: 100,
                   ),
                 ),
-                SizedBox(height: 24),
+                const SizedBox(height: 24),
                 const Text(
                   'Create Account',
                   textAlign: TextAlign.center,
@@ -119,7 +169,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                SizedBox(height: 8),
+                const SizedBox(height: 8),
                 const Text(
                   'Get started with FlyRedi',
                   textAlign: TextAlign.center,
@@ -128,7 +178,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     fontSize: 16,
                   ),
                 ),
-                SizedBox(height: 35),
+                const SizedBox(height: 35),
 
                 // Full Name field
                 AuthTextField(
@@ -142,15 +192,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   textCapitalization: TextCapitalization.words,
                   onSubmitted: (_) => emailFocusNode.requestFocus(),
                 ),
-                Obx(() => _nameError.value != null
-                    ? Column(
-                        children: [
-                          SizedBox(height: 6),
-                          _buildFieldError(_nameError.value!),
-                        ],
-                      )
-                    : SizedBox.shrink()),
-                SizedBox(height: 18),
+                if (_nameError != null) ...[
+                  const SizedBox(height: 6),
+                  _buildFieldError(_nameError!),
+                ],
+                const SizedBox(height: 18),
 
                 // Email field
                 AuthTextField(
@@ -165,15 +211,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   enableSuggestions: true,
                   onSubmitted: (_) => passwordFocusNode.requestFocus(),
                 ),
-                Obx(() => _emailError.value != null
-                    ? Column(
-                        children: [
-                          SizedBox(height: 6),
-                          _buildFieldError(_emailError.value!),
-                        ],
-                      )
-                    : SizedBox.shrink()),
-                SizedBox(height: 18),
+                if (_emailError != null) ...[
+                  const SizedBox(height: 6),
+                  _buildFieldError(_emailError!),
+                ],
+                const SizedBox(height: 18),
 
                 // Password field
                 AuthTextField(
@@ -189,8 +231,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   enableSuggestions: false,
                   onSubmitted: (_) => _handleRegister(),
                 ),
-                SizedBox(height: 6),
-                Padding(
+                const SizedBox(height: 6),
+                const Padding(
                   padding: EdgeInsets.only(left: 4),
                   child: Text(
                     'Use at least 8 characters with letters and numbers.',
@@ -201,23 +243,47 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     ),
                   ),
                 ),
-                Obx(() => _passwordError.value != null
-                    ? Column(
-                        children: [
-                          SizedBox(height: 6),
-                          _buildFieldError(_passwordError.value!),
-                        ],
-                      )
-                    : SizedBox.shrink()),
-                SizedBox(height: 28),
+                if (_passwordError != null) ...[
+                  const SizedBox(height: 6),
+                  _buildFieldError(_passwordError!),
+                ],
+                const SizedBox(height: 28),
 
                 // Create Account button
-                Obx(() => CustomButton(
-                      title: 'Create Account',
-                      onTap: _authController.isLoading.value ? () {} : _handleRegister,
-                      isLoading: _authController.isLoading.value,
-                    )),
-                SizedBox(height: 24),
+                CustomButton(
+                  title: 'Create Account',
+                  onTap: anyLoading ? () {} : _handleRegister,
+                  isLoading: _isEmailLoading,
+                ),
+                const SizedBox(height: 24),
+
+                // OR divider
+                Row(
+                  children: [
+                    const Expanded(child: Divider(color: Color(0xFF3A3A4E), thickness: 1)),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                      child: Text(
+                        'OR',
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.4),
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: 1.2,
+                        ),
+                      ),
+                    ),
+                    const Expanded(child: Divider(color: Color(0xFF3A3A4E), thickness: 1)),
+                  ],
+                ),
+                const SizedBox(height: 24),
+
+                // Google Sign-In
+                GoogleSignInButton(
+                  onTap: anyLoading ? () {} : _handleGoogleLogin,
+                  isLoading: _isGoogleLoading,
+                ),
+                const SizedBox(height: 24),
 
                 // Already have account
                 Row(
@@ -228,7 +294,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       style: TextStyle(color: Colors.white70),
                     ),
                     GestureDetector(
-                      onTap: () => Get.toNamed('/login'),
+                      onTap: () => Navigator.pushReplacementNamed(context, AppRouter.login),
                       child: const Text(
                         'Sign In',
                         style: TextStyle(
@@ -239,7 +305,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     ),
                   ],
                 ),
-                SizedBox(height: 24),
+                const SizedBox(height: 24),
               ],
             ),
           ),
@@ -250,19 +316,15 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   Widget _buildFieldError(String message) {
     return Padding(
-      padding: EdgeInsets.only(left: 4),
+      padding: const EdgeInsets.only(left: 4),
       child: Row(
         children: [
-          Icon(
-            Icons.info_outline_rounded,
-            size: 14,
-            color: Color(0xFFE11D48),
-          ),
-          SizedBox(width: 6),
+          const Icon(Icons.info_outline_rounded, size: 14, color: Color(0xFFE11D48)),
+          const SizedBox(width: 6),
           Expanded(
             child: Text(
               message,
-              style: TextStyle(
+              style: const TextStyle(
                 color: Color(0xFFE11D48),
                 fontSize: 12,
                 fontWeight: FontWeight.w500,

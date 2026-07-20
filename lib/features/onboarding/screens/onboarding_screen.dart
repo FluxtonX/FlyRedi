@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:provider/provider.dart';
 import '../widgets/plan_selection_page.dart';
-import 'package:get/get.dart';
-import '../../auth/presentation/screens/sign_in_screen.dart';
-import '../../traveller/screens/traveller_tabs_screen.dart';
-import '../repositories/onboarding_repository.dart';
+import '../../../config/app_router.dart';
+import '../presentation/providers/onboarding_provider.dart';
 import '../../../core/widgets/custom_button.dart';
 
 class OnboardingScreen extends StatefulWidget {
@@ -15,10 +14,7 @@ class OnboardingScreen extends StatefulWidget {
 }
 
 class _OnboardingScreenState extends State<OnboardingScreen> {
-  final OnboardingRepository _onboardingRepository = OnboardingRepository();
-
   int currentIndex = 0;
-  bool _isCompleting = false;
   int get _planPageIndex => onboardingData.length;
   int get _totalPages => onboardingData.length + 1;
 
@@ -61,31 +57,24 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   ];
 
   Future<void> _finishOnboarding() async {
-    setState(() {
-      _isCompleting = true;
-    });
-
+    final onboardingProvider = context.read<OnboardingProvider>();
     try {
       final user = FirebaseAuth.instance.currentUser;
-      await _onboardingRepository.completeLocalOnboarding();
-
       if (user != null) {
-        await _onboardingRepository.completeOnboarding(
+        await onboardingProvider.completeOnboarding(
           role: 'User',
           notificationsEnabled: true,
-          displayName: user.displayName ?? user.email?.split('@').first,
+          displayName: user.displayName ?? user.email?.split('@').first ?? 'User',
         );
+      } else {
+        await onboardingProvider.completeLocalOnly();
       }
     } catch (e) {
       debugPrint('Failed to complete onboarding: $e');
     } finally {
       if (mounted) {
-        setState(() {
-          _isCompleting = false;
-        });
-
         final user = FirebaseAuth.instance.currentUser;
-        Get.offAllNamed(user == null ? '/login' : '/home');
+        Navigator.pushReplacementNamed(context, user == null ? AppRouter.login : AppRouter.home);
       }
     }
   }
@@ -109,6 +98,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   @override
   Widget build(BuildContext context) {
     final bool isPlanPage = currentIndex == _planPageIndex;
+    final isLoading = context.select<OnboardingProvider, bool>((p) => p.isLoading);
 
     return Scaffold(
       body: Stack(
@@ -132,10 +122,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 : _buildOnboardingContent(),
           ),
           // Loading overlay
-          if (_isCompleting)
+          if (isLoading)
             Container(
               color: Colors.black.withOpacity(0.5),
-              child: Center(
+              child: const Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -166,7 +156,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
     return Padding(
       key: const ValueKey('onboarding_content'),
-      padding: EdgeInsets.all(24),
+      padding: const EdgeInsets.all(24),
       child: Column(
         children: [
           const Spacer(),
@@ -185,21 +175,21 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   size: 76,
                   color: const Color(0xFFFFC229),
                 ),
-                SizedBox(height: 40),
+                const SizedBox(height: 40),
                 Text(
                   item['title'] as String,
                   textAlign: TextAlign.center,
-                  style: TextStyle(
+                  style: const TextStyle(
                     color: Colors.white,
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
                 Text(
                   item['description'] as String,
                   textAlign: TextAlign.center,
-                  style: TextStyle(
+                  style: const TextStyle(
                     color: Colors.white60,
                     fontSize: 15,
                     height: 1.5,
@@ -209,7 +199,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             ),
           ),
 
-          SizedBox(height: 40),
+          const SizedBox(height: 40),
 
           // Dots — stay in place, just animate width/color smoothly
           Row(
@@ -220,7 +210,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               return AnimatedContainer(
                 duration: const Duration(milliseconds: 300),
                 curve: Curves.easeInOut,
-                margin: EdgeInsets.symmetric(horizontal: 4),
+                margin: const EdgeInsets.symmetric(horizontal: 4),
                 width: isActive ? 28 : 8,
                 height: 8,
                 decoration: BoxDecoration(
@@ -238,7 +228,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             title: isLastContentPage ? 'Get Started' : 'Next',
             onTap: nextPage,
           ),
-          SizedBox(height: 18),
+          const SizedBox(height: 18),
 
           // Skip link — stays in place, hidden on last page
           if (!isLastContentPage)
@@ -252,7 +242,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 ),
               ),
             ),
-          SizedBox(height: 20),
+          const SizedBox(height: 20),
         ],
       ),
     );

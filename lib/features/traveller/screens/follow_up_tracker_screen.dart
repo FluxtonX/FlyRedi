@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:sky_rightz_360/core/constants/app_colors.dart';
 import '../widgets/traveller_bottom_nav.dart';
 import '../screens/flight_details_screen.dart';
+import 'traveller_tabs_screen.dart';
 
 class FollowUpTrackerScreen extends StatelessWidget {
   const FollowUpTrackerScreen({super.key});
@@ -454,7 +455,13 @@ class FollowUpTrackerScreen extends StatelessWidget {
                   // Back to Home Button
                   GestureDetector(
                     onTap: () {
-                      Navigator.popUntil(context, (route) => route.isFirst);
+                      Navigator.pushAndRemoveUntil(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const TravellerTabsScreen(initialIndex: 0),
+                        ),
+                        (route) => false,
+                      );
                     },
                     child: Container(
                       width: double.infinity,

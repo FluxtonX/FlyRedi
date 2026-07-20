@@ -5,7 +5,7 @@ import 'dart:math';
 import 'dart:async';
 import 'package:sky_rightz_360/core/constants/app_colors.dart';
 import '../models/trip_model.dart';
-import '../repositories/flight_api_service.dart';
+import '../data/datasources/flight_remote_datasource.dart';
 
 class LiveFlightTrackerScreen extends StatefulWidget {
   final TripModel? trip;
@@ -92,7 +92,7 @@ class _LiveFlightTrackerScreenState extends State<LiveFlightTrackerScreen>
 
   Future<void> _fetchLivePosition() async {
     try {
-      final data = await FlightApiService.fetchLiveFlightPosition(
+      final data = await FlightRemoteDatasource.fetchLiveFlightPosition(
         _flightNumber,
         flightDate: widget.trip?.departureDate ?? '',
       );

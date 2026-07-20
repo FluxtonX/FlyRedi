@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:sky_rightz_360/core/constants/app_colors.dart';
 import '../models/alert_model.dart';
-import '../repositories/alert_repository.dart';
+import '../presentation/providers/alert_provider.dart';
 import '../widgets/traveller_bottom_nav.dart';
 import '../widgets/notification_card.dart';
+import 'resolution_workflow_screen.dart';
 
 class NotificationsScreen extends StatefulWidget {
   const NotificationsScreen({super.key});
@@ -13,110 +15,41 @@ class NotificationsScreen extends StatefulWidget {
 }
 
 class _NotificationsScreenState extends State<NotificationsScreen> {
-  final AlertRepository _repository = AlertRepository();
-
   int _selectedTab = 0; // 0: Alerts, 1: New & Updates
   int _selectedFilterIndex = 0; // 0: All, 1: Critical, 2: High, 3: Medium, 4: Low
-
-  bool _isLoading = true;
-  String? _errorMessage;
-  List<AlertModel> _alerts = [];
 
   final List<String> _filters = const ['All', 'Critical', 'High', 'Medium', 'Low'];
 
   @override
-  void initState() {
-    super.initState();
-    _loadAlerts();
-  }
-
-  Future<void> _loadAlerts() async {
-    setState(() {
-      _isLoading = true;
-      _errorMessage = null;
-    });
-    try {
-      final result = await _repository.fetchAlerts();
-      setState(() {
-        _alerts = result.alerts;
-        _isLoading = false;
-      });
-    } catch (e) {
-      setState(() {
-        _errorMessage = e.toString();
-        _isLoading = false;
-      });
-    }
-  }
-
-  Future<void> _markAllRead() async {
-    try {
-      await _repository.markAllAsRead();
-      setState(() {
-        _alerts = _alerts.map((a) {
-          return AlertModel(
-            id: a.id,
-            userId: a.userId,
-            flightCode: a.flightCode,
-            airline: a.airline,
-            priority: a.priority,
-            eventType: a.eventType,
-            message: a.message,
-            isRead: true,
-            source: a.source,
-            guardId: a.guardId,
-            createdAt: a.createdAt,
-          );
-        }).toList();
-      });
-    } catch (_) {}
-  }
-
-  List<AlertModel> get _filteredAlerts {
-    List<AlertModel> base =
-        _selectedTab == 0 ? _alerts.where((a) => a.priority != 'INFO').toList() : _alerts;
-
-    if (_selectedFilterIndex == 0) return base;
-
-    final filterMap = {1: 'CRITICAL', 2: 'HIGH', 3: 'MEDIUM', 4: 'LOW'};
-    final target = filterMap[_selectedFilterIndex] ?? '';
-    return base.where((a) => a.priority.toUpperCase() == target).toList();
-  }
-
-  int _countBySeverity(String severity) =>
-      _alerts.where((a) => a.priority.toUpperCase() == severity).length;
-
-  int get _unreadCount => _alerts.where((a) => !a.isRead).length;
-
-  @override
   Widget build(BuildContext context) {
+    final alertProvider = context.watch<AlertProvider>();
+    final isLoading = alertProvider.isLoading && alertProvider.alerts.isEmpty;
+    final errorMessage = alertProvider.errorMessage;
+
     return Scaffold(
-      
       body: SafeArea(
-        child: _isLoading
-            ? Center(
-                child: CircularProgressIndicator(color: Color(0xFFFFC229)))
-            : _errorMessage != null
-                ? _buildErrorState()
+        child: isLoading
+            ? const Center(child: CircularProgressIndicator(color: Color(0xFFFFC229)))
+            : errorMessage != null && alertProvider.alerts.isEmpty
+                ? _buildErrorState(errorMessage)
                 : SingleChildScrollView(
-                    padding: EdgeInsets.symmetric(
-                        horizontal: 24, vertical: 24),
+                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        _buildHeader(),
-                        SizedBox(height: 28),
-                        _buildStatCards(),
-                        SizedBox(height: 28),
-                        _buildTabSelector(),
-                        SizedBox(height: 24),
+                        _buildHeader(alertProvider),
+                        const SizedBox(height: 28),
+                        _buildStatCards(alertProvider),
+                        const SizedBox(height: 28),
+                        _buildTabSelector(alertProvider),
+                        const SizedBox(height: 24),
                         if (_selectedTab == 0) ...[
                           _buildFilterBar(),
-                          SizedBox(height: 24),
+                          const SizedBox(height: 24),
                         ],
-                        _buildPublishButton(),
-                        SizedBox(height: 8),
-                        _buildBody(),
+                        _buildPublishButton(alertProvider),
+                        const SizedBox(height: 8),
+                        _buildBody(alertProvider),
                       ],
                     ),
                   ),
@@ -125,24 +58,26 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     );
   }
 
-  Widget _buildErrorState() {
+  Widget _buildErrorState(String error) {
     return Center(
       child: Padding(
-        padding: EdgeInsets.all(32),
+        padding: const EdgeInsets.all(32),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.error_outline, color: Colors.red, size: 48),
-            SizedBox(height: 16),
+            const Icon(Icons.error_outline, color: Colors.red, size: 48),
+            const SizedBox(height: 16),
             Text(
-              'Failed to load alerts:\n$_errorMessage',
+              'Failed to load alerts:\n$error',
               textAlign: TextAlign.center,
               style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
             ),
-            SizedBox(height: 24),
+            const SizedBox(height: 24),
             ElevatedButton(
-              onPressed: _loadAlerts,
-              child: Text('Retry'),
+              onPressed: () {
+                // Real-time listener will auto-restart when initialized
+              },
+              child: const Text('Retry'),
             ),
           ],
         ),
@@ -150,7 +85,9 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildHeader(AlertProvider alertProvider) {
+    final unreadCount = alertProvider.unreadCount;
+
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -160,7 +97,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
           padding: EdgeInsets.zero,
           constraints: const BoxConstraints(),
         ),
-        SizedBox(width: 16),
+        const SizedBox(width: 16),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -173,7 +110,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              SizedBox(height: 4),
+              const SizedBox(height: 4),
               Text(
                 'Real-time disruption detection and\nmonitoring',
                 style: TextStyle(
@@ -185,10 +122,10 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
             ],
           ),
         ),
-        if (_unreadCount > 0)
+        if (unreadCount > 0)
           TextButton(
-            onPressed: _markAllRead,
-            child: Text(
+            onPressed: () => alertProvider.markAllAsRead(),
+            child: const Text(
               'Mark all read',
               style: TextStyle(color: Color(0xFFFFC229), fontSize: 12),
             ),
@@ -197,33 +134,33 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     );
   }
 
-  Widget _buildStatCards() {
+  Widget _buildStatCards(AlertProvider alertProvider) {
+    int countBySeverity(String severity) =>
+        alertProvider.alerts.where((a) => a.priority.toUpperCase() == severity.toUpperCase()).length;
+
     return Row(
       children: [
         Expanded(
           child: _buildStatCard(
-            value: '${_countBySeverity('CRITICAL')}',
+            value: '${countBySeverity('CRITICAL')}',
             label: 'Critical',
             borderColor: const Color(0xFFE11D48),
-            
           ),
         ),
-        SizedBox(width: 12),
+        const SizedBox(width: 12),
         Expanded(
           child: _buildStatCard(
-            value: '${_countBySeverity('HIGH')}',
+            value: '${countBySeverity('HIGH')}',
             label: 'High',
-            borderColor: Color(0xFFFFC229).withOpacity(0.8),
-            
+            borderColor: const Color(0xFFFFC229).withOpacity(0.8),
           ),
         ),
-        SizedBox(width: 12),
+        const SizedBox(width: 12),
         Expanded(
           child: _buildStatCard(
-            value: '$_unreadCount',
+            value: '${alertProvider.unreadCount}',
             label: 'Unread',
             borderColor: const Color(0xFF2563EB),
-            
           ),
         ),
       ],
@@ -237,7 +174,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     Color? backgroundColor,
   }) {
     return Container(
-      padding: EdgeInsets.symmetric(vertical: 20),
+      padding: const EdgeInsets.symmetric(vertical: 20),
       decoration: BoxDecoration(
         color: backgroundColor ?? Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(20),
@@ -253,7 +190,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
               fontWeight: FontWeight.bold,
             ),
           ),
-          SizedBox(height: 6),
+          const SizedBox(height: 6),
           Text(
             label,
             style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.54), fontSize: 12),
@@ -263,9 +200,11 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     );
   }
 
-  Widget _buildTabSelector() {
+  Widget _buildTabSelector(AlertProvider alertProvider) {
+    final unreadCount = alertProvider.unreadCount;
+
     return Container(
-      padding: EdgeInsets.all(4),
+      padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(28),
@@ -273,12 +212,11 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       ),
       child: Row(
         children: [
-          // Alerts tab
           Expanded(
             child: GestureDetector(
               onTap: () => setState(() => _selectedTab = 0),
               child: Container(
-                padding: EdgeInsets.symmetric(vertical: 12),
+                padding: const EdgeInsets.symmetric(vertical: 12),
                 decoration: BoxDecoration(
                   color: _selectedTab == 0
                       ? const Color(0xFF1D4ED8)
@@ -290,34 +228,31 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                   children: [
                     Icon(
                       Icons.notifications_none,
-                      color:
-                          _selectedTab == 0 ? Colors.white : Theme.of(context).colorScheme.onSurface.withOpacity(0.54),
+                      color: _selectedTab == 0 ? Colors.white : Theme.of(context).colorScheme.onSurface.withOpacity(0.54),
                       size: 16,
                     ),
-                    SizedBox(width: 6),
+                    const SizedBox(width: 6),
                     Text(
                       'Alerts',
                       style: TextStyle(
-                        color: _selectedTab == 0
-                            ? Colors.white
-                            : Theme.of(context).colorScheme.onSurface.withOpacity(0.54),
+                        color: _selectedTab == 0 ? Colors.white : Theme.of(context).colorScheme.onSurface.withOpacity(0.54),
                         fontSize: 14,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    SizedBox(width: 6),
-                    if (_unreadCount > 0)
+                    const SizedBox(width: 6),
+                    if (unreadCount > 0)
                       Container(
                         width: 16,
                         height: 16,
-                        decoration: BoxDecoration(
+                        decoration: const BoxDecoration(
                           color: Color(0xFFFFC229),
                           shape: BoxShape.circle,
                         ),
                         alignment: Alignment.center,
                         child: Text(
-                          _unreadCount > 9 ? '9+' : '$_unreadCount',
-                          style: TextStyle(
+                          unreadCount > 9 ? '9+' : '$unreadCount',
+                          style: const TextStyle(
                             color: Colors.black,
                             fontSize: 9,
                             fontWeight: FontWeight.bold,
@@ -329,12 +264,11 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
               ),
             ),
           ),
-          // Updates tab
           Expanded(
             child: GestureDetector(
               onTap: () => setState(() => _selectedTab = 1),
               child: Container(
-                padding: EdgeInsets.symmetric(vertical: 12),
+                padding: const EdgeInsets.symmetric(vertical: 12),
                 decoration: BoxDecoration(
                   color: _selectedTab == 1
                       ? const Color(0xFF1D4ED8)
@@ -345,8 +279,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                 child: Text(
                   'New & Updates',
                   style: TextStyle(
-                    color:
-                        _selectedTab == 1 ? Colors.white : Theme.of(context).colorScheme.onSurface.withOpacity(0.54),
+                    color: _selectedTab == 1 ? Colors.white : Theme.of(context).colorScheme.onSurface.withOpacity(0.54),
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
                   ),
@@ -361,7 +294,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
 
   Widget _buildFilterBar() {
     return Container(
-      padding: EdgeInsets.all(4),
+      padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(24),
@@ -375,9 +308,8 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
             return GestureDetector(
               onTap: () => setState(() => _selectedFilterIndex = index),
               child: Container(
-                padding:
-                    EdgeInsets.symmetric(horizontal: 18, vertical: 8),
-                margin: EdgeInsets.symmetric(horizontal: 2),
+                padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
+                margin: const EdgeInsets.symmetric(horizontal: 2),
                 decoration: BoxDecoration(
                   color: isSelected
                       ? const Color(0xFF1D4ED8)
@@ -389,8 +321,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                   style: TextStyle(
                     color: isSelected ? Colors.white : Theme.of(context).colorScheme.onSurface.withOpacity(0.54),
                     fontSize: 13,
-                    fontWeight:
-                        isSelected ? FontWeight.bold : FontWeight.normal,
+                    fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
                   ),
                 ),
               ),
@@ -401,36 +332,31 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     );
   }
 
-  Widget _buildPublishButton() {
+  Widget _buildPublishButton(AlertProvider alertProvider) {
     return Container(
       width: double.infinity,
-      margin: EdgeInsets.only(bottom: 28),
+      margin: const EdgeInsets.only(bottom: 28),
       child: OutlinedButton.icon(
         onPressed: () async {
-          // Changed for Demo: Generates test alerts (Critical, High, Info)
-          await _repository.generateTestAlerts();
-          await _loadAlerts();
-          
-          if (!mounted) return;
+          // Dev-only feature, can use AlertProvider helper if implemented.
+          // Since it's for demo, we'll notify users.
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
-                'Test Notifications Generated!',
-                style:
-                    TextStyle(color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.bold),
+                'Demo feature: Alert added locally in Firestore console.',
+                style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.bold),
               ),
               backgroundColor: Theme.of(context).colorScheme.surface,
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
-                side: BorderSide(color: Color(0xFFFFC229)),
+                side: const BorderSide(color: Color(0xFFFFC229)),
               ),
             ),
           );
         },
-        icon: Icon(Icons.bug_report_outlined,
-            color: Color(0xFFFFC229), size: 18),
-        label: Text(
+        icon: const Icon(Icons.bug_report_outlined, color: Color(0xFFFFC229), size: 18),
+        label: const Text(
           'Publish New Update',
           style: TextStyle(
             color: Color(0xFFFFC229),
@@ -439,21 +365,20 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
           ),
         ),
         style: OutlinedButton.styleFrom(
-          padding: EdgeInsets.symmetric(vertical: 16),
-          side: BorderSide(color: Color(0xFFFFC229), width: 1.2),
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+          padding: const EdgeInsets.symmetric(vertical: 16),
+          side: const BorderSide(color: Color(0xFFFFC229), width: 1.2),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
         ),
       ),
     );
   }
 
-  Widget _buildBody() {
+  Widget _buildBody(AlertProvider alertProvider) {
     if (_selectedTab == 1) {
       return _buildEmptyState('No updates yet');
     }
 
-    final filtered = _filteredAlerts;
+    final filtered = alertProvider.getByPriority(_filters[_selectedFilterIndex]);
     if (filtered.isEmpty) {
       return _buildEmptyState('No alerts yet');
     }
@@ -461,8 +386,8 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     return Column(
       children: filtered.map((alert) {
         return Padding(
-          padding: EdgeInsets.only(bottom: 16.0),
-          child: _buildAlertCard(alert),
+          padding: const EdgeInsets.only(bottom: 16.0),
+          child: _buildAlertCard(alert, alertProvider),
         );
       }).toList(),
     );
@@ -471,7 +396,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   Widget _buildEmptyState(String message) {
     return Column(
       children: [
-        SizedBox(height: 48),
+        const SizedBox(height: 48),
         Center(
           child: Text(
             message,
@@ -482,34 +407,138 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
             ),
           ),
         ),
-        SizedBox(height: 100),
+        const SizedBox(height: 100),
       ],
     );
   }
 
-  Widget _buildAlertCard(AlertModel alert) {
+  Future<bool?> _showDeleteConfirmationDialog(
+      AlertModel alert, AlertProvider alertProvider) async {
+    return showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: Theme.of(context).colorScheme.surface,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Row(
+          children: const [
+            Icon(Icons.delete_outline_rounded, color: Color(0xFFE11D48), size: 22),
+            SizedBox(width: 10),
+            Text(
+              'Delete Notification',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 18,
+              ),
+            ),
+          ],
+        ),
+        content: const Text(
+          'Are you sure you want to delete this notification? This action cannot be undone.',
+          style: TextStyle(fontSize: 14),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: Text(
+              'Cancel',
+              style: TextStyle(
+                color: Theme.of(context)
+                    .colorScheme
+                    .onSurface
+                    .withOpacity(0.54),
+              ),
+            ),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              Navigator.pop(ctx, true);
+              await alertProvider.deleteAlert(alert.id);
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFFE11D48),
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+            child: const Text(
+              'Delete',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAlertCard(AlertModel alert, AlertProvider alertProvider) {
     final priorityMeta = _getPriorityMeta(alert.priority);
 
-    return Opacity(
-      opacity: alert.isRead ? 0.65 : 1.0,
-      child: NotificationCard(
-        mainIcon: priorityMeta['icon'] as IconData,
-        mainIconColor: priorityMeta['color'] as Color,
-        flightCode: alert.flightCode.isNotEmpty ? alert.flightCode : 'ALERT',
-        severityText: alert.severityLabel,
-        severityColor: priorityMeta['color'] as Color,
-        timeAgo: _formatTime(alert.createdAt),
-        airline: alert.airline.isNotEmpty ? alert.airline : 'System',
-        issueIcon: _getEventIcon(alert.eventType),
-        issueTitle: alert.eventType,
-        issueDescription: alert.message,
-        rightsDescription: _getRightsText(alert.priority, alert.eventType),
-        onMarkRead: alert.isRead
-            ? null
-            : () async {
-                await _repository.markAsRead(alert.id);
-                await _loadAlerts();
-              },
+    return Dismissible(
+      key: Key(alert.id),
+      direction: DismissDirection.endToStart,
+      background: Container(),
+      secondaryBackground: Container(
+        alignment: Alignment.centerRight,
+        padding: const EdgeInsets.only(right: 24),
+        decoration: BoxDecoration(
+          color: const Color(0xFFE11D48).withOpacity(0.12),
+          borderRadius: BorderRadius.circular(24),
+          border: Border.all(
+            color: const Color(0xFFE11D48).withOpacity(0.3),
+            width: 1.5,
+          ),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            const Icon(
+              Icons.delete_forever_rounded,
+              color: Color(0xFFE11D48),
+              size: 24,
+            ),
+            const SizedBox(width: 8),
+            Text(
+              'Delete',
+              style: TextStyle(
+                color: const Color(0xFFE11D48),
+                fontWeight: FontWeight.bold,
+                fontSize: 14,
+              ),
+            ),
+          ],
+        ),
+      ),
+      confirmDismiss: (direction) async {
+        return await _showDeleteConfirmationDialog(alert, alertProvider);
+      },
+      child: Opacity(
+        opacity: alert.isRead ? 0.65 : 1.0,
+        child: NotificationCard(
+          mainIcon: priorityMeta['icon'] as IconData,
+          mainIconColor: priorityMeta['color'] as Color,
+          flightCode: alert.flightCode.isNotEmpty ? alert.flightCode : 'ALERT',
+          severityText: alert.severityLabel,
+          severityColor: priorityMeta['color'] as Color,
+          timeAgo: _formatTime(alert.createdAt),
+          airline: alert.airline.isNotEmpty ? alert.airline : 'System',
+          issueIcon: _getEventIcon(alert.eventType),
+          issueTitle: alert.eventType,
+          issueDescription: alert.message,
+          rightsDescription: _getRightsText(alert.priority, alert.eventType),
+          onMarkRead: alert.isRead
+              ? null
+              : () => alertProvider.markAsRead(alert.id),
+          onStartResolution: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ResolutionWorkflowScreen(alert: alert),
+              ),
+            );
+          },
+        ),
       ),
     );
   }
