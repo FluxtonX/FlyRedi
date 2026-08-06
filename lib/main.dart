@@ -16,6 +16,7 @@ void main() async {
   );
   AppLogger.info('Firebase initialized');
 
+
   final storageService = StorageService();
   await storageService.init();
   AppLogger.info('StorageService initialized');

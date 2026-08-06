@@ -6,6 +6,7 @@ import '../widgets/resolve_header_gradient.dart';
 import '../widgets/case_card.dart';
 import '../models/claim_model.dart';
 import '../presentation/providers/claim_provider.dart';
+import '../presentation/providers/trips_provider.dart';
 import '../widgets/skeleton_box.dart';
 
 class ResolveDashboardScreen extends StatefulWidget {
@@ -277,24 +278,16 @@ class _ResolveDashboardScreenState extends State<ResolveDashboardScreen> {
     final claims = claimProvider.claims;
     final isLoading = claimProvider.isLoading && claims.isEmpty;
 
-    final activeCases = claims.where((c) => c.status.toUpperCase() != 'COMPLETED' && c.status.toUpperCase() != 'REJECTED').toList();
+    // Use user's real trips for Active Cases
+    final tripsProvider = context.watch<TripsProvider>();
+    final trips = tripsProvider.trips;
+    final isTripsLoading = tripsProvider.isLoading;
+
     final completedCases = claims.where((c) => c.status.toUpperCase() == 'COMPLETED' || c.status.toUpperCase() == 'REJECTED').toList();
-    bool isEmptyActive = activeCases.isEmpty;
     bool isEmptyCompleted = completedCases.isEmpty;
 
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: _showReportDisruptionSheet,
-        icon: const Icon(Icons.add, color: Colors.black),
-        label: const Text(
-          'Report Disruption',
-          style: TextStyle(
-            color: Colors.black,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ),
       body: SafeArea(
         bottom: false,
         child: RefreshIndicator(
@@ -324,9 +317,9 @@ class _ResolveDashboardScreenState extends State<ResolveDashboardScreen> {
                             ),
                           ),
                           Text(
-                            isEmptyActive
+                            trips.isEmpty
                                 ? '0 in progress'
-                                : '${activeCases.length} in progress',
+                                : '${trips.length} in progress',
                             style: TextStyle(
                               color: Theme.of(context).colorScheme.onSurface.withOpacity(0.38),
                               fontSize: 14,
@@ -335,7 +328,7 @@ class _ResolveDashboardScreenState extends State<ResolveDashboardScreen> {
                         ],
                       ),
                       const SizedBox(height: 10),
-                      if (isLoading)
+                      if (isTripsLoading)
                         Container(
                           height: 140,
                           alignment: Alignment.center,
@@ -343,7 +336,7 @@ class _ResolveDashboardScreenState extends State<ResolveDashboardScreen> {
                             valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFFFC229)),
                           ),
                         )
-                      else if (isEmptyActive)
+                      else if (trips.isEmpty)
                         Container(
                           padding: const EdgeInsets.symmetric(vertical: 36),
                           decoration: BoxDecoration(
@@ -354,23 +347,39 @@ class _ResolveDashboardScreenState extends State<ResolveDashboardScreen> {
                             ),
                           ),
                           alignment: Alignment.center,
-                          child: Text(
-                            'No active cases',
-                            style: TextStyle(
-                              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
-                              fontSize: 13,
-                              fontWeight: FontWeight.bold,
-                            ),
+                          child: Column(
+                            children: [
+                              Icon(Icons.flight_takeoff_rounded,
+                                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.25),
+                                  size: 36),
+                              const SizedBox(height: 10),
+                              Text(
+                                'No flights added yet',
+                                style: TextStyle(
+                                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                'Add a trip from the Trips tab',
+                                style: TextStyle(
+                                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.25),
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ],
                           ),
                         )
                       else
-                        ...activeCases.map((claim) => CaseCard(
-                              flightCode: claim.flightCode,
-                              airline: claim.airline,
-                              disruptionType: claim.disruptionType,
-                              status: _mapClaimStatus(claim.status),
-                              progress: claim.progress,
-                              stepText: 'Processing claim',
+                        ...trips.map((trip) => CaseCard(
+                              flightCode: trip.flightNumber,
+                              airline: '${trip.origin} → ${trip.destination}',
+                              disruptionType: trip.departureDate,
+                              status: CaseStatus.inProgress,
+                              progress: 0.0,
+                              stepText: 'Flight tracked',
                             )),
                       const SizedBox(height: 32),
                       Text(

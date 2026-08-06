@@ -33,6 +33,7 @@ class _SentinelMonitorScreenState extends State<SentinelMonitorScreen> {
   String? _errorMessage;
   StreamSubscription<RemoteMessage>? _fcmSubscription;
   FlightStatusModel? _liveStatus;
+  Timer? _refreshTimer; // Auto-refresh timer for live tracking
 
   @override
   void initState() {
@@ -48,11 +49,18 @@ class _SentinelMonitorScreenState extends State<SentinelMonitorScreen> {
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _loadTrips();
+      // Auto-refresh every 30 seconds for real-time tracking
+      _refreshTimer = Timer.periodic(const Duration(seconds: 30), (_) {
+        if (mounted) {
+          _loadTrips(forceRefresh: true);
+        }
+      });
     });
   }
 
   @override
   void dispose() {
+    _refreshTimer?.cancel();
     _fcmSubscription?.cancel();
     super.dispose();
   }
@@ -109,6 +117,8 @@ class _SentinelMonitorScreenState extends State<SentinelMonitorScreen> {
           final live = await FlightRemoteDatasource.fetchFlightStatus(
             selected.flightNumber,
             flightDate: dateParam,
+            expectedOrigin: selected.origin,
+            expectedDestination: selected.destination,
             forceRefresh: forceRefresh,
           );
           _liveStatus = live;
@@ -639,6 +649,8 @@ class _SentinelMonitorScreenState extends State<SentinelMonitorScreen> {
                   final live = await FlightRemoteDatasource.fetchFlightStatus(
                     trip.flightNumber,
                     flightDate: dateParam,
+                    expectedOrigin: trip.origin,
+                    expectedDestination: trip.destination,
                   );
                   if (mounted && _selectedTrip?.id == trip.id) {
                     setState(() {

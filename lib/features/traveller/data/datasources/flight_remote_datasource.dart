@@ -188,7 +188,11 @@ class FlightStatusModel {
     this.callsign,
   });
 
-  factory FlightStatusModel.fromJson(Map<String, dynamic> json) {
+  factory FlightStatusModel.fromJson(
+    Map<String, dynamic> json, {
+    String expectedOrigin = '',
+    String expectedDestination = '',
+  }) {
     final Map<String, dynamic> flightData;
     if (json.containsKey('response')) {
       final resp = json['response'];
@@ -196,7 +200,27 @@ class FlightStatusModel {
         if (resp.isEmpty) {
           throw Exception('Flight not found');
         }
-        flightData = resp.first as Map<String, dynamic>;
+        
+        // Find matching leg by checking origin and destination
+        Map<String, dynamic>? matchingFlight;
+        if (expectedOrigin.isNotEmpty || expectedDestination.isNotEmpty) {
+          for (final item in resp) {
+            if (item is Map) {
+              final depIata = (item['dep_iata'] as String? ?? '').trim().toUpperCase();
+              final arrIata = (item['arr_iata'] as String? ?? '').trim().toUpperCase();
+              
+              final originMatch = expectedOrigin.isEmpty || depIata == expectedOrigin.trim().toUpperCase();
+              final destMatch = expectedDestination.isEmpty || arrIata == expectedDestination.trim().toUpperCase();
+              
+              if (originMatch && destMatch) {
+                matchingFlight = Map<String, dynamic>.from(item);
+                break;
+              }
+            }
+          }
+        }
+        
+        flightData = matchingFlight ?? Map<String, dynamic>.from(resp.first as Map);
       } else if (resp is Map) {
         flightData = Map<String, dynamic>.from(resp);
       } else {
@@ -214,7 +238,24 @@ class FlightStatusModel {
     final arrEst = (flightData['arr_estimated'] as String? ?? flightData['arr_time'] as String? ?? '').replaceAll(' ', 'T');
     final arrAct = (flightData['arr_actual'] as String? ?? '').replaceAll(' ', 'T');
 
-    final depDelay = (flightData['dep_delayed'] as num?)?.toInt() ?? (flightData['delayed'] as num?)?.toInt() ?? 0;
+    // Calculate delay minutes by comparing estimated departure vs scheduled departure times
+    int computedDelay = 0;
+    try {
+      if (depTime.isNotEmpty && depEst.isNotEmpty) {
+        final schedDt = DateTime.parse(depTime);
+        final estDt = DateTime.parse(depEst);
+        final diff = estDt.difference(schedDt).inMinutes;
+        if (diff > 0) {
+          computedDelay = diff;
+        }
+      }
+    } catch (_) {}
+
+    int depDelay = (flightData['dep_delayed'] as num?)?.toInt() ?? (flightData['delayed'] as num?)?.toInt() ?? 0;
+    if (computedDelay > depDelay) {
+      depDelay = computedDelay;
+    }
+
     final arrDelay = (flightData['arr_delayed'] as num?)?.toInt() ?? 0;
 
     final departure = FlightStatusEndpoint(
@@ -334,9 +375,12 @@ class FlightStatusModel {
   String get statusLabel {
     switch (status.toLowerCase()) {
       case 'active':
+      case 'en-route':
+      case 'airborne':
+      case 'takeoff':
         return 'In Flight';
       case 'active_delayed':
-        return 'Active (Delayed)';
+        return 'In Flight (Delayed)';
       case 'landed':
         return 'Landed';
       case 'landed_estimated':
@@ -351,6 +395,7 @@ class FlightStatusModel {
         return 'Incident';
       case 'scheduled':
       default:
+        if (delayMinutes > 0) return 'Delayed';
         return 'Scheduled';
     }
   }
@@ -363,6 +408,9 @@ class FlightStatusModel {
   bool get isCancelled => status.toLowerCase() == 'cancelled';
   bool get isActive =>
       status.toLowerCase() == 'active' ||
+      status.toLowerCase() == 'en-route' ||
+      status.toLowerCase() == 'airborne' ||
+      status.toLowerCase() == 'takeoff' ||
       status.toLowerCase() == 'active_delayed';
   bool get isLanded =>
       status.toLowerCase() == 'landed' ||
@@ -467,7 +515,7 @@ class FlightRemoteDatasource {
   static const String _baseUrl = 'https://airlabs.co/api/v9/flight';
   static const String _apiKey = 'b0e8d96e-e374-41b5-9e83-4191a2980476';
 
-  static const Duration _cacheTtl = Duration(seconds: 60);
+  static const Duration _cacheTtl = Duration(seconds: 30); // Shorter TTL for active-flight accuracy
 
   // Memory Caches
   static final Map<String, _CacheEntry<FlightStatusModel>> _statusCache = {};
@@ -498,6 +546,8 @@ class FlightRemoteDatasource {
   static Future<FlightStatusModel> fetchFlightStatus(
     String flightNumber, {
     String flightDate = '',
+    String expectedOrigin = '',
+    String expectedDestination = '',
     bool forceRefresh = false,
   }) async {
     final key = '${flightNumber.trim().toUpperCase().replaceAll(' ', '')}_$flightDate';
@@ -554,7 +604,11 @@ class FlightRemoteDatasource {
         }
 
         try {
-          final model = FlightStatusModel.fromJson(json);
+          final model = FlightStatusModel.fromJson(
+            json,
+            expectedOrigin: expectedOrigin,
+            expectedDestination: expectedDestination,
+          );
           // Store in cache
           _statusCache[key] = _CacheEntry(model);
           return model;

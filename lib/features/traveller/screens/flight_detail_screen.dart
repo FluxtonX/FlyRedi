@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:sky_rightz_360/core/constants/app_colors.dart';
 import '../widgets/traveller_bottom_nav.dart';
@@ -22,11 +23,22 @@ class _FlightDetailScreenState extends State<FlightDetailScreen> {
   FlightStatusModel? _liveStatus;
   bool _isLoading = true;
   String? _errorMessage;
+  Timer? _refreshTimer;
 
   @override
   void initState() {
     super.initState();
     _fetchLiveDetails();
+    // Auto-refresh every 30 seconds for live tracking
+    _refreshTimer = Timer.periodic(const Duration(seconds: 30), (_) {
+      if (mounted) _fetchLiveDetails(forceRefresh: true);
+    });
+  }
+
+  @override
+  void dispose() {
+    _refreshTimer?.cancel();
+    super.dispose();
   }
 
   static String _toYMD(String raw) {
@@ -51,6 +63,8 @@ class _FlightDetailScreenState extends State<FlightDetailScreen> {
       final status = await FlightRemoteDatasource.fetchFlightStatus(
         widget.trip.flightNumber,
         flightDate: dateParam,
+        expectedOrigin: widget.trip.origin,
+        expectedDestination: widget.trip.destination,
         forceRefresh: forceRefresh,
       );
       if (mounted) {

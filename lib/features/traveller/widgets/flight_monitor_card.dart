@@ -134,6 +134,8 @@ class _FlightMonitorCardState extends State<FlightMonitorCard> {
       final result = await FlightRemoteDatasource.fetchFlightStatus(
         trip.flightNumber,
         flightDate: dateParam,
+        expectedOrigin: trip.origin,
+        expectedDestination: trip.destination,
       );
       debugPrint('[FlightMonitorCard] API status=${result.status} delay=${result.delayMinutes}');
       if (mounted) {

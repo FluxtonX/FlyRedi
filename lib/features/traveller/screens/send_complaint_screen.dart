@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:permission_handler/permission_handler.dart';
 import '../widgets/traveller_bottom_nav.dart';
 import 'traveller_tabs_screen.dart';
 
@@ -118,32 +119,87 @@ class _SendComplaintScreenState extends State<SendComplaintScreen> {
           );
         }
       } else if (_selectedOption == 2) {
-        // Download PDF / Text Document (Real file writing + triggering native save sheet)
+        // Download PDF & Text directly to phone storage
         try {
-          final tempDir = await getTemporaryDirectory();
-          final file = File('${tempDir.path}/NCAA_Flight_Complaint.pdf');
-          await file.writeAsString(widget.emailBody);
+          Directory? downloadDir;
+          if (Platform.isAndroid) {
+            // Request storage permission
+            final status = await Permission.storage.request();
+            if (status.isGranted) {
+              downloadDir = Directory('/storage/emulated/0/Download');
+              // Create folder if it doesn't exist
+              if (!await downloadDir.exists()) {
+                await downloadDir.create(recursive: true);
+              }
+            } else {
+              if (mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Storage permission is required to save directly to Downloads!'),
+                    backgroundColor: Color(0xFF1E293B),
+                  ),
+                );
+              }
+              setState(() {
+                _isProcessing = false;
+              });
+              return;
+            }
+          } else {
+            // iOS Documents directory (made visible in Files app via Info.plist keys)
+            downloadDir = await getApplicationDocumentsDirectory();
+          }
 
-          if (mounted) {
-            // Trigger native dialog allowing 'Save to Files' or 'Copy to...'
-            await Share.shareXFiles(
-              [XFile(file.path)],
-              subject: 'NCAA Flight Complaint PDF',
-              text: 'Save your Flight Complaint PDF to your device',
-            );
+          if (downloadDir != null) {
+            final timestamp = DateTime.now().millisecondsSinceEpoch;
+            final pdfFile = File('${downloadDir.path}/NCAA_Flight_Complaint_$timestamp.pdf');
+            final txtFile = File('${downloadDir.path}/NCAA_Flight_Complaint_$timestamp.txt');
 
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Use the system dialog to save the PDF to your File Manager!'),
-                backgroundColor: Color(0xFF1E293B),
-              ),
-            );
+            // Write content to both files
+            await pdfFile.writeAsString(widget.emailBody);
+            await txtFile.writeAsString(widget.emailBody);
+
+            if (mounted) {
+              showDialog(
+                context: context,
+                builder: (context) => AlertDialog(
+                  backgroundColor: Theme.of(context).colorScheme.surface,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                  title: Row(
+                    children: const [
+                      Icon(Icons.check_circle, color: Color(0xFF10B981)),
+                      SizedBox(width: 10),
+                      Text('Saved to Storage!', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                    ],
+                  ),
+                  content: Text(
+                    Platform.isAndroid
+                        ? 'Files downloaded directly to your phone\'s "Downloads" folder:\n\n'
+                            '• NCAA_Flight_Complaint_$timestamp.pdf\n'
+                            '• NCAA_Flight_Complaint_$timestamp.txt\n\n'
+                            'Open your File Manager / Downloads app to view them.'
+                        : 'Files saved to your device. Open the iOS "Files" app and look under "On My iPhone" -> "Sky Rightz 360" to find:\n\n'
+                            '• NCAA_Flight_Complaint_$timestamp.pdf\n'
+                            '• NCAA_Flight_Complaint_$timestamp.txt',
+                    style: const TextStyle(fontSize: 14, height: 1.4),
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: const Text('OK', style: TextStyle(color: Color(0xFFFFC229), fontWeight: FontWeight.bold)),
+                    ),
+                  ],
+                ),
+              );
+            }
+          } else {
+            throw Exception('Storage directory not available');
           }
         } catch (e) {
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text('Failed to save file: $e'),
+                content: Text('Failed to download directly: $e'),
                 backgroundColor: const Color(0xFF1E293B),
               ),
             );

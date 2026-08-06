@@ -36,12 +36,12 @@ class NotificationCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.all(20),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14), // Reduced outer padding
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface,
-        borderRadius: BorderRadius.circular(24),
+        color: const Color(0xFF102246), // Deep navy blue matching screenshot
+        borderRadius: BorderRadius.circular(20), // Slightly smaller border radius
         border: Border.all(
-          color: Theme.of(context).colorScheme.outline,
+          color: Colors.white.withOpacity(0.08), // Extremely subtle light border
         ),
       ),
       child: Column(
@@ -51,18 +51,18 @@ class NotificationCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
-                padding: EdgeInsets.all(10),
+                padding: const EdgeInsets.all(8), // Reduced icon padding
                 decoration: BoxDecoration(
-                  color: mainIconColor.withOpacity(0.15),
+                  color: mainIconColor.withOpacity(0.12),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
                   mainIcon,
                   color: mainIconColor,
-                  size: 20,
+                  size: 18, // Reduced icon size
                 ),
               ),
-              SizedBox(width: 16),
+              const SizedBox(width: 12), // Reduced spacing
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -74,27 +74,27 @@ class NotificationCard extends StatelessWidget {
                           children: [
                             Text(
                               flightCode,
-                              style: TextStyle(
-                                color: Theme.of(context).colorScheme.onSurface,
-                                fontSize: 18,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 16, // Slightly smaller font
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
-                            SizedBox(width: 12),
+                            const SizedBox(width: 8), // Reduced spacing
                             Container(
-                              padding: EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3), // Reduced padding
                               decoration: BoxDecoration(
                                 color: severityColor.withOpacity(0.15),
-                                borderRadius: BorderRadius.circular(12),
+                                borderRadius: BorderRadius.circular(10),
                                 border: Border.all(
-                                  color: severityColor.withOpacity(0.5),
+                                  color: severityColor.withOpacity(0.3),
                                 ),
                               ),
                               child: Text(
-                                severityText,
+                                severityText.toUpperCase(),
                                 style: TextStyle(
                                   color: severityColor,
-                                  fontSize: 10,
+                                  fontSize: 9, // Slightly smaller font
                                   fontWeight: FontWeight.bold,
                                   letterSpacing: 0.5,
                                 ),
@@ -105,18 +105,18 @@ class NotificationCard extends StatelessWidget {
                         Text(
                           timeAgo,
                           style: TextStyle(
-                            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.54),
-                            fontSize: 12,
+                            color: Colors.white.withOpacity(0.4),
+                            fontSize: 11, // Slightly smaller font
                           ),
                         ),
                       ],
                     ),
-                    SizedBox(height: 4),
+                    const SizedBox(height: 2), // Reduced spacing
                     Text(
                       airline,
                       style: TextStyle(
-                        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.54),
-                        fontSize: 14,
+                        color: Colors.white.withOpacity(0.6),
+                        fontSize: 13, // Slightly smaller font
                       ),
                     ),
                   ],
@@ -124,12 +124,13 @@ class NotificationCard extends StatelessWidget {
               ),
             ],
           ),
-          SizedBox(height: 20),
+          const SizedBox(height: 14), // Reduced spacing (from 20)
+          // Issue Container
           Container(
-            padding: EdgeInsets.all(16),
+            padding: const EdgeInsets.all(12), // Reduced padding (from 16)
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.surface.withOpacity(0.4),
-              borderRadius: BorderRadius.circular(16),
+              color: const Color(0xFF162B4E), // Lighter card/container background inside deep navy card
+              borderRadius: BorderRadius.circular(12), // Slightly smaller border radius
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -138,40 +139,41 @@ class NotificationCard extends StatelessWidget {
                   children: [
                     Icon(
                       issueIcon,
-                      color: Theme.of(context).colorScheme.onSurface,
-                      size: 16,
+                      color: Colors.white,
+                      size: 14, // Reduced icon size
                     ),
-                    SizedBox(width: 8),
+                    const SizedBox(width: 6),
                     Text(
                       issueTitle,
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.onSurface,
-                        fontSize: 15,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 14, // Slightly smaller font
                         fontWeight: FontWeight.w600,
                       ),
                     ),
                   ],
                 ),
-                SizedBox(height: 8),
+                const SizedBox(height: 6),
                 Text(
                   issueDescription,
                   style: TextStyle(
-                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
-                    fontSize: 14,
+                    color: Colors.white.withOpacity(0.7),
+                    fontSize: 12, // Slightly smaller font
                     height: 1.4,
                   ),
                 ),
               ],
             ),
           ),
-          SizedBox(height: 16),
+          const SizedBox(height: 10), // Reduced spacing (from 16)
+          // Your Rights Container (Yellow/gold outline, transparent background)
           Container(
-            padding: EdgeInsets.all(16),
+            padding: const EdgeInsets.all(12), // Reduced padding (from 16)
             decoration: BoxDecoration(
               color: Colors.transparent,
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(12), // Slightly smaller border radius
               border: Border.all(
-                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.1),
+                color: const Color(0xFFFFC229).withOpacity(0.25), // Thin gold outline
               ),
             ),
             child: Column(
@@ -180,23 +182,24 @@ class NotificationCard extends StatelessWidget {
                 Text(
                   'Your Rights',
                   style: TextStyle(
-                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.54),
-                    fontSize: 12,
+                    color: Colors.white.withOpacity(0.5),
+                    fontSize: 11, // Slightly smaller font
                   ),
                 ),
-                SizedBox(height: 8),
+                const SizedBox(height: 6),
                 Text(
                   rightsDescription,
-                  style: TextStyle(
-                    color: Theme.of(context).colorScheme.onSurface,
-                    fontSize: 14,
-                    height: 1.4,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 13, // Slightly smaller font
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
               ],
             ),
           ),
-          SizedBox(height: 20),
+          const SizedBox(height: 14), // Reduced spacing (from 20)
+          // Action Buttons
           Row(
             children: [
               Expanded(
@@ -210,44 +213,44 @@ class NotificationCard extends StatelessWidget {
                     );
                   },
                   child: Container(
-                    padding: EdgeInsets.symmetric(vertical: 14),
+                    padding: const EdgeInsets.symmetric(vertical: 11), // Reduced padding (from 14)
                     decoration: BoxDecoration(
-                      color: const Color(0xFFFFC229),
-                      borderRadius: BorderRadius.circular(20),
+                      color: const Color(0xFFFFC229), // Yellow
+                      borderRadius: BorderRadius.circular(14), // Slightly smaller border radius
                     ),
                     alignment: Alignment.center,
-                    child: Text(
+                    child: const Text(
                       'Start Resolution',
                       style: TextStyle(
                         color: Colors.black,
-                        fontSize: 15,
-                        fontWeight: FontWeight.w600,
+                        fontSize: 14, // Slightly smaller font
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
                   ),
                 ),
               ),
-              SizedBox(width: 12),
+              const SizedBox(width: 8), // Reduced spacing
               Expanded(
                 flex: 1,
                 child: GestureDetector(
                   onTap: onMarkRead,
                   child: Container(
-                    padding: EdgeInsets.symmetric(vertical: 14),
+                    padding: const EdgeInsets.symmetric(vertical: 11), // Reduced padding (from 14)
                     decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.surface,
-                      borderRadius: BorderRadius.circular(20),
+                      color: const Color(0xFF101F3D), // Dark blue outline background
+                      borderRadius: BorderRadius.circular(14), // Slightly smaller border radius
                       border: Border.all(
-                        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.1),
+                        color: Colors.white.withOpacity(0.12), // Subtle light outline
                       ),
                     ),
                     alignment: Alignment.center,
-                    child: Text(
-                      onMarkRead != null ? 'Mark Read' : 'Read',
+                    child: const Text(
+                      'Details', // Text changed to match the screenshot
                       style: TextStyle(
-                        color: Theme.of(context).colorScheme.onSurface,
-                        fontSize: 15,
-                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
+                        fontSize: 14, // Slightly smaller font
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
                   ),
